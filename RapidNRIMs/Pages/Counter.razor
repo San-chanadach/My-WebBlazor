@@ -1,0 +1,137 @@
+﻿@page "/table"
+@using System.Collections.Generic
+
+<h3>Table Example</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in items)
+        {
+            <tr style="@GetRowStyle(item)" @onclick="() => HandleRowClick(item)">
+                <td>@item.ID</td>
+                <td>@item.Name</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="row mt-2" style="justify-content:center">
+    <div class="text-center">
+        @if (selectedItem != null)
+        {
+            <a href="@($"ChildComponent/PersonalDose/PersonalDoseSearch/{selectedItem.ID}")" type="button" class="btn btn-warning">Show</a>
+        }       
+        else
+        {
+            <button type="button" disabled class="btn btn-warning">Show</button>
+        }
+    </div>
+</div>
+
+@code {
+    public class Item
+    {
+        public int ID { get; set; }
+        public string Name { get; set; }
+    }
+
+    List<Item> items = new List<Item>();
+
+    protected override void OnInitialized()
+    {
+        // สร้างข้อมูลเพื่อแสดงในตาราง
+        for (int i = 1; i <= 10; i++)
+        {
+            items.Add(new Item { ID = i, Name = $"Item {i}" });
+        }
+    }
+
+    // เมธอดสำหรับกำหนดสีพื้นหลังของแถว
+    string GetRowStyle(Item item)
+    {
+        if (selectedItem != null && item.ID == selectedItem.ID)
+        {
+            return "background-color: yellow; cursor: pointer;";
+        }
+        return "cursor: pointer;";
+    }
+
+    Item selectedItem;
+
+    // เมธอดสำหรับเลือกแถว
+    void HandleRowClick(Item item)
+    {
+        selectedItem = item;
+    }
+}
+
+
+
+@* @page "/base64"
+
+<PageTitle>Base64</PageTitle>
+
+<h1>Base64</h1>
+
+@foreach (var image in images)
+{
+    <div>
+        <h5>รูปที่ @image.Index</h5>
+        <div>
+            <label for="@($"base64Image{image.Index}")">Base64 รูปภาพ:</label>
+            <input type="text" id="@($"base64Image{image.Index}")" @bind="image.Base64" />
+        </div>
+        <div>
+            <label for="@($"imageName{image.Index}")">ชื่อรูปภาพ:</label>
+            <input type="text" id="@($"imageName{image.Index}")" @bind="image.Name" />
+        </div>
+        <button class="btn btn-primary" @onclick="() => DownloadImage(image)">ดาวน์โหลด</button>
+
+        @if (!string.IsNullOrWhiteSpace(image.DownloadedImageUrl))
+        {
+            <div>
+                <h6>รูปภาพที่ดาวน์โหลด</h6>
+                <img src="@image.DownloadedImageUrl" alt="@image.Name" />
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<ImageInfo> images = new List<ImageInfo>
+    {
+        new ImageInfo { Index = 1 },
+        new ImageInfo { Index = 2 },
+        new ImageInfo { Index = 3 },
+    };
+
+    private class ImageInfo
+    {
+        public int Index { get; set; }
+        public string Base64 { get; set; }
+        public string Name { get; set; }
+        public string DownloadedImageUrl { get; set; }
+    }
+
+    private async Task DownloadImage(ImageInfo image)
+    {
+        // ตรวจสอบว่ามีข้อมูล base64 และชื่อรูปภาพหรือไม่
+        if (!string.IsNullOrWhiteSpace(image.Base64) && !string.IsNullOrWhiteSpace(image.Name))
+        {
+            // สร้างไฟล์รูปภาพจากข้อมูล base64
+            var imageData = Convert.FromBase64String(image.Base64);
+            var imagePath = Path.Combine("wwwroot/images", image.Name);
+
+            await File.WriteAllBytesAsync(imagePath, imageData);
+
+            // อัพเดต URL ของรูปภาพที่ดาวน์โหลด
+            image.DownloadedImageUrl = $"images/{image.Name}";
+        }
+    }
+} *@

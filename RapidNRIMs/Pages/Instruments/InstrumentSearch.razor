@@ -1,0 +1,737 @@
+﻿@page "/Instruments/InstrumentSearch"
+@inject IJSRuntime jsRuntime
+@inject AppData AppData
+@inject IToastService ToastService
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IConfiguration Config
+@inject IMasterData _masterData
+@inject ILocalStorageService _localstorageService
+@using System.Threading
+@using System.Globalization
+
+<PageTitle>Instrument Search Page</PageTitle>
+
+<div class="row margin-row-card">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">@AppData.LangResource[AppData.LanguageID, 12]</div>
+            <div class="card-body">
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 61]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <input type="text" @bind-value="instrument.InstrumentNumber" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,61]">
+                        </div>
+                    </div>
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 66]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <select class="form-control" @bind="instrument.InstrumentTypeID">
+                                <option selected value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                @foreach (var item in instrumentTypes)
+                                {
+                                    if (item.IsActive == true && item.IsActive != null)
+                                    {
+                                        <option value="@item.InstrumentTypeID">@item.InstrumentTypeName</option>
+                                    }
+                                }
+                            </select>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 64]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <input type="text" @bind-value="instrument.InstrumentTHName" class="form-control" name="NameThai" id="NameThai" placeholder="@AppData.LangResource[AppData.LanguageID,64]">
+                        </div>
+                    </div>
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 65]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <input type="text" @bind-value="instrument.InstrumentENName" class="form-control" name="NameEnglish" id="NameEnglish" placeholder="@AppData.LangResource[AppData.LanguageID,65]">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 62]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <input type="text" @bind-value="instrument.InstrumentAssetNumber" class="form-control" name="AssetNumber" id="AssetNumber" placeholder="@AppData.LangResource[AppData.LanguageID,62]">
+                        </div>
+                    </div>
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 63]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <input type="text" @bind-value="instrument.InstrumentSerialNumber" class="form-control" name="SerialNumber" id="SerialNumber" placeholder="@AppData.LangResource[AppData.LanguageID,63]">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 71]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <select class="form-control" @bind="instrument.InstrumentBrandID">
+                                <option selected value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                @foreach (var item in instrumentBrands)
+                                {
+                                    if (item.IsActive == true && item.IsActive != null)
+                                    {
+                                        <option value="@item.InstrumentBrandID">@item.InstrumentBrandName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 70]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <select class="form-control" @bind="instrument.InstrumentModelID">
+                                <option selected value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                @foreach (var item in instrumentModels)
+                                {
+                                    if (item.IsActive == true && item.IsActive != null)
+                                    {
+                                        if (item.InstrumentBrandID.ToString() == instrument.InstrumentBrandID)
+                                        {
+                                            <option value="@item.InstrumentModelID">@item.InstrumentModelName</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 76]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <select class="form-control" @bind="instrument.InstrumentAgencyID">
+                                <option selected value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                @foreach (var item in instrumentAgencys)
+                                {
+                                    if (item.IsActive == true && item.IsActive != null)
+                                    {
+                                        <option value="@item.InstrumentAgencyID">@item.InstrumentAgencyName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 73]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <select class="form-control" @bind="instrument.ResposibleUserID">
+                                <option selected value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                @foreach (var item in accounts)
+                                {
+                                    if (item.IsActive)
+                                    {
+                                        <option value="@item.UserID">@item.FirstName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 74]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <input type="text" @bind-value="Year" class="form-control" name="ReceiveDate" id="ReceiveDate" placeholder="@AppData.LangResource[AppData.LanguageID,74]">
+                        </div>
+                    </div>
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 30]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <select class="form-control" @bind="instrument.InstrumentLocationID">
+                                <option selected value=null>@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                @foreach (var item in instrumentLocations)
+                                {
+                                    if (item.IsActive == true && item.IsActive != null)
+                                    {
+                                        if (AppData.LanguageID == 0)
+                                        {
+                                            <option value="@item.InstrumentLocationID">@item.InstrumentLocationNameENG</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.InstrumentLocationID">@item.InstrumentLocationName</option>
+                                        }
+                                    }
+                                   
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center" style="margin-top:0.5rem;">
+                    <button type="submit" @onclick="Onsearch" class="btn" style="background-color:#2E2BFF; color:#fff" name="InstrumentSearch" id="OnsearchDoseUserAll">@AppData.LangResource[AppData.LanguageID, 48]</button>
+                    <button type="reset" @onclick="OnClear" class="btn" id="OnsearchDoseUserAll" style="background-color:#B90F1B; color:#fff">@AppData.LangResource[AppData.LanguageID, 45]</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header"><i class="fas fa-table mr-1"></i>@AppData.LangResource[AppData.LanguageID, 88]</div>
+            <div class="card-body">
+                <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height:380px;">
+                    <table id="dataTable" class="table table-bordered table-striped text-center">
+                        <thead class="fixedthead">
+                            <tr>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 93]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 89]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 90]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 91]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 92]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 71]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 70]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 30]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 415]</th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody class="scrollContent">
+                            @foreach (var item in FilteredInstrumentSearch)
+                            {
+                                <tr @onclick="() => TrClickedAtIndex(item.InstrumentID)">
+
+                                    <td data-label="@AppData.LangResource[AppData.LanguageID,93]">
+                                        <span class="@item.Status.ColorTag">
+                                            @item.Status.InstrumentStatusENName
+                                        </span>
+                                    </td>
+                                    <td data-label="@AppData.LangResource[AppData.LanguageID,89]">@item.InstrumentNumber</td>
+                                    <td data-label="@AppData.LangResource[AppData.LanguageID,90]">@item.InstrumentENName</td>
+                                    <td data-label="@AppData.LangResource[AppData.LanguageID,91]">@item.InstrumentAssetNumber</td>
+                                    <td data-label="@AppData.LangResource[AppData.LanguageID,92]">@item.InstrumentSerialNumber</td>
+                                    @if(item.Brand != null)
+                                    {
+                                        @if(item.Brand.IsActive == true && item.Brand.IsActive != null)
+                                        {
+                                            <td data-label="@AppData.LangResource[AppData.LanguageID,71]">@(item.Brand != null ? item.Brand.InstrumentBrandName:"-")</td>
+                                        }
+                                        else
+                                        {
+                                            <td>-</td>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <td>-</td>
+                                    }
+
+                                    @if(item.Model != null)
+                                    {
+                                        @if(item.Model.IsActive == true && item.Model.IsActive != null)
+                                        {
+                                            <td data-label="@AppData.LangResource[AppData.LanguageID,70]">@(item.Model != null ? item.Model.InstrumentModelName:"-") </td>
+                                        }
+                                        else
+                                        {
+                                            <td>-</td>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <td>-</td>
+                                    }
+
+                                    
+                                    @if (item.Location != null)
+                                    {
+                                        @if(item.Location.IsActive == true && item.Location.IsActive != null)
+                                        {
+                                            if (AppData.LanguageID == 0)
+                                            {
+                                                <td data-label="Location">@(item.Location != null ? item.Location.InstrumentLocationNameENG : "-")</td>
+                                            }
+                                            else
+                                            {
+                                                <td data-label="Location">@(item.Location != null ? item.Location.InstrumentLocationName : "-")</td>
+                                            }
+
+                                        }
+                                        else
+                                        {
+                                            <td>-</td>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <td>-</td>
+                                    }
+
+                                    <td data-label="@AppData.LangResource[AppData.LanguageID,56]">@item.InstrumentRegisterDate.Value.ToString("yyyy")</td>
+
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        @if (AppData.CurrentPermission.Find(i => i.permissionID == 4).permissionE || AppData.CurrentPermission.Find(i => i.permissionID == 4).permissionU)
+        {
+            <div class="text-center" style="margin-top:-1rem; margin-bottom:2rem;">
+                @if (FilteredInstrumentSearch.Count == 0 || ID == null)
+                {
+                    <button style="cursor: pointer;" disabled class="btn btn-warning" name="ShowInstrument" id="ShowInstrument">@AppData.LangResource[AppData.LanguageID, 94]</button>
+                    <button class="btn" disabled style="background-color:#404040; color:#fff">@AppData.LangResource[AppData.LanguageID, 95]</button>
+                    <button @onclick="ShowDiscard" id="OnsearchDoseUserAll" class="btn" style="background-color:#404040; color:#fff">@AppData.LangResource[AppData.LanguageID, 482]</button>
+                }
+                else
+                {
+                    <a href="@($"Instruments/ShowInstrument/{ID}")" class="btn btn-warning mr-2" name="ShowInstrument" id="ShowInstrument" style="cursor: pointer;">@AppData.LangResource[AppData.LanguageID, 94]</a>
+                    if (discardinstrument.IsActive == true)
+                    {
+                        <button class="btn mr-2" style="background-color:#404040; color:#fff" @onclick="@(() => InstrumentDiscard.Show())" >@AppData.LangResource[AppData.LanguageID, 95]</button>
+                    }
+                    else
+                    {
+                        <button disabled class="btn mr-2" style="background-color:#404040; color:#fff" name="Discard" id="Discard">@AppData.LangResource[AppData.LanguageID, 95]</button>
+                    }
+                    <button @onclick="ShowDiscard" id="OnsearchDoseUserAll" class="btn" style="background-color:#404040; color:#fff">@AppData.LangResource[AppData.LanguageID, 482]</button>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<EditForm Model="@instrumentById" OnValidSubmit="UpdateInstrumentDiscard">
+    <DataAnnotationsValidator />
+    <BSModal @ref="InstrumentDiscard">
+        <BSModalHeader OnClick="@(() => InstrumentDiscard.Hide())" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID, 119]</BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 61]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="discardinstrument.InstrumentNumber" disabled placeholder="@AppData.LangResource[AppData.LanguageID,120]" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => discardinstrument.InstrumentNumber)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 120]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputDate @bind-Value="discardinstrument.InstrumentDiscardDate" placeholder="@AppData.LangResource[AppData.LanguageID,120]" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => discardinstrument.InstrumentDiscardDate)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 121]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputSelect class="form-control" @bind-Value="discardinstrument.InstrumentDiscardByID">
+                            <option value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                            @foreach (var item in accounts)
+                            {
+                                if(item.IsActive)
+                                {
+                                    @if (item.UserID == discardinstrument.InstrumentDiscardByID)
+                                    {
+                                        <option value="@item.UserID">@item.FirstName</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item.UserID">@item.FirstName</option>
+                                    }
+                                }
+                                
+                            }
+                        </InputSelect>
+                    </div>
+                    <ValidationMessage For="@(() => discardinstrument.InstrumentDiscardByID)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 104]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="discardinstrument.InstrumentReason" placeholder="@AppData.LangResource[AppData.LanguageID,104]" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => discardinstrument.InstrumentReason)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+        </BSModalBody>
+        <BSModalFooter>
+            <button type="submit" class="btn btn-danger">@AppData.LangResource[AppData.LanguageID, 95]</button>
+            <button type="reset" class="btn btn-info"  @onclick="@(() => InstrumentDiscard.Hide())">@AppData.LangResource[AppData.LanguageID, 45]</button>
+        </BSModalFooter>
+    </BSModal>
+</EditForm>
+
+<BSModal class="row style-justify mt-5" @ref="Load" IsCentered="true" Size="Size.Small" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+    <BSModalBody>
+        <div class="text-center mt-3">
+            <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+                  style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+        </div>
+        <div class="text-center pt-3" style=" font-size: 16pt">
+            @AppData.LangResource[AppData.LanguageID, 325]
+        </div>
+    </BSModalBody>
+</BSModal>
+
+
+@code {
+
+    /// <summary>
+    /// Varliable
+    /// </summary>
+    InstrumentSearchParameter instrument = new InstrumentSearchParameter();
+
+    InstrumentListView instrumentListView = new InstrumentListView();
+
+    RecordEvent showinstrument = new RecordEvent();
+
+    Instrument discardinstrument = new Instrument()
+        {
+            InstrumentDiscardDate = DateTime.Now
+        };
+
+    string currentYear = DateTime.Now.Year.ToString();
+    string Year = "";
+
+    private List<Instrument> instruments = new List<Instrument>();
+    private List<InstrumentListView> instrumentListViews = new List<InstrumentListView>();
+    private List<Instrument> instrumentById = new List<Instrument>();
+    private List<InstrumentLocation> instrumentLocations = new List<InstrumentLocation>();
+    private List<Account> accounts = new List<Account>();
+    private List<InstrumentBrand> instrumentBrands = new List<InstrumentBrand>();
+    private List<InstrumentModel> instrumentModels = new List<InstrumentModel>();
+    private List<InstrumentAgency> instrumentAgencys = new List<InstrumentAgency>();
+    private List<InstrumentType> instrumentTypes = new List<InstrumentType>();
+    private List<InstrumentStatus> instrumentStatus = new List<InstrumentStatus>();
+
+    /// <summary>
+    /// Filtered Instrument Search
+    /// </summary>
+    List<Instrument> FilteredInstrumentSearch = new List<Instrument>();
+    /*=> instruments.Where(
+    i => i.InstrumentNumber.ToLower().Contains(instrument.InstrumentNumber.ToLower()) &&
+    i.InstrumentTHName.ToLower().Contains(instrument.InstrumentTHName.ToLower()) &&
+    i.InstrumentENName.ToLower().Contains(instrument.InstrumentENName.ToLower()) &&
+    i.InstrumentAssetNumber.ToLower().Contains(instrument.InstrumentAssetNumber.ToLower()) &&
+    i.InstrumentSerialNumber.ToLower().Contains(instrument.InstrumentSerialNumber.ToLower()) &&
+    i.InstrumentBrandID.ToString().ToLower().Contains(instrument.InstrumentBrandID.ToString().ToLower()) &&
+    i.InstrumentModelID.ToString().ToLower().Contains(instrument.InstrumentModelID.ToString().ToLower()) &&
+    i.InstrumentAgencyID.ToString().ToLower().Contains(instrument.InstrumentAgencyID.ToString().ToLower()) &&
+    i.InstrumentUserID.ToString().ToLower().Contains(instrument.InstrumentUserID.ToString().ToLower()) &&
+    i.InstrumentRegisterDate.ToString().ToLower().Contains(instrument.InstrumentRegisterDate.ToString().ToLower()) &&
+    i.InstrumentLocationID.ToString().ToLower().Contains(instrument.InstrumentLocationID.ToString().ToLower())
+    ).ToList();*/
+
+    BSModal Load { get; set; }
+    DateTime today = DateTime.Today;
+
+    /// <summary>
+    /// GetLookUp OnInitializedAsync
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        //instruments = await Http.GetFromJsonAsync<List<Instrument>>("api/GetInstrument");
+        instrumentTypes = AppData.instrumentTypes;
+        //var activeInstrumentType = instrumentTypes.Find(i => i.IsActive == true).IsActive;
+        //if(activeInstrumentType == true)
+        //    instrumentTypes = await _masterData.GetAllActiveMasterDataAsync<InstrumentType>("ActiveInstrumentType");
+
+        instrumentBrands = AppData.instrumentBrands;
+        //var activeInstrumentBrand = instrumentBrands.Find(i => i.IsActive == true).IsActive;
+        //if (activeInstrumentBrand == true)
+        //    instrumentBrands = await _masterData.GetAllActiveMasterDataAsync<InstrumentBrand>("ActiveInstrumentBrand");
+
+        instrumentAgencys = AppData.instrumentAgencies;
+        //var activeInstrumentAgencies = instrumentAgencys.Find(i => i.IsActive == true).IsActive;
+        //if(activeInstrumentAgencies == true)
+        //    instrumentAgencys = await _masterData.GetAllActiveMasterDataAsync<InstrumentAgency>("ActiveInstrumentAgencies");
+
+        instrumentModels = AppData.instrumentModels;
+        //var activeInstrumentModel = instrumentModels.Find(i => i.IsActive == true).IsActive;
+        //if(activeInstrumentModel == true)
+        //    instrumentModels = await _masterData.GetAllActiveMasterDataAsync<InstrumentModel>("ActiveInstrumentModel");
+
+        instrumentLocations = AppData.instrumentLocations;
+        //var activeInstrumentLocation = instrumentLocations.Find(i => i.IsActive == true).IsActive;
+        //if (activeInstrumentLocation == true)
+        //    instrumentLocations = await _masterData.GetAllActiveMasterDataAsync<InstrumentLocation>("ActiveInstrumentLocation");
+
+        instrumentStatus = AppData.instrumentStatus;
+
+        accounts = await Http.GetFromJsonAsync<List<Account>>($"{Config["aurl"]}/api/GetAccount");
+
+        if (AppData.LanguageID == 0)
+        {
+            var resultInstrumentType = instrumentTypes.OrderBy(t => t.InstrumentTypeName).ToList();
+            instrumentTypes = resultInstrumentType;
+            var resultInstrumentBrand = instrumentBrands.OrderBy(b => b.InstrumentBrandName).ToList();
+            instrumentBrands = resultInstrumentBrand;
+            var resultInstrumentModel = instrumentModels.OrderBy(m => m.InstrumentModelName).ToList();
+            instrumentModels = resultInstrumentModel;
+            var resultInstrumentLocationEN = instrumentLocations.OrderBy(l => l.InstrumentLocationNameENG).ToList();
+            instrumentLocations = resultInstrumentLocationEN;
+            var resultAccounts = accounts.OrderBy(r => r.FirstName).ToList();
+            accounts = resultAccounts;
+            var resultInstrumentAgency = instrumentAgencys.OrderBy(a => a.InstrumentAgencyName).ToList();
+            instrumentAgencys = resultInstrumentAgency;
+        }
+        else
+        {
+            var resultInstrumentLocationTH = instrumentLocations.OrderBy(l => l.InstrumentLocationName).ToList();
+            instrumentLocations = resultInstrumentLocationTH;
+        }
+    }
+
+    /// <summary>
+    /// On InstrumentBrandSelect
+    /// </summary>
+    public void OnInstrumentBrandSelected()
+    {
+
+        if (this.instrument.InstrumentBrandID != null && this.instrument.InstrumentBrandID != "")
+        {
+            instrumentModels = instrumentBrands.Find(i => i.InstrumentBrandID == int.Parse(instrument.InstrumentBrandID)).model;
+            if (AppData.LanguageID == 0)
+            {
+                var resultInstrumentModel = instrumentModels.OrderBy(m => m.InstrumentModelName).ToList();
+                instrumentModels = resultInstrumentModel;
+
+            }
+
+            instrument.InstrumentModelID = "";
+        }
+        else
+        {
+            instrumentModels = new List<InstrumentModel>();
+        }
+
+    }
+
+    /// <summary>
+    /// UpdateInstrumentDiscard
+    /// </summary>
+    private async Task UpdateInstrumentDiscard()
+    {
+        var upresult = await Http.PutAsJsonAsync($"{Config["nurl"]}/api/ExpireInstrument/{ID}", discardinstrument);
+
+        ToastService.ShowSuccess("Discard Instrument Save Successfully");
+        var Respond = await Http.PostAsJsonAsync<InstrumentSearchParameter>($"{Config["nurl"]}/api/GetInstrumentByParameter", instrument);
+        if (Respond.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            FilteredInstrumentSearch = await Respond.Content.ReadFromJsonAsync<List<Instrument>>();
+
+            foreach (var i in FilteredInstrumentSearch)
+            {
+                i.GetLookup(instrumentBrands, instrumentModels, instrumentAgencys, instrumentStatus, instrumentLocations);
+            }
+
+
+
+        }
+        StateHasChanged();
+        InstrumentDiscard.Hide();
+        //await OnInitializedAsync();
+    }
+
+    /// <summary>
+    /// onclick select table getbyID
+    /// </summary>
+    public int? ID { get; set; }
+    public async Task TrClickedAtIndex(int? id)
+    {
+        ID = id;
+        //instrumentById = await Http.GetFromJsonAsync<List<Instrument>>($"api/GetInstrument/{ID}");
+        try
+        {
+            var respond = await Http.GetFromJsonAsync<List<Instrument>>($"{Config["nurl"]}/api/GetInstrument/{ID}");
+            discardinstrument = respond.First();
+            discardinstrument.InstrumentDiscardDate = DateTime.Today;
+            discardinstrument.InstrumentReason = "";
+        }
+        catch (Exception e) { Console.WriteLine("" + e); }
+
+        // Console.WriteLine(ID);
+    }
+
+    /// <summary>
+    /// Instrument list is not selected
+    /// </summary>
+    private void ShowInstrumentError()
+    {
+        ToastService.ShowError("Instrument list is not selected.");
+    }
+
+    /// <summary>
+    /// ModalDiscard
+    /// </summary>
+    BSModal InstrumentDiscard { get; set; }
+
+
+    string resultInstrumentSearch;
+
+    public async void Onsearch()
+    {
+
+        try
+        {
+            ID = null;
+
+            if (Year == "" || Year == null)
+            {
+                instrument.InstrumentRegisterDate = null;
+                Console.WriteLine(instrument.InstrumentRegisterDate);
+                //ToastService.ShowSuccess("Save โดยแปลง พ.ศ เป็น ค.ศ");
+
+            }
+            else if (int.Parse(Year) >= 2443 && int.Parse(Year) <= 2983)
+            {
+                instrument.InstrumentRegisterDate = new DateTime(int.Parse(Year) - 543, 1, 1);
+                //Console.WriteLine(showinstrument.InstrumentRegisterDate);
+                //ToastService.ShowSuccess("Save โดยแปลง พ.ศ เป็น ค.ศ");
+
+            }
+            else if (int.Parse(Year) >= 1900 && int.Parse(Year) <= 2440)
+            {
+                instrument.InstrumentRegisterDate = new DateTime(int.Parse(Year), 1, 1);
+                //Console.WriteLine(showinstrument.InstrumentRegisterDate);
+                //ToastService.ShowSuccess("Save โดย เป็น ค.ศ");
+            }
+
+            Load.Show();
+            await Task.Run(Loading);
+
+            var Respond = await Http.PostAsJsonAsync<InstrumentSearchParameter>($"{Config["nurl"]}/api/GetInstrumentByParameter", instrument);
+            if (Respond.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                FilteredInstrumentSearch = await Respond.Content.ReadFromJsonAsync<List<Instrument>>();
+
+                foreach (var i in FilteredInstrumentSearch)
+                {
+                    i.GetLookup(instrumentBrands, instrumentModels, instrumentAgencys, instrumentStatus, instrumentLocations);
+                }
+
+
+
+            }
+
+            Load.Hide();
+
+            //var localstorageInstrument = await _localstorageService.GetItemAsStringAsync("InstrumentSearch");
+            //Console.WriteLine(localstorageInstrument);
+
+
+        }
+        catch (Exception e)
+        {
+
+            ToastService.ShowError("ERR" + e.Message);
+
+        }
+
+        // await _localstorageService.SetItemAsync("InstrumentSearch", FilteredInstrumentSearch);
+
+        StateHasChanged();
+
+    }
+
+
+
+    public async void ShowDiscard()
+    {
+        Load.Show();
+        try
+        {
+            ID = null;
+            FilteredInstrumentSearch = await Http.GetFromJsonAsync<List<Instrument>>($"{Config["nurl"]}/api/GetDiscardsInstrument");
+
+            foreach (var i in FilteredInstrumentSearch)
+            {
+                i.GetLookup(instrumentBrands, instrumentModels, instrumentAgencys, instrumentStatus, instrumentLocations);
+            }
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError("" + e);
+        }
+        StateHasChanged();
+        Load.Hide();
+    }
+
+    public void OnClear()
+    {
+        ID = null;
+        instrument = new InstrumentSearchParameter();
+        Year = "";
+        FilteredInstrumentSearch = new List<Instrument>();
+    }
+
+    //public async Task NavigationShowInstrument()
+    //{
+    //    Load.Show();
+    //    await Task.Run(Loading);
+    //    NavigationManager.NavigateTo($"Instrument/ShowInstrument/{ID}");
+    //    Load.Hide();
+    //}
+
+    private void Loading()
+    {
+        System.Threading.Thread.Sleep(300);
+        // Retrieve data from the server and initialize
+        // Employees property which the View will bind
+    }
+
+    /// <summary>
+    /// clearURL
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeAsync<object>("ResponsiveDataTables");
+            await jsRuntime.InvokeVoidAsync("clearURL");
+        }
+    }
+
+}

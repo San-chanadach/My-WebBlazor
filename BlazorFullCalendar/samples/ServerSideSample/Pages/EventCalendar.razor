@@ -1,0 +1,201 @@
+﻿@inherits CalendarPageBase
+
+@page "/events"
+
+<FullCalendar settings=@settings
+              @ref="calendar"
+              OnDrop="@AddEvent"
+              OnEventChange="@UpdateEvent"
+              OnEventClick="@ClickEvent" />
+
+@code {
+    public CalendarSettings settings { get; set; }
+    FullCalendar calendar;
+
+    public CalendarSourceFeed DefaultSourceFeed { get; set; }
+    public CalendarSourceFeed ProjectsSourceFeed { get; set; }
+    public CalendarSourceFeed HolidaySourceFeed { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        DefaultSourceFeed = new CalendarSourceFeed
+        {
+            Url = "/api/Events/50",
+            Method = "GET"
+        };
+
+        ProjectsSourceFeed = new CalendarSourceFeed
+        {
+            Url = "/api/EventsAllday/10",
+            Method = "GET"
+        };
+
+        var dateFormatHourMinute = new CalendarDateFormatter[] {
+            new CalendarDateFormatter
+            {
+                Hour12 = false,
+                Hour = "2-digit",
+                Minute = "2-digit",
+                Meridiem = "false"
+            }
+        };
+        var dateFormatDayMonth = new CalendarDateFormatter
+        {
+            Month = "2-digit",
+            Day = "2-digit",
+            Weekday = "short"
+        };
+
+        settings = new CalendarSettings
+        {
+            Plugins = new[] { "timeGrid", "dayGrid", "interaction" },
+            InitialView = "timeGrid2Weeks",
+            HeaderToolbar  = new CalendarHeader
+            {
+                Left = "prev,next today",
+                Center = "title",
+                Right = "timeGridDay,timeGrid4Days,timeGridWeek,timeGrid2Weeks,timeGrid4Weeks dayGridMonth,dayGridYear"
+            },
+            //refetchResourcesOnNavigate = true,
+            SlotMinTime = new CalendarDurationObject { Hour = 6 },
+            SlotMaxTime = new CalendarDurationObject { Hour = 24 },
+            EventStartEditable = true,
+            EventResizableFromStart = true,
+            EventDurationEditable = true,
+            FirstDay = 1,
+            Locale = "en",
+            //editable = true,
+            //droppable = true,
+            //drop = "BlazorFullCalendar.interop.calendarOnDrop",
+            //eventClick = "BlazorFullCalendar.interop.calendarOnEventClick",
+            //eventDrop = "BlazorFullCalendar.interop.calendarOnEventResize",
+            //eventResize = "BlazorFullCalendar.interop.calendarOnEventResize",
+            EventTimeFormat = new CalendarEventTimeFormat 
+            { 
+                Hour = "2-digit", 
+                Minute = "2-digit", Meridiem = false 
+            },
+            Views = new Dictionary<string, CalendarViewDefinition>()
+            {
+                { 
+                    "timeGrid4Days", 
+                    new CalendarViewDefinition(
+                        CalendarPluginTypes.TimeGrid,
+                        "4 Days",CalendarDurationObject.FromDays(4), 
+                        dateFormatHourMinute, 
+                        dateFormatDayMonth
+                    )
+                    { 
+                        AllDaySlot=true, 
+                        AllDayText="Projects"
+                    }
+                },
+                { 
+                    "timeGridDay", 
+                    new CalendarViewDefinition(
+                        CalendarPluginTypes.TimeGrid, 
+                        "1 Day", 
+                        CalendarDurationObject.FromDays(1), 
+                        dateFormatHourMinute, 
+                        dateFormatDayMonth
+                    ) 
+                    { 
+                        AllDaySlot=true, 
+                        AllDayText="Projects"
+                    }
+                },
+                { 
+                    "timeGridWeek", 
+                    new CalendarViewDefinition(
+                        CalendarPluginTypes.TimeGrid, 
+                        "Week", 
+                        CalendarDurationObject.FromWeeks(1),
+                        dateFormatHourMinute, 
+                        dateFormatDayMonth
+                    ) 
+                    { 
+                        AllDaySlot=true, 
+                        AllDayText="Projects"
+                    }
+                },
+                { 
+                    "timeGrid2Weeks", 
+                    new CalendarViewDefinition(
+                        CalendarPluginTypes.TimeGrid,
+                        "2 Weeks", 
+                        CalendarDurationObject.FromWeeks(2),
+                        dateFormatHourMinute, 
+                        dateFormatDayMonth
+                        ) 
+                        { 
+                            AllDaySlot=true, 
+                            AllDayText="Projects"
+                        }
+                    },
+                { 
+                    "timeGrid4Weeks", 
+                    new CalendarViewDefinition(
+                        CalendarPluginTypes.TimeGrid, 
+                        "4 Weeks", 
+                        CalendarDurationObject.FromWeeks(4), 
+                        dateFormatHourMinute, 
+                        dateFormatDayMonth
+                    ) 
+                    { 
+                        AllDaySlot=true, 
+                        AllDayText="Projects"
+                    }
+                },
+                { 
+                    "dayGridMonth", 
+                    new CalendarViewDefinition(
+                        CalendarPluginTypes.DayGrid,
+                        "Month", 
+                        CalendarDurationObject.FromMonths(1)
+                    )
+                },
+                { 
+                    "dayGridYear",
+                    new CalendarViewDefinition(
+                        CalendarPluginTypes.DayGrid,
+                        "Year", 
+                        CalendarDurationObject.FromYears(1)
+                    )
+                },
+            },
+            EventSources = new List<CalendarSourceFeed>()
+            {
+                DefaultSourceFeed, ProjectsSourceFeed
+            },
+        };
+    }
+
+
+    protected async Task AddEvent(CalendarEventChangeResponse response)
+    {
+        Console.WriteLine("AddEvent callback");
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+
+    protected async Task UpdateEvent(CalendarEventChangeResponse response)
+    {
+        Console.WriteLine("UpdateEvent callback");
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+
+    protected async Task ClickEvent(CalendarEventChangeResponse response)
+    {
+        Console.WriteLine("ClickEvent callback");
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+
+    protected async Task Change(object args, string field = "")
+    {
+        Console.WriteLine("Change callback");
+        await calendar.CalendarRefetchEvents();
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+}

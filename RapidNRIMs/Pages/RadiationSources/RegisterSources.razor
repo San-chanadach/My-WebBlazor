@@ -1,0 +1,1417 @@
+﻿@page "/RadiationSources/RegisterSources"
+@inject IJSRuntime jsRuntime
+@inject NavigationManager NavigationManager
+@inject AppData AppData
+@inject IRadiationSourceTypeService RadiationSourceTypeService
+@inject IToastService ToastService
+@inject HttpClient Http
+@inject IPrintingService PrintingService
+@inject IMasterData _masterData
+@inject IConfiguration Config
+@using System.Threading
+@using System.Text
+@inject ImageService _imageService
+<PageTitle>Register Source Page</PageTitle>
+
+<EditForm Model="@radiationSource" OnValidSubmit="@PostRegisterRadiationSource">
+    <!--DataAnnotationsValidator/-->
+    <div class="row margin-row-card">
+        <div class="col-md-12">
+            <div class="card">
+                @if (radiationSource.RadiationSourceID != 0)
+                {
+                    <div class="card-header">@AppData.LangResource[AppData.LanguageID, 279] : @radiationSource.RadiationSourceNumber </div>
+                }
+                else
+                {
+                    <div class="card-header">@AppData.LangResource[AppData.LanguageID, 221]</div>
+                }
+
+                <div class="card-body">
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 123]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <input type="text" class="form-control" @onkeydown="OnTest"  @bind-value="radiationSource.RadiationSourceNuclide" placeholder="@AppData.LangResource[AppData.LanguageID,123]" />
+                                <!--input type="text" list="txtSearch" class="form-control" /--->
+                                <!--datalist id="txtSearch">
+                                    @foreach (var item in AppData.radiationSourceTypes)
+                                    {
+                                        <option>@item.RadiationSourceTypeName</option>
+                                    }
+                                </!--datalist--->
+                            </div>
+                            <!--ValidationMessage For="@(() => radiationSource.RadiationSourceNuclide)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" /-->
+                        </div>
+                        <label class="col-12 col-md-4 col-lg-1 col-form-label-ins margin-label-ins">
+                            <span class="txt-span-ins">@AppData.LangResource[AppData.LanguageID, 125]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom input-box-ins">
+                                <select class="form-control" @bind="radiationSource.RadiationSourceTypeID">
+                                    <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                    @foreach (var item in AppData.radiationSourceTypes)
+                                    {
+                                        if (item.IsActive == true && item.IsActive != null)
+                                        {
+                                            <option value="@item.RadiationSourceTypeID">@item.RadiationSourceTypeName</option>
+                                        }
+                                    }
+                                </select>
+                                <span class="span-btn-sourceType">
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 13).permissionE)
+                                    {
+                                        <!--button type="button" @onclick="@(() => AddSourceType.Show())" class="btn btn-warning margin-btn">
+                                            <i class="fas fa-plus"></i>
+                                        </button-->
+                                    }
+                                </span>
+                            </div>
+                            <!--ValidationMessage For="@(() => radiationSource.RadiationSourceTypeID)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" /-->
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <label class="col-12 col-md-3 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID,528]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-2">
+                            <div class="input-group input-box-bottom">
+                                <!--input type="text" @bind-value="radiationSource.RadiationSourceActivityDetail" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,124]" /--->
+                                <InputNumber @bind-Value="radiationSource.InitialActivity" class="form-control" min="0" placeholder="@AppData.LangResource[AppData.LanguageID,528]" />
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-1 col-lg-1">
+                            <div class="input-group input-box-bottom">
+                                <select class="form-control" @bind="radiationSource.RadioActivityUnitID">
+                                    @foreach (var item in AppData.radiationSourceUnits)
+                                    {
+                                        if (item.IsActive == true && item.IsActive != null)
+                                        {
+                                            <option value="@item.RadiationSourceUnitID">@item.RadiationSourceUnitName</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <label class="col-12 col-md-3 col-lg-1 col-form-label-ins margin-label-ins">
+                            <span class="txt-span-ins">@AppData.LangResource[AppData.LanguageID, 435]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-2">
+                            <div class="input-group input-box-bottom input-box-ins">
+                                <input type="text" @bind-value="radiationSource.RadiationSourceDoseRate" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,435]" />
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-1 col-lg-1">
+                            <div class="input-group input-box-bottom">
+                                <select class="form-control" @bind="radiationSource.RadiationDoseUnitID">
+                                    @foreach (var item in AppData.radiationDoseUnits)
+                                    {
+                                        if (item.IsActive == true && item.IsActive != null)
+                                        {
+                                            <option value="@item.RadiationDoseUnitID">@item.RadiationDoseUnitSymbol</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 126]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom" id='datetimepicker1'>
+                                <InputDate @bind-Value="radiationSource.RadiationSourceManufacturedDate" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,126]" />
+                            </div>
+                            <!--ValidationMessage For="@(() => radiationSource.RadiationSourceManufacturedDate)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" /-->
+                        </div>
+                        <label class="col-12 col-md-4 col-lg-1 col-form-label-ins margin-label-ins">
+                            <span class="txt-span-ins">@AppData.LangResource[AppData.LanguageID, 112]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom input-box-ins">
+                                <InputDate @bind-Value="radiationSource.RadiationSourcePurchaseDate" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,112]" />
+                            </div>
+                            <!--ValidationMessage For="@(() => radiationSource.RadiationSourcePurchaseDate)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" /-->
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 128]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <!--input type="number" @bind-value="radiationSource.RadiationSourceHalflife" class="form-control" min="0" placeholder="@AppData.LangResource[AppData.LanguageID,128]" /-->
+                                <InputNumber @bind-Value="radiationSource.Halflife" class="form-control" min="0" placeholder="@AppData.LangResource[AppData.LanguageID,128]" />
+                            </div>
+                        </div>
+                        <label class="col-12 col-md-4 col-lg-1 col-form-label-ins margin-label-ins">
+                            <span class="txt-span-ins">@AppData.LangResource[AppData.LanguageID, 63]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom input-box-ins">
+                                <InputText @bind-Value="radiationSource.RadiationSourceSerial" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,63]" />
+                            </div>
+                            <!--ValidationMessage For="@(() => radiationSource.RadiationSourceSerial)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" /-->
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 30]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <InputSelect class="form-control" @bind-Value="radiationSource.RadiationSourceLocation">
+                                    <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                    @foreach (var item in AppData.radiationSourceLocations)
+                                    {
+                                        if (item.IsActive == true && item.IsActive != null)
+                                        {
+                                            @if (AppData.LanguageID == 0)
+                                            {
+                                                <option value="@item.RadiationSourceLocationID">@item.RadiationSourceLocationENName</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.RadiationSourceLocationID">@item.RadiationSourceLocationTHName</option>
+                                            }
+                                        }
+                                    }
+                                </InputSelect>
+                                <span class="span-btn-location">
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 13).permissionE)
+                                    {
+                                        <!--button type="button" @onclick="@(() => AddSourceLocation.Show())" class="btn btn-warning margin-btn">
+                                            <i class="fas fa-plus"></i>
+                                        </button-->
+                                    }
+                                </span>
+                            </div>
+                            <!--ValidationMessage For="@(() => radiationSource.RadiationSourceLocation)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" /-->
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 110]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <InputNumber @bind-Value="radiationSource.RadiationSourceQuantity" min="0" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,110]" />
+                            </div>
+                            <!--ValidationMessage For="@(() => radiationSource.RadiationSourceQuantity)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" /-->
+                        </div>
+                        <label class="col-12 col-md-4 col-lg-1 col-form-label-ins margin-label-ins">
+                            <span class="txt-span-ins">@AppData.LangResource[AppData.LanguageID, 111]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom input-box-ins">
+                                <InputNumber step=".01" @bind-Value="radiationSource.RadiationSourcePrice" min="0" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,111]" />
+                            </div>
+                            <!--ValidationMessage For="@(() => radiationSource.RadiationSourcePrice)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" /-->
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 295]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+
+                                <InputFile OnChange="@OnInputFileDocumentChange" class="custom-file-input file-name-custom clearFileName" id="documentfile" />
+                                @if (AppData.LanguageID == 0)
+                                {
+                                    <label class="custom-file-label" id="documentfile" for="documentfile" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                                }
+                                else
+                                {
+                                    <label class="custom-file-label" id="documentfile" for="documentfile" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                                }
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 296]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <InputFile OnChange="@OnInputFileDefaultChange" class="custom-file-input file-name-custom" id="pictureDefault" />
+                                @if (AppData.LanguageID == 0)
+                                {
+                                    <label class="custom-file-label" for="pictureDefault" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                                }
+                                else
+                                {
+                                    <label class="custom-file-label" for="pictureDefault" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                                }
+                            </div>
+
+                        </div>
+                        <label for="user" class="col-12 col-md-4 col-lg-1 col-form-label-ins margin-label-ins">
+                            <span class="txt-span-ins">@AppData.LangResource[AppData.LanguageID, 73]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom input-box-ins">
+                                <InputSelect class="form-control" @bind-Value="userID">
+                                    <option value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                    @foreach (var item in accounts)
+                                    {
+                                        if (item.IsActive)
+                                        {
+                                            <option value="@item.UserID">@item.FirstName</option>
+                                        }
+                                    }
+                                </InputSelect>
+                                <span class="span-btn-addresposible">
+                                    @if (userID != null)
+                                    {
+                                        <button type="button" @onclick="@(() =>
+                                        {
+                                            var existingUser = radiationSource.Resposible.Any(r => r.UserID == userID);
+                                            if (!existingUser)
+                                            {
+                                                radiationSource.Resposible.Add(new RadiationSourceResposibleUser
+                                                {
+                                                    UserID = userID,
+                                                    resposibleUserName = accounts.Find(i => i.UserID == userID).FirstName
+                                                });
+                                                // เคลียร์ค่าของ resposibleUserName
+                                                 userID = null;
+                                            }
+                                            else
+                                            {
+                                                 ToastService.ShowError("Team Add Duplicatie");
+                                            }
+
+                                            
+                                        })"
+                                                class="btn btn-warning">
+                                            @AppData.LangResource[AppData.LanguageID, 419]
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" class="btn btn-warning" @onclick="PleaseSelect">
+                                            @AppData.LangResource[AppData.LanguageID, 419]
+                                        </button>
+                                    }
+                                    @* <button type="button" @onclick="@(() => radiationSource.Resposible.Add( new RadiationSourceResposibleUser { UserID = userid.UserID, resposibleUserName = accounts.Find(i=>i.UserID==userid.UserID).FirstName }))" class="btn btn-warning ">
+                                        @AppData.LangResource[AppData.LanguageID, 419]
+                                    </button> *@
+
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span></span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                @if (radiationSource.RadiationSourcePictureDefault != "")
+                                {
+                                    <div class="card shadow-lg" style="width:30rem;">
+                                        <div class="card-body">
+                                           @if (!string.IsNullOrEmpty(ImageShow))
+                                            {
+                                                <a href="@("data:image/png;base64,"+ImageShow+"")" data-lightbox="gallery" data-title="@AppData.LangResource[AppData.LanguageID, 296]">
+                                                    <img class="img-show float-left m-2" src="@("data:image/png;base64,"+ImageShow+"")" />
+                                                </a>
+
+                                            }
+                                            else
+                                            {
+                                                <a href="@($"{Config["nurl"]}{Config["nurlFileRadiationSource"]}{radiationSource.RadiationSourcePictureDefault}")" data-lightbox="gallery" data-title="@AppData.LangResource[AppData.LanguageID, 296]">
+                                                    <img class="img-show float-left m-2" src="@($"{Config["nurl"]}{Config["nurlFileRadiationSource"]}{radiationSource.RadiationSourcePictureDefault}")" />
+                                                </a>
+
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <img class="img-show float-left" src="assets/images/no-img/ImageNotFount.png">
+                                }
+                            </div>
+                        </div>
+                        <label class="col-12 col-md-4 col-lg-1 col-form-label-ins margin-label-ins">
+                            <span></span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="table-responsive fixTableHead scroll-inner scrollBar-x  margin-bottom">
+                                <table class="table table-striped text-center">
+                                    <thead class="fixedthead">
+                                        <tr>
+                                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 420]</th>
+                                            <th class="alternateRow"> - </th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody class="scrollContent">
+                                        @foreach (var item in radiationSource.Resposible)
+                                        {
+                                            <tr>
+                                                <td> @item.resposibleUserName</td>
+                                                <td class="badge badge-pill badge-danger" @onclick="@(()=> radiationSource.Resposible.Remove(@item))">@AppData.LangResource[AppData.LanguageID, 421]</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 298]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <InputFile OnChange="@OnInputFileLeftChange" class="custom-file-input file-name-custom" id="pictureLeft" />
+                                @if (AppData.LanguageID == 0)
+                                {
+                                    <label class="custom-file-label" for="pictureLeft" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                                }
+                                else
+                                {
+                                    <label class="custom-file-label" for="pictureLeft" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                                }
+                            </div>
+                        </div>
+                        <label class="col-12 col-md-4 col-lg-1 col-form-label-ins margin-label-ins">
+                            <span class="txt-span-ins">@AppData.LangResource[AppData.LanguageID, 299]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom input-box-ins">
+                                <InputFile OnChange="e => OnInputFileRightChange(e)" class="custom-file-input file-name-custom" id="pictureRight" />
+                                @if (AppData.LanguageID == 0)
+                                {
+                                    <label class="custom-file-label" for="pictureRight" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                                }
+                                else
+                                {
+                                    <label class="custom-file-label" for="pictureRight" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span></span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                @if (radiationSource.RadiationSourcePictureLeft != "")
+                                {
+                                    <div class="card shadow-lg" style="width:30rem;">
+                                        <div class="card-body">
+                                            @if (!string.IsNullOrEmpty(ImageLeftShow))
+                                            {
+                                                <a href="@("data:image/png;base64,"+ImageLeftShow+"")" data-lightbox="gallery" data-title="@AppData.LangResource[AppData.LanguageID, 298]">
+                                                    <img class="img-show float-left m-2" src="@("data:image/png;base64,"+ImageLeftShow+"")" />
+                                                </a>
+
+                                            }
+                                            else
+                                            {
+                                                <a href="@($"{Config["nurl"]}{Config["nurlFileRadiationSource"]}{radiationSource.RadiationSourcePictureLeft}")" data-lightbox="gallery" data-title="@AppData.LangResource[AppData.LanguageID, 298]">
+                                                    <img class="img-show float-left m-2" src="@($"{Config["nurl"]}{Config["nurlFileRadiationSource"]}{radiationSource.RadiationSourcePictureLeft}")" />
+                                                </a>
+
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <img class="img-show float-left" src="assets/images/no-img/ImageNotFount.png">
+                                }
+
+                            </div>
+                        </div>
+                        <label class="col-12 col-md-4 col-lg-1 col-form-label-ins margin-label-ins">
+                            <span></span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom input-box-ins">
+                                @if (radiationSource.RadiationSourcePictureRight != "")
+                                {
+                                    <div class="card shadow-lg" style="width:30rem;">
+                                        <div class="card-body">
+                                            @if (!string.IsNullOrEmpty(ImageRightShow))
+                                            {
+                                                <a href="@("data:image/png;base64,"+ImageRightShow+"")" data-lightbox="gallery" data-title="@AppData.LangResource[AppData.LanguageID, 299]">
+                                                    <img class="img-show float-left m-2" src="@("data:image/png;base64,"+ImageRightShow+"")" />
+                                                </a>
+
+                                            }
+                                            else
+                                            {
+                                                <a href="@($"{Config["nurl"]}{Config["nurlFileRadiationSource"]}{radiationSource.RadiationSourcePictureRight}")" data-lightbox="gallery" data-title="@AppData.LangResource[AppData.LanguageID, 299]">
+                                                    <img class="img-show float-left m-2" src="@($"{Config["nurl"]}{Config["nurlFileRadiationSource"]}{radiationSource.RadiationSourcePictureRight}")" />
+                                                </a>
+
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <img class="img-show float-left" src="assets/images/no-img/ImageNotFount.png">
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 37]</span>
+                        </label>
+                        <div class="col-12 col-md-12 col-lg-8 input-box-bottom">
+                            <InputTextArea @bind-Value="radiationSource.RadiationSourceDetail" rows="2" placeholder="@AppData.LangResource[AppData.LanguageID,37]" class="form-control"></InputTextArea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+    <div class="row margin-row-card">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">@AppData.LangResource[AppData.LanguageID, 76]</div>
+                <div class="card-body">
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 77]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                             <div class="input-group input-box-bottom">
+                                <InputSelect class="form-control" @bind-Value="radiationSource.RadiationSourceAgencyID">
+                                    <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                    @foreach (var item in AppData.radiationSourceAgencies)
+                                    {
+                                        if (item.IsActive == true && item.IsActive != null)
+                                        {
+                                            <option value="@item.RadiationSourceAgencyID">@item.RadiationSourceAgencyName</option>
+                                        }
+                                    }
+                                </InputSelect>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="address" class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 39]</span>
+                        </label>
+                         <div class="col-12 col-md-12 col-lg-8 input-box-bottom">
+                            @if (radiationSource.RadiationSourceAgencyID > 0)
+                            {
+                                <InputTextArea disabled @bind-Value="AppData.radiationSourceAgencies.Find(i => i.RadiationSourceAgencyID == radiationSource.RadiationSourceAgencyID).RadiationSourceAgencyAddress" rows="2" placeholder="@AppData.LangResource[AppData.LanguageID,39]" class="form-control" />
+                            }
+                            else
+                            {
+                                <InputTextArea disabled @bind-Value="radiationSourceAgency.RadiationSourceAgencyAddress" rows="2" placeholder="@AppData.LangResource[AppData.LanguageID,39]" class="form-control" />
+                            }
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="tel" class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 78]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                @if (radiationSource.RadiationSourceAgencyID > 0)
+                                {
+                                    <InputText disabled maxlength="10" @bind-Value="AppData.radiationSourceAgencies.Find(b => b.RadiationSourceAgencyID == radiationSource.RadiationSourceAgencyID).RadiationSourceAgencyTel" id="tel" placeholder="@AppData.LangResource[AppData.LanguageID,78]" class="form-control" />
+                                }
+                                else
+                                {
+                                    <InputText disabled maxlength="10" @bind-Value="radiationSourceAgency.RadiationSourceAgencyTel" id="tel" placeholder="@AppData.LangResource[AppData.LanguageID,78]" class="form-control" />
+                                }
+
+                            </div>
+                        </div>
+                        <label for="email" class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 79]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                             <div class="input-group input-box-bottom">
+                                @if (radiationSource.RadiationSourceAgencyID > 0)
+                                {
+                                    <InputText disabled @bind-Value="AppData.radiationSourceAgencies.Find(b => b.RadiationSourceAgencyID == radiationSource.RadiationSourceAgencyID).RadiationSourceAgencyEmail" placeholder="@AppData.LangResource[AppData.LanguageID,79]" class="form-control" />
+                                }
+                                else
+                                {
+                                    <InputText disabled @bind-Value="radiationSourceAgency.RadiationSourceAgencyEmail" placeholder="@AppData.LangResource[AppData.LanguageID,79]" class="form-control" />
+                                }
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                @if (radiationSource.RadiationSourceID != 0 && AppData.CurrentPermission.Find(i => i.permissionID == 13).permissionE)
+                {
+                    <button type="button" @onclick="BarcodeQRGeneratre" class="btn btn-warning margin-btn" name="PrintBarcode" id="PrintBarcode">@AppData.LangResource[AppData.LanguageID, 87]</button>
+                }
+
+                @if (radiationSource.RadiationSourceNuclide != "" && radiationSource.RadiationSourceTypeID != null && radiationSource.InitialActivity != null && radiationSource.RadiationSourceDoseRate != "" && radiationSource.Halflife != null && AppData.CurrentPermission.Find(i => i.permissionID == 13).permissionC)
+                {
+                    <button type="submit" class="btn margin-btn" style="background-color:#4CBB17; color:#fff">@AppData.LangResource[AppData.LanguageID, 44]</button>
+                }
+                else
+                {
+                    <button type="button" disabled class="btn margin-btn" style="background-color:#4CBB17; color:#fff">@AppData.LangResource[AppData.LanguageID, 44]</button>
+                }
+                <button type="reset" @onclick="OnClear" class="btn margin-btn" style="background-color:#B90F1B; color:#fff">@AppData.LangResource[AppData.LanguageID, 45]</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+<EditForm Model="@radiationSourceType" OnValidSubmit="PostRadiationSourceType">
+    <!--<DataAnnotationsValidator />-->
+    <BSModal @ref="AddSourceType">
+        <BSModalHeader OnClick="@(() => AddSourceType.Hide())" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID, 205]</BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 206]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="radiationSourceType.RadiationSourceTypeName" placeholder="@AppData.LangResource[AppData.LanguageID,206]" class="form-control" />
+                    </div>
+
+                    <ValidationMessage For="@(() => radiationSourceType.RadiationSourceTypeName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+
+                </div>
+
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 207]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputTextArea @bind-Value="radiationSourceType.RadiationSourceTypeDescription" rows="2" placeholder="@AppData.LangResource[AppData.LanguageID,207]" class="form-control" />
+                    </div>
+
+                    <ValidationMessage For="@(() => radiationSourceType.RadiationSourceTypeDescription)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+
+                </div>
+
+            </div>
+        </BSModalBody>
+        <BSModalFooter>
+            <button type="submit" class="btn" style="background-color:#4CBB17; color:#fff">@AppData.LangResource[AppData.LanguageID, 44]</button>
+            <button type="reset" class="btn" style="background-color:#B90F1B; color:#fff" @onclick="@(() => AddSourceType.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+        </BSModalFooter>
+    </BSModal>
+</EditForm>
+
+<EditForm Model="@radiationSourceLocation" OnValidSubmit="PostRadiationSourceLocation">
+    <!--<DataAnnotationsValidator />--->
+    <BSModal @ref="AddSourceLocation">
+        <BSModalHeader OnClick="@(() => AddSourceLocation.Hide())" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID, 211]</BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 212]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="radiationSourceLocation.RadiationSourceLocationTHName" placeholder="@AppData.LangResource[AppData.LanguageID,212]" class="form-control" />
+                    </div>
+
+                    <ValidationMessage For="@(() => radiationSourceLocation.RadiationSourceLocationTHName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+
+                </div>
+
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 213]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="radiationSourceLocation.RadiationSourceLocationENName" placeholder="@AppData.LangResource[AppData.LanguageID,213]" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => radiationSourceLocation.RadiationSourceLocationENName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+        </BSModalBody>
+        <BSModalFooter>
+            <button type="submit" class="btn btn-warning">@AppData.LangResource[AppData.LanguageID, 44]</button>
+            <button type="reset" class="btn btn-warning" @onclick="@(() => AddSourceLocation.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+        </BSModalFooter>
+    </BSModal>
+</EditForm>
+
+<BSModal class="row style-justify mt-5" @ref="Load" IsCentered="true" Size="Size.Small" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+    <BSModalBody>
+        <div class="text-center mt-3">
+            <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+                  style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+        </div>
+        <div class="text-center pt-3" style=" font-size: 16pt">
+            @AppData.LangResource[AppData.LanguageID, 325]
+        </div>
+    </BSModalBody>
+</BSModal>
+
+@code {
+
+    private List<RadiationSourceLocation> radiationSourceLocations = new List<RadiationSourceLocation>();
+    private List<RadiationSourceType> radiationSourceTypes = new List<RadiationSourceType>();
+    private List<RadiationSourceAgency> radiationSourceAgencies = new List<RadiationSourceAgency>();
+    RadiationSourceLocation radiationSourceLocation = new RadiationSourceLocation();
+    RadiationSource radiationSource = new RadiationSource();
+    RadiationSourceType radiationSourceType = new RadiationSourceType();
+    RadiationSourceAgency radiationSourceAgency = new RadiationSourceAgency();
+    Account userid = new Account();
+    private List<Account> accounts = new List<Account>();
+    Guid? userID;//กำหนดค่าให้เป็น null ป้องกันไม่ให้ขึ้น reload
+
+    [Parameter]
+    public string BindingValue { get; set; }
+
+    public void OnTest(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            if  (radiationSource.RadiationSourceNuclide == "5")
+            {
+
+                radiationSource.RadiationSourceHalflife = 90;
+            }
+            else
+            {
+                radiationSource.RadiationSourceHalflife = 30;
+
+            }
+        }
+
+
+    }
+
+
+    private void PleaseSelect()
+    {
+        ToastService.ShowError("Please select a Resposible User");
+    }
+
+    /// <summary>
+    /// PostRegisterRadiationSource
+    /// </summary>
+    // private async Task PostRegisterRadiationSource()
+    // {
+    //     await Task.Run(Loading);
+    //     Load.Show();
+    //     try
+    //     {
+    //         if (radiationSource.RadiationSourceUserID == null)
+    //         {
+    //             radiationSource.RadiationSourceUserID = new Guid("00000000-0000-0000-0000-000000000000");
+    //         }
+
+
+    //         userID = userid.UserID;
+    //         var response = await Http.PostAsJsonAsync($"{Config["nurl"]}/api/RegisterRadiationSource", radiationSource);
+    //         List<RadiationSource> article = await response.Content.ReadFromJsonAsync<List<RadiationSource>>();
+    //         if (response.StatusCode == System.Net.HttpStatusCode.OK)
+    //         {
+    //             this.radiationSource.RadiationSourceID = article.First().RadiationSourceID;
+    //             this.radiationSource.RadiationSourceNumber = article.First().RadiationSourceNumber;
+    //             Console.WriteLine(article);
+
+    //             foreach (var item in radiationSource.Resposible)
+    //             {
+
+    //                 item.radiationSourceID = radiationSource.RadiationSourceID;
+    //                 var r = await Http.PostAsJsonAsync($"{Config["nurl"]}/api/RadiationSourceResposibleUser", item);
+
+    //             }
+    //             await FileDocument();
+    //             await ImageDefaultFile();
+    //             await ImageLeftFile();
+    //             await ImageRightFile();
+
+    //             ToastService.ShowSuccess("Successfully RadiationSource");
+    //             //userID = null;
+    //         }
+    //         else
+    //         {
+    //             ToastService.ShowError("Error Please Contract System Administrator");
+    //         }
+
+    //         this.radiationSource = article.First();
+    //         userID = null;
+
+
+
+    //         //NavigationManager.NavigateTo("RadiationSources/SourcesSearch");
+    //     }
+    //     catch(Exception e)
+    //     {
+    //         ToastService.ShowError($"Error {e.Message}");
+    //     }
+    //     Load.Hide();
+
+
+    // }
+
+    private async Task PostRegisterRadiationSource()
+    {
+        await Task.Run(Loading);
+        Load.Show();
+        try
+        {
+            if(radiationSource.RadiationSourceManufacturedDate > DateTime.Now.Date)
+            {
+                ToastService.ShowError("Do not enter a future manufacture date.");
+            }
+            else
+            {
+
+                if (radiationSource.RadiationSourceUserID == null)
+                {
+                    radiationSource.RadiationSourceUserID = new Guid("00000000-0000-0000-0000-000000000000");
+                }
+
+                userID = userid.UserID;
+                //Console.WriteLine(JsonSerializer.Serialize(radiationSource)); // ตรวจสอบ radiationSource
+
+                var response = await Http.PostAsJsonAsync($"{Config["nurl"]}/api/RegisterRadiationSource", radiationSource);
+                var responseContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(responseContent); // ตรวจสอบ response content
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var article = await response.Content.ReadFromJsonAsync<List<RadiationSource>>();
+
+                    if (article != null && article.Any())
+                    {
+                        this.radiationSource.RadiationSourceID = article.First().RadiationSourceID;
+                        this.radiationSource.RadiationSourceNumber = article.First().RadiationSourceNumber;
+
+                        foreach (var item in radiationSource.Resposible)
+                        {
+                            item.radiationSourceID = radiationSource.RadiationSourceID;
+                            var r = await Http.PostAsJsonAsync($"{Config["nurl"]}/api/RadiationSourceResposibleUser", item);
+                        }
+
+                        await FileDocument();
+                        await ImageDefaultFile();
+                        await ImageLeftFile();
+                        await ImageRightFile();
+
+                        ToastService.ShowSuccess("Successfully RadiationSource");
+
+                    }
+                    else
+                    {
+                        ToastService.ShowError("No RadiationSource data returned from the server.");
+                    }
+
+                    this.radiationSource = article.First();
+                    userID = null;
+                }
+                else
+                {
+                    Console.WriteLine($"Error: {response.ReasonPhrase}");
+                    ToastService.ShowError("Error Please Contract System Administrator");
+                }
+            }
+
+        }
+        catch(Exception e)
+        {
+            ToastService.ShowSuccess($"Error {e.Message}");
+        }
+        
+
+        Load.Hide();
+        // NavigationManager.NavigateTo("RadiationSources/SourcesSearch");
+    }
+
+
+
+    public void OnClear()
+    {
+        radiationSource = new RadiationSource();
+        userid = new Account();
+        radiationSource.Resposible = new List<RadiationSourceResposibleUser>();
+    }
+
+    /// <summary>
+    /// PostRadiationSourceLocation
+    /// </summary>
+    private async Task PostRadiationSourceLocation()
+    {
+        var res  = await Http.PostAsJsonAsync($"{Config["nurl"]}/api/RegisterRadiationSourceLocation", radiationSourceLocation);
+        ToastService.ShowSuccess("Successfully CheckInLocation");
+        List<RadiationSourceLocation> l = await res.Content.ReadFromJsonAsync<List<RadiationSourceLocation>>();
+        AppData.radiationSourceLocations.AddRange(l);
+        radiationSourceLocations = AppData.radiationSourceLocations;
+        radiationSource.RadiationSourceLocation = l.First().RadiationSourceLocationID;
+        AddSourceLocation.Hide();
+        await OnInitializedAsync();
+    }
+
+    /// <summary>
+    /// PostRadiationSourceType
+    /// </summary>
+    private async Task PostRadiationSourceType()
+    {
+        var res  = await Http.PostAsJsonAsync($"{Config["nurl"]}/api/RegisterRadiationSourceType", radiationSourceType);
+        ToastService.ShowSuccess("Successfully added RadiationSourceType");
+        List<RadiationSourceType> l = await res.Content.ReadFromJsonAsync<List<RadiationSourceType>>();
+        AppData.radiationSourceTypes.AddRange(l);
+        radiationSourceTypes = AppData.radiationSourceTypes;
+        radiationSource.RadiationSourceTypeID = l.First().RadiationSourceTypeID;
+        AddSourceType.Hide();
+        await OnInitializedAsync();
+    }
+
+    /// <summary>
+    /// OnInitializedAsync
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        //radiationSourceTypes = AppData.radiationSourceTypes;
+        //var activeRadiationSourceTypes = radiationSourceTypes.Find(r => r.IsActive == true).IsActive;
+        //if (activeRadiationSourceTypes == true)
+        //    radiationSourceTypes = await _masterData.GetAllActiveMasterDataAsync<RadiationSourceType>("ActiveRadiationSourceTypes");
+
+        //radiationSourceLocations = AppData.radiationSourceLocations;
+        //var activeRadiationSourceLocations = radiationSourceLocations.Find(r => r.IsActive.Value ).IsActive;
+        //if (activeRadiationSourceLocations == true)
+        //    radiationSourceLocations = await _masterData.GetAllActiveMasterDataAsync<RadiationSourceLocation>("ActiveRadiationSourceLocations");
+
+        //OnTest();
+
+        accounts = await Http.GetFromJsonAsync<List<Account>>($"{Config["aurl"]}/api/GetAccount");
+
+        if  (AppData.LanguageID == 0)
+        {
+            var resultRadiationSourceTypes = AppData.radiationSourceTypes.OrderBy(rt => rt.RadiationSourceTypeName).ToList();
+            AppData.radiationSourceTypes = resultRadiationSourceTypes;
+            var resultRadiationSourceLocationEN = AppData.radiationSourceLocations.OrderBy(rl => rl.RadiationSourceLocationENName).ToList();
+            AppData.radiationSourceLocations = resultRadiationSourceLocationEN;
+            var resultAccount = accounts.OrderBy(a => a.FirstName).ToList();
+            accounts = resultAccount;
+            var resultRadiationSourceAgency = AppData.radiationSourceAgencies.OrderBy(ra => ra.RadiationSourceAgencyName).ToList();
+            AppData.radiationSourceAgencies = resultRadiationSourceAgency;
+        }
+        else
+        {
+            var resultRadiationSourceLocationTH = AppData.radiationSourceLocations.OrderBy(rl => rl.RadiationSourceLocationTHName).ToList();
+            AppData.radiationSourceLocations = resultRadiationSourceLocationTH;
+        }
+
+    }
+    
+
+    private IBrowserFile? fileDocument;
+    private IBrowserFile? fileImageDefault;
+    private IBrowserFile? fileImageLeft;
+    private IBrowserFile? fileImageRight;
+
+    private string? ImageShow { get; set; }
+    private string? ImageLeftShow { get; set; }
+    private string? ImageRightShow { get; set; }
+
+    private string pathDocumentFolder { get; set; } = "Document";
+    private string pathPictureDefaultFolder { get; set; } = "PictureDefault";
+    private string pathPictureLeftFolder { get; set; } = "PictureLeft";
+    private string pathPictureRightFolder { get; set; } = "PictureRight";
+
+    private byte[] UploadPathDefault { get; set; }
+    private byte[] UploadPathLeft { get; set; }
+    private byte[] UploadPathRight { get; set; }
+
+    /*******************************************UploadFile*************************************************************************/
+    /// <summary>
+    /// Document File
+    /// </summary>
+    protected async Task OnInputFileDocumentChange(InputFileChangeEventArgs e)
+    {
+        fileDocument = e.File;
+        //var formatDocumentFile = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        var fileType = fileDocument.ContentType;
+        var sizefile = fileDocument.Size;
+
+        if (sizefile > 2154227)
+        {
+            ToastService.ShowError("The file size cannot exceed 30MB.");
+            radiationSource.RadiationSourceFile = "";
+        }
+        else if (fileType != "application/pdf")
+        {
+            ToastService.ShowError("File Type Document Incorrect !");
+            radiationSource.RadiationSourceFile = "";
+        }
+        else
+        {
+            Load.Show();
+            await Task.Run(Loading);
+            string newFileName = await GenerateUniqueFileName(fileDocument.Name, pathDocumentFolder);
+            radiationSource.RadiationSourceFile = newFileName;
+            Load.Hide();
+        }
+
+    }
+
+    /// <summary>
+    /// Document File
+    /// </summary>
+    private async Task FileDocument()
+    {
+        if (fileDocument != null)
+        {
+            try
+            {
+                var fileType = fileDocument.ContentType;
+                var sizefile = fileDocument.Size;
+                if (sizefile <= 2154227 && fileType == "application/pdf")
+                {
+                    string newFileName = await GenerateUniqueFileName(fileDocument.Name, pathDocumentFolder);
+                    string path = Path.Combine(Config.GetValue<string>("FileStorage")!, "RadiationSource", "Register", pathDocumentFolder, newFileName);
+
+                    Directory.CreateDirectory(Path.Combine(Config.GetValue<string>("FileStorage")!, "RadiationSource", "Register", pathDocumentFolder));
+
+                    await using FileStream fs = new(path, FileMode.Create);
+                    await fileDocument.OpenReadStream(sizefile).CopyToAsync(fs);
+                }
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowError($"File: {fileDocument.Name} Error: {ex.Message}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Image Default
+    /// </summary>
+    private async Task OnInputFileDefaultChange(InputFileChangeEventArgs e)
+    {
+        fileImageDefault = e.File;
+        var imageType = fileImageDefault.ContentType;
+        var sizefile = fileImageDefault.Size;
+
+        if (sizefile > 5542880)
+        {
+            ToastService.ShowError("The file size cannot exceed 5MB.");
+            radiationSource.RadiationSourcePictureDefault = "";
+        }
+        else if (imageType != "image/png" && imageType != "image/jpeg")
+        {
+            ToastService.ShowError("File Type Image Incorrect !");
+            radiationSource.RadiationSourcePictureDefault = "";
+        }
+        else
+        {
+            Load.Show();
+            await Task.Run(Loading);
+            var resizedImage = await fileImageDefault.RequestImageFileAsync(imageType, 550, 550);
+            // อ่านข้อมูลรูปภาพและแปลงเป็น Base64
+            using (var stream = resizedImage.OpenReadStream(resizedImage.Size))
+            {
+                var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream);
+                var buffer = memoryStream.ToArray();
+                ImageShow = Convert.ToBase64String(buffer);
+            }
+            int maxWidth = 640;
+            int maxHeight = 480;
+            int quality = 90;
+
+            byte[] compressedImage = _imageService.CompressBase64Image(ImageShow, maxWidth, maxHeight, quality);
+            string compressedBase64 = Convert.ToBase64String(compressedImage);
+            ImageShow = compressedBase64;
+            UploadPathDefault = compressedImage;
+
+            string newFileImageName = await GenerateUniqueFileName(fileImageDefault.Name, pathPictureDefaultFolder);
+            radiationSource.RadiationSourcePictureDefault = newFileImageName;
+
+
+            //using MemoryStream memoryStream = new MemoryStream();
+            //await fileImageDefault.OpenReadStream(sizefile).CopyToAsync(memoryStream);
+            //var buffer = memoryStream.GetBuffer();
+            //var imageLeftDataUrl = $"data:{imageType};base64,{Convert.ToBase64String(buffer)}";
+            //ImageShow = imageLeftDataUrl;
+            //string newFileImageName = await GenerateUniqueFileName(fileImageDefault.Name, pathPictureDefaultFolder);
+            //radiationSource.RadiationSourcePictureDefault = newFileImageName;
+            Load.Hide();
+        }
+
+
+    }
+    /// <summary>
+    /// Image Default
+    /// </summary>
+    private async Task ImageDefaultFile()
+    {
+
+        if (fileImageDefault != null)
+        {
+            try
+            {
+                var imageType = fileImageDefault.ContentType;
+                var sizefile = fileImageDefault.Size;
+                if (sizefile > 5542880)
+                {
+                    //ToastService.ShowError("The file size cannot exceed 5MB.");
+                    radiationSource.RadiationSourcePictureDefault = "";
+                }
+                else if (imageType != "image/png" && imageType != "image/jpeg")
+                {
+                    ///ToastService.ShowError("File Type Image Incorrect !");
+                    radiationSource.RadiationSourcePictureDefault = "";
+                }
+                else
+                {
+                    string newFileImageName = await GenerateUniqueFileName(fileImageDefault.Name, pathPictureDefaultFolder);
+                    string path = Path.Combine(Config.GetValue<string>("FileStorage")!, "RadiationSource", "Register", "Picture", pathPictureDefaultFolder, newFileImageName);
+                    Directory.CreateDirectory(Path.Combine(Config.GetValue<string>("FileStorage")!, "RadiationSource", "Register", "Picture", pathPictureDefaultFolder)); // Ensure the directory exists
+
+                    await File.WriteAllBytesAsync(path, UploadPathDefault);
+
+                    //string newFileImageName = await GenerateUniqueFileName(fileImageDefault.Name, pathPictureDefaultFolder);
+                    ////string prefixedNewFileName = $"Update_{showinstrument.InstrumentNumber}_" + newFileImageName;
+                    //string path = Path.Combine(Config.GetValue<string>("FileStorage")!, "RadiationSource", "Register", "Picture", pathPictureDefaultFolder, newFileImageName);
+
+                    //Directory.CreateDirectory(Path.Combine(Config.GetValue<string>("FileStorage")!, "RadiationSource", "Register", "Picture", pathPictureDefaultFolder));
+
+                    //await using FileStream fs = new(path, FileMode.Create);
+                    //await fileImageDefault.OpenReadStream(sizefile).CopyToAsync(fs);
+
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowError($"File: {fileImageDefault.Name} Error: {ex.Message}");
+            }
+        }
+
+    }
+    
+    /// <summary>
+    /// Image Left
+    /// </summary>
+    private IList<string> imageLeftDataUrls = new List<string>();
+    private async Task OnInputFileLeftChange(InputFileChangeEventArgs e)
+    {
+        fileImageLeft = e.File;
+        var imageType = fileImageLeft.ContentType;
+        var sizefile = fileImageLeft.Size;
+
+        if (sizefile > 5542880)
+        {
+            ToastService.ShowError("The file size cannot exceed 5MB.");
+            radiationSource.RadiationSourcePictureLeft = "";
+        }
+        else if (imageType != "image/png" && imageType != "image/jpeg")
+        {
+            ToastService.ShowError("File Type Image Incorrect !");
+            radiationSource.RadiationSourcePictureLeft = "";
+        }
+        else
+        {
+            Load.Show();
+            await Task.Run(Loading);
+            var resizedImage = await fileImageLeft.RequestImageFileAsync(imageType, 550, 550);
+            // อ่านข้อมูลรูปภาพและแปลงเป็น Base64
+            using (var stream = resizedImage.OpenReadStream(resizedImage.Size))
+            {
+                var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream);
+                var buffer = memoryStream.ToArray();
+                ImageLeftShow = Convert.ToBase64String(buffer);
+            }
+            int maxWidth = 640;
+            int maxHeight = 480;
+            int quality = 90;
+
+            byte[] compressedImage = _imageService.CompressBase64Image(ImageLeftShow, maxWidth, maxHeight, quality);
+            string compressedBase64 = Convert.ToBase64String(compressedImage);
+            ImageLeftShow = compressedBase64;
+            UploadPathLeft = compressedImage;
+
+            string newFileImageName = await GenerateUniqueFileName(fileImageLeft.Name, pathPictureLeftFolder);
+            radiationSource.RadiationSourcePictureLeft = newFileImageName;
+
+            //using MemoryStream memoryStream = new MemoryStream();
+            //await fileImageLeft.OpenReadStream(sizefile).CopyToAsync(memoryStream);
+            //var buffer = memoryStream.GetBuffer();
+            //var imageLeftDataUrl = $"data:{imageType};base64,{Convert.ToBase64String(buffer)}";
+            //ImageLeftShow = imageLeftDataUrl;
+            //string newFileImageName = await GenerateUniqueFileName(fileImageLeft.Name, pathPictureLeftFolder);
+            //radiationSource.RadiationSourcePictureLeft = newFileImageName;
+            Load.Hide();
+        }
+    }
+
+    /// <summary>
+    /// Image Left
+    /// </summary>
+    private async Task ImageLeftFile()
+    {
+
+        if (fileImageLeft != null)
+        {
+            try
+            {
+                var imageType = fileImageLeft.ContentType;
+                var sizefile = fileImageLeft.Size;
+                if (sizefile > 5542880)
+                {
+                    //ToastService.ShowError("The file size cannot exceed 5MB.");
+                    radiationSource.RadiationSourcePictureLeft = "";
+                }
+                else if (imageType != "image/png" && imageType != "image/jpeg")
+                {
+                    ///ToastService.ShowError("File Type Image Incorrect !");
+                    radiationSource.RadiationSourcePictureLeft = "";
+                }
+                else
+                {
+                    string newFileImageName = await GenerateUniqueFileName(fileImageLeft.Name, pathPictureLeftFolder);
+                    string path = Path.Combine(Config.GetValue<string>("FileStorage")!, "RadiationSource", "Register", "Picture", pathPictureLeftFolder, newFileImageName);
+                    Directory.CreateDirectory(Path.Combine(Config.GetValue<string>("FileStorage")!, "RadiationSource", "Register", "Picture", pathPictureLeftFolder)); // Ensure the directory exists
+
+                    await File.WriteAllBytesAsync(path, UploadPathLeft);
+
+                    //string newFileImageName = await GenerateUniqueFileName(fileImageLeft.Name, pathPictureLeftFolder);
+                    ////string prefixedNewFileName = $"Update_{showinstrument.InstrumentNumber}_" + newFileImageName;
+                    //string path = Path.Combine(Config.GetValue<string>("FileStorage")!, "RadiationSource", "Register", "Picture", pathPictureLeftFolder, newFileImageName);
+
+                    //Directory.CreateDirectory(Path.Combine(Config.GetValue<string>("FileStorage")!, "RadiationSource", "Register", "Picture", pathPictureLeftFolder));
+
+                    //await using FileStream fs = new(path, FileMode.Create);
+                    //await fileImageLeft.OpenReadStream(sizefile).CopyToAsync(fs);
+
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowError($"File: {fileImageLeft.Name} Error: {ex.Message}");
+            }
+        }
+
+    }
+   
+    /// <summary>
+    /// Image Right
+    /// </summary>
+    private IList<string> imageRightDataUrls = new List<string>();
+    private async Task OnInputFileRightChange(InputFileChangeEventArgs e)
+    {
+        fileImageRight = e.File;
+        var imageType = fileImageRight.ContentType;
+        var sizefile = fileImageRight.Size;
+
+        if (sizefile > 5542880)
+        {
+            ToastService.ShowError("The file size cannot exceed 5MB.");
+            radiationSource.RadiationSourcePictureRight = "";
+        }
+        else if (imageType != "image/png" && imageType != "image/jpeg")
+        {
+            ToastService.ShowError("File Type Image Incorrect !");
+            radiationSource.RadiationSourcePictureRight = "";
+        }
+        else
+        {
+            Load.Show();
+            await Task.Run(Loading);
+            var resizedImage = await fileImageRight.RequestImageFileAsync(imageType, 550, 550);
+            // อ่านข้อมูลรูปภาพและแปลงเป็น Base64
+            using (var stream = resizedImage.OpenReadStream(resizedImage.Size))
+            {
+                var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream);
+                var buffer = memoryStream.ToArray();
+                ImageRightShow = Convert.ToBase64String(buffer);
+            }
+            int maxWidth = 640;
+            int maxHeight = 480;
+            int quality = 90;
+
+            byte[] compressedImage = _imageService.CompressBase64Image(ImageRightShow, maxWidth, maxHeight, quality);
+            string compressedBase64 = Convert.ToBase64String(compressedImage);
+            ImageRightShow = compressedBase64;
+            UploadPathRight = compressedImage;
+
+            string newFileImageName = await GenerateUniqueFileName(fileImageRight.Name, pathPictureRightFolder);
+            radiationSource.RadiationSourcePictureRight = newFileImageName;
+
+
+            //using MemoryStream memoryStream = new MemoryStream();
+            //await fileImageRight.OpenReadStream(sizefile).CopyToAsync(memoryStream);
+            //var buffer = memoryStream.GetBuffer();
+            //var imageRightDataUrl = $"data:{imageType};base64,{Convert.ToBase64String(buffer)}";
+            //ImageRightShow = imageRightDataUrl;
+            //string newFileImageName = await GenerateUniqueFileName(fileImageRight.Name, pathPictureRightFolder);
+            //radiationSource.RadiationSourcePictureRight = newFileImageName;
+            Load.Hide();
+        }
+    }
+
+
+    /// <summary>
+    /// Image Right
+    /// </summary>
+    private async Task ImageRightFile()
+    {
+
+        if (fileImageRight != null)
+        {
+            try
+            {
+                var imageType = fileImageRight.ContentType;
+                var sizefile = fileImageRight.Size;
+                if (sizefile > 5542880)
+                {
+                    //ToastService.ShowError("The file size cannot exceed 5MB.");
+                    radiationSource.RadiationSourcePictureRight = "";
+                }
+                else if (imageType != "image/png" && imageType != "image/jpeg")
+                {
+                    ///ToastService.ShowError("File Type Image Incorrect !");
+                    radiationSource.RadiationSourcePictureRight = "";
+                }
+                else
+                {
+                    string newFileImageName = await GenerateUniqueFileName(fileImageRight.Name, pathPictureRightFolder);
+                    string path = Path.Combine(Config.GetValue<string>("FileStorage")!, "RadiationSource", "Register", "Picture", pathPictureRightFolder, newFileImageName);
+                    Directory.CreateDirectory(Path.Combine(Config.GetValue<string>("FileStorage")!, "RadiationSource", "Register", "Picture", pathPictureRightFolder)); // Ensure the directory exists
+
+                    await File.WriteAllBytesAsync(path, UploadPathRight);
+
+                    //string newFileImageName = await GenerateUniqueFileName(fileImageRight.Name, pathPictureRightFolder);
+                    ////string prefixedNewFileName = $"Update_{showinstrument.InstrumentNumber}_" + newFileImageName;
+                    //string path = Path.Combine(Config.GetValue<string>("FileStorage")!, "RadiationSource", "Register", "Picture", pathPictureRightFolder, newFileImageName);
+
+                    //Directory.CreateDirectory(Path.Combine(Config.GetValue<string>("FileStorage")!, "RadiationSource", "Register", "Picture", pathPictureRightFolder));
+
+                    //await using FileStream fs = new(path, FileMode.Create);
+                    //await fileImageRight.OpenReadStream(sizefile).CopyToAsync(fs);
+
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowError($"File: {fileImageRight.Name} Error: {ex.Message}");
+            }
+        }
+
+    }
+    
+    /// <summary>
+    /// GenerateUniqueFileDocument
+    /// </summary>
+    private async Task<string> GenerateUniqueFileName(string originalFileName, string folderName)
+    {
+        string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(originalFileName);
+        string fileExtension = Path.GetExtension(originalFileName);
+        string newFileName = fileNameWithoutExtension + fileExtension;
+        if (folderName == "Document")
+        {
+            int counter = 1;
+            string path = Path.Combine(Config.GetValue<string>("FileStorage")!, "RadiationSource", "Register", folderName, newFileName);
+
+            while (File.Exists(path))
+            {
+                newFileName = $"{fileNameWithoutExtension}({counter}){fileExtension}";
+                path = Path.Combine(Config.GetValue<string>("FileStorage")!, "RadiationSource", "Register", folderName, newFileName);
+                counter++;
+            }
+        }
+        else
+        {
+            int counter = 1;
+            string path = Path.Combine(Config.GetValue<string>("FileStorage")!, "RadiationSource", "Register", "Picture", folderName, newFileName);
+
+            while (File.Exists(path))
+            {
+                newFileName = $"{fileNameWithoutExtension}({counter}){fileExtension}";
+                path = Path.Combine(Config.GetValue<string>("FileStorage")!, "RadiationSource", "Register", "Picture", folderName, newFileName);
+                counter++;
+            }
+        }
+
+
+        return newFileName;
+    }
+    
+
+    /// <summary>
+    /// clearURL
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("clearURL");
+            await jsRuntime.InvokeAsync<object>("showFileName");
+        }
+    }
+
+    /// <summary>
+    /// Modal AddSourceType AddSourceLocation
+    /// </summary>
+    BSModal AddSourceType { get; set; }
+    BSModal AddSourceLocation { get; set; }
+    BSModal Load { get; set; }
+
+    /// <summary>
+    /// PrintBarcode
+    /// </summary>
+    string barcode { get; set; } = "";
+
+    public async void BarcodeQRGeneratre()
+    {
+        Load.Show();
+        await Task.Run(Loading);
+        Barcode sticker = new Barcode();
+        var pdf = await sticker.GenerateBarcodeAsync(radiationSource.RadiationSourceNumber, radiationSource.RadiationSourceNuclide,
+            AppData.radiationSourceLocations.Find(r => r.RadiationSourceLocationID == radiationSource.RadiationSourceLocation) != null ? AppData.radiationSourceLocations.Find(r => r.RadiationSourceLocationID == radiationSource.RadiationSourceLocation).RadiationSourceLocationENName  :  "-", BarcodeType.QRCode);
+        barcode = Convert.ToBase64String(pdf);
+        await PrintingService.Print(new PrintOptions(barcode) { Base64 = true });
+        Load.Hide();
+    }
+
+    private void Loading()
+    {
+        System.Threading.Thread.Sleep(300);
+        // Retrieve data from the server and initialize
+        // Employees property which the View will bind
+    }
+
+
+
+}

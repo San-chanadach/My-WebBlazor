@@ -1,0 +1,186 @@
+﻿@inherits EventTeamDashboardBase
+
+
+
+<div class="col-lg-12 col-md-6 mt-4 mb-4 margin-top-paper">
+    <div class="card-dashbord z-index-2 text-wrap">
+        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+            <div class="card-header text-white txt-size-paper-two" style="background-color:#1E97DB">
+                <b>@AppData.LangResource[AppData.LanguageID, 538]</b>
+            </div>
+            <div class="scrollBar fixTableHead height-tbody table-responsive scroll-inner height-size-event-team">
+                <table id="dataTable" class="table table-striped text-wrap txt-size-paper-two-content">
+                    <thead class="fixedthead">
+                        <tr>
+                            <th width="200" class="alternateRow">@AppData.LangResource[AppData.LanguageID, 36]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 540]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 553]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 555]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 232]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 32]</th>
+                            @* <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 33]</th> *@
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 579]</th>
+
+                        </tr>
+                    </thead>
+                    <tbody class="scrollContent">
+
+                        @foreach (var item in recordProjects.OrderByDescending(x => x.ProjectNumber))
+                        {
+                            <tr>
+                                <td>
+
+                                   
+                                    @foreach (var itemTeam in projectTeams)
+                                    {
+                                        
+                                        @if (itemTeam.ProjectID == item.ProjectID)
+                                        {
+                                            <i @onclick="() => ShowNameTeamEvent(itemTeam.UserID)" class="fa-solid fa-user fa-2x height-icon-team" style="padding:1px; color:#164176; cursor:default"></i>
+
+                                        }
+ 
+                                    }
+
+                                    
+                                    @foreach (var supportTeam in projectSupportTeams)
+                                    {
+                                        @if (supportTeam.ProjectID == item.ProjectID && supportTeam.OrderProject == 1)
+                                        {
+                                            <i @onclick="() => ShowSupportTeamNameEvent(supportTeam.ProjectSupportTeamID)" class="fa-regular fa-user fa-2x height-icon-team" style="padding:1px; color:#164176; cursor:default"></i>
+                                        }
+                                    }
+
+
+                                    <!------------แสดงด้วย EventRecordTeam------------------------->
+                                   @*  @foreach (var itemProEvent in projectEventRecords)
+                                    {
+                                        @if (itemProEvent.ProjectID == item.ProjectID)
+                                        {
+                                            @foreach (var itemTeam in teams)
+                                            {
+
+                                                @if (itemTeam.EventID == itemProEvent.EventID)
+                                                {
+                                                    <i @onclick="() => ShowNameTeamEvent(itemTeam.UserID)" class="fa-solid fa-user fa-2x height-icon-team" style="padding:1px; color:#164176; cursor:default"></i>
+
+                                                }
+                                            }
+                                        }
+
+
+                                    } *@
+                                     
+
+                                    
+
+                                </td>
+                                <td>
+                                    @item.ProjectNumber
+                                        
+                                </td>
+                                <td>@item.ProjectName</td>
+                                <td>@(recordProjectTypes.Find(x => x.ProjectTypeID == item.ProjectType) != null ? recordProjectTypes.Find(x => x.ProjectTypeID == item.ProjectType).ProjectTypeENName:"-")</td>
+                                <td>
+                                    @(recordRegionals.Find(x => x.RegionalNumber == item.ProjectRegional) != null ? recordRegionals.Find(x => x.RegionalNumber == item.ProjectRegional).RegionalENName:"-")
+
+
+                                   @*  @foreach (var itemProEvent in projectEventRecords)
+                                    {
+                                        @if (itemProEvent.ProjectID == item.ProjectID)
+                                        {
+                                            @foreach (var itemEvent in recordEvents)
+                                            {
+
+                                                @if (itemEvent.EventID == itemProEvent.EventID)
+                                                {
+                                                    <div class="province-info">
+                                                        <span class="province-name">
+                                                            @(recordEventProvinces.Find(x => x.ProvinceID == itemEvent.ProvinceID) != null ? recordEventProvinces.Find(x => x.ProvinceID == itemEvent.ProvinceID).ProvinceENName : "-")
+                                                        </span>
+                                                        <span class="district-name">
+                                                            @(recordEventDistricts.Find(x => x.DistrictID == itemEvent.SubDistrictID) != null ? recordEventDistricts.Find(x => x.DistrictID == itemEvent.SubDistrictID).DistrictENName : "-")
+                                                        </span>
+                                                        <span class="subdistrict-name">
+                                                            @(subDistricts.Find(x => x.subDistrictID == itemEvent.SubDistrictID) != null ? subDistricts.Find(x => x.subDistrictID == itemEvent.SubDistrictID).subDistrictENName : "-")
+                                                        </span>
+                                                        <span class="subdistrict-code">
+                                                            @(subDistricts.Find(i => i.subDistrictID == itemEvent.SubDistrictID) != null ? subDistricts.Find(i => i.subDistrictID == itemEvent.SubDistrictID).subDistrictCode : "-")
+                                                        </span>
+                                                    </div>
+                                                }
+                                            }
+                                        }
+                                    } *@
+                                </td>
+
+                                <td>@String.Format("{0:dd/MM/yyyy}", item.ProjectStartDate)</td>
+                                @* <td>@String.Format("{0:dd/MM/yyyy}", item.ProjectEndDate)</td> *@
+                                <td style="cursor:default">
+                                    <a href="@($"ChildComponent/IndexDashboardComponent/ShowDetailEventResult/{item.ProjectID}")" class="btn btn-warning" name="ShowInstrument" id="ShowInstrument">
+                                        <i class="fa-solid fa-list"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+
+
+                        @* @foreach (var item in recordEvents)
+                        {
+                            <tr>
+
+                                <td style="cursor:default">
+
+                                    @foreach (var itemTeam in teams)
+                                    {
+
+                                        @if (itemTeam.EventID == item.EventID)
+                                        {
+                                            <i @onclick="() => ShowNameTeamEvent(itemTeam.UserID)" class="fa-solid fa-user fa-2x height-icon-team" style="padding:1px; color:#164176;"></i>
+
+                                        }
+                                    }
+
+                                </td>
+
+                                <td style="cursor:default">
+
+                                    @foreach (var itemPro in recordProjects)
+                                    {
+                                        @foreach (var itemProEvent in projectEventRecords)
+                                        {
+                                            @if (itemPro.ProjectID == itemProEvent.ProjectID && itemProEvent.EventID == item.EventID)
+                                            {
+
+                                                @itemPro.ProjectNumber
+
+                                            }
+                                        }
+
+                                    }
+
+                                </td>
+
+                                <td style="cursor:default">@item.EventNumber</td>
+                                <td style="cursor:default">@(AppData.recordEventTypes.Find(x => x.EventTypeID == item.EventType) != null ? AppData.recordEventTypes.Find(x => x.EventTypeID == item.EventType).EventTypeENName:"-")</td>
+                                <td style="cursor:default">
+                                    @(recordEventProvinces.Find(x => x.ProvinceID == item.ProvinceID) != null ? recordEventProvinces.Find(x => x.ProvinceID == item.ProvinceID).ProvinceENName:"-")
+                                    @(recordEventDistricts.Find(x => x.DistrictID == item.SubDistrictID) != null ? recordEventDistricts.Find(x => x.DistrictID == item.SubDistrictID).DistrictENName:"-")
+                                    @(subDistricts.Find(x => x.subDistrictID == item.SubDistrictID) != null ? subDistricts.Find(x => x.subDistrictID == item.SubDistrictID).subDistrictENName:"-")
+                                    @(subDistricts.Find(i => i.subDistrictID == item.SubDistrictID) != null ? subDistricts.Find(i => i.subDistrictID == item.SubDistrictID).subDistrictCode:"-")
+                                </td>
+                                <td style="cursor:default">@item.EventStartDate.Value.Date.ToString("dd/MM/yyyy")</td>
+                                <td style="cursor:default">
+                                    <a href="@($"ChildComponent/IndexDashboardComponent/ShowDetailEventResult/{item.EventID}")" class="btn btn-warning" name="ShowInstrument" id="ShowInstrument">
+                                        <i class="fa-solid fa-list"></i>
+                                    </a>
+                                </td>
+                            </tr>
+
+                        } *@
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

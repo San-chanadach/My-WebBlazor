@@ -1,0 +1,48 @@
+﻿@inherits CalendarPageBase
+
+@page "/monthviewarray"
+
+<h3>MonthView (Array Source)</h3>
+
+<FullCalendar settings="@calendarSettings" />
+
+@code {
+    public CalendarSettings calendarSettings { get; set; }
+
+    protected override void OnInitialized()
+    {
+        calendarSettings = new CalendarSettings
+        {
+            Plugins = new[] { CalendarPluginTypes.DayGrid, CalendarPluginTypes.Interaction, CalendarPluginTypes.Bootstrap },
+            InitialView = "dayGridTwoMonths",
+            TimeZone = "UTC",
+            
+            HeaderToolbar  = new CalendarHeader
+            {
+                Left = "title",
+                Center = "",
+                Right = "dayGridOneWeek,dayGridTwoWeeks,dayGridTwoMonths today prev,next"
+            },
+            ThemeSystem = "bootstrap",
+            Views = new Dictionary<string, CalendarViewDefinition>()
+            {
+                { 
+                    "dayGridOneWeek", 
+                    CalendarViewDefinition.DayGridWeeks(1,"One Week") 
+                },
+                { 
+                    "dayGridTwoWeeks", 
+                    CalendarViewDefinition.DayGridWeeks(2,"Two Weeks") 
+                },
+                {
+                    "dayGridTwoMonths", 
+                    CalendarViewDefinition.DayGridMonths(2,"Two Months") 
+                },
+            },
+            Events = GetRandomEvents(50).ToArray()
+        };
+    }
+
+
+
+}

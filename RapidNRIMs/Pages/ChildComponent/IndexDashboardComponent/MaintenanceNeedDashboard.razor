@@ -1,0 +1,80 @@
+﻿@inherits MaintenanceNeedDashboardBase
+
+<div class="col-lg-4 col-md-6 mt-4 mb-4">
+    <div class="card-dashbord z-index-2 ">
+        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+            <a href="@($"Instruments/InstrumentMA")" style="text-decoration:none;">
+                <div class="card-header text-white txt-size-paper-two" style="background-color:#3CBBCE">
+                    <b>
+                         @AppData.LangResource[AppData.LanguageID, 547] @AppData.DueMa.Count @AppData.LangResource[AppData.LanguageID, 537]
+                    </b>
+                </div>
+            </a>
+            <div class="card-body bg-light">
+                <div class="scrollBar fixTableHead table-responsive scroll-inner height-size-paper-two">
+                    @if (AppData.DueMa.Count != 0)
+                    {
+                        <table class="table table-striped text-wrap txt-size-paper-two-content">
+                            <thead class="fixedthead">
+                                <tr>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 408]</th>
+                                    <th class="alternateRow text-right">@AppData.LangResource[AppData.LanguageID, 412]</th>
+
+                                </tr>
+                            </thead>
+                            <tbody class="scrollContent">
+                                @foreach (var item in AppData.DueMa
+                               .Where(item => item.instrument != null && item.InstrumentMaintenanceNext.HasValue)
+                               .OrderBy(item => item.InstrumentMaintenanceNext.Value.Date)
+                               .ThenBy(item => Math.Abs((item.InstrumentMaintenanceNext.Value.Date - DateTime.Now.Date).TotalDays))
+                               .ThenBy(item => item.InstrumentMaintenanceNext.Value.Date))
+                                {
+                                    DateTime maintenanceNext = item.InstrumentMaintenanceNext.Value.Date;
+                                    DateTime currentDate = DateTime.Now.Date;
+                                    TimeSpan timeDifference = maintenanceNext - currentDate;
+                                    var rowColorClass = "";
+
+                                    if (maintenanceNext < currentDate)
+                                    {
+                                        rowColorClass = "bg-danger text-white"; // แถวเกินกำหนดสีแดง
+                                    }
+                                    else
+                                    {
+                                        rowColorClass = "bg-warning"; // ยังไม่ถึงเวลากำหนด Due
+                                    }
+                                    @* else if (timeDifference.TotalDays <= 5)
+                                    {
+                                        rowColorClass = "bg-warning"; // แถวใกล้ถึงกำหนดสีเหลือง
+                                    } *@
+
+                                    <tr class="@rowColorClass">
+                                        <td style="cursor:default">@(item.instrument != null? item.instrument.InstrumentENName:"-")</td>
+                                        <td style="cursor:default" class="text-right">
+                                            @(item != null? item.InstrumentMaintenanceNext.Value.Date.ToString("dd/MM/yyyy"):"-")
+                                        </td>
+
+                                    </tr>
+                                    
+
+
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <BSAlert Color="Color.Warning" IsDismissible="true">
+                            @AppData.LangResource[AppData.LanguageID, 414]
+                        </BSAlert>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+@*@foreach (var item in AppData.DueMa
+                               .Where(item => item.instrument != null && item.InstrumentMaintenanceNext.HasValue)
+                               .OrderByDescending(item => item.InstrumentMaintenanceNext.Value < DateTime.Now.Date)
+                               .ThenBy(item => Math.Abs((item.InstrumentMaintenanceNext.Value.Date - DateTime.Now.Date).TotalDays))
+                               .ThenBy(item => item.InstrumentMaintenanceNext.Value.Date))*@

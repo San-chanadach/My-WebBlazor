@@ -1,0 +1,614 @@
+﻿@layout LoginLayout
+@page "/Accounting/Login"
+@inherits ComponentBase 
+@inject ILanguageService LanguageService
+@inject AppData AppData
+@inject IConfiguration Config
+@inject IJSRuntime jsRuntime
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IConfiguration config
+@inject IToastService ToastService
+
+<PageTitle>Login Page</PageTitle>
+
+<div class="registration-form">
+    <form class="form " id="loginusername">
+        <div class="form-icon">
+            @if (logoEPR != "")
+            {
+                <img class="form-icon" src="@($"{Config["nurl"]}{Config["nurlFileLogo"]}{logoEPR}")">
+            }
+            
+        </div>
+        <div class="row text-center" style="justify-content:center; margin-bottom: 0.9rem; margin-top: -0.5rem;">
+            <a type="button" href="./" style="margin-top: 1rem; text-decoration:none; color:#0066CC" id="linkloginemail">@AppData.LangResource[AppData.LanguageID, 526]</a>
+        </div>
+        <div class="form-group">
+            <label class="col-form-label" id="lbl_username">
+                @AppData.LangResource[AppData.LanguageID, 142]
+            </label>
+            <input type="text" class="form-control item" @bind-value="accountLogin.UserName" id="username" placeholder="@AppData.LangResource[AppData.LanguageID,142]" />
+        </div>
+        <div class="form-group">
+            <label class="col-form-label" id="lbl_password">
+                @AppData.LangResource[AppData.LanguageID, 150]
+            </label>
+            <input type="password" @bind-value="accountLogin.PassWord" oninput="getInputValuePassword();" class="form-control item" id="password" placeholder="@AppData.LangResource[AppData.LanguageID,150]" />
+            <span toggle="#password" class="far fa-eye field-icon eye-event toggle-password"></span>
+        </div>
+        <div class="form-group">
+            <label class="col-form-label" id="lbl_language">
+                @AppData.LangResource[AppData.LanguageID, 156]
+            </label>
+            <select class="form-control item" name="sel_language" @bind="AppData.LanguageID" id="sel_language">
+                <option value=0>English</option>
+                <option value=1>ไทย</option>
+            </select>
+        </div>
+
+        <div class="form-group text-center">
+            <button @onclick="OnUserAccount" type="button" class="btn btn-warning btn-sign-in" id='btn_signin'>@AppData.LangResource[AppData.LanguageID, 153]</button>
+            <hr style="margin-top:2rem; border-top: 1.5px solid #ccc; margin-bottom: 0.5rem;">
+            <a type="button" @onclick="@(() => Forgot?.Show())" style="margin-top: 0.5rem; text-decoration:none; color:#0066CC; ">@AppData.LangResource[AppData.LanguageID, 525]</a>
+        </div>
+
+    </form>
+    <form class="form form--hidden" id="loginemail">
+        <div class="form-icon">
+            @if(logoEPR != "")
+            {
+                <img class="form-icon" src="@($"{Config["nurl"]}{Config["nurlFileLogo"]}{logoEPR}")">
+            }
+           
+        </div>
+        <div class="row" style="justify-content:center; margin-bottom: 0.9rem; margin-top: -0.5rem;">
+            <a type="button" href="./" style="margin-top: 1rem; text-decoration:none; color:#0066CC" id="linkloginusername">@AppData.LangResource[AppData.LanguageID, 527]</a>
+        </div>
+
+        <div class="form-group">
+
+            <label class="col-form-label" id="lbl_username">
+                @AppData.LangResource[AppData.LanguageID, 79]
+            </label>
+            <input type="email" @bind-value="accountLogin.Email" class="form-control item" id="email" placeholder="@AppData.LangResource[AppData.LanguageID,79]" />
+        </div>
+        <div class="form-group">
+            <label class="col-form-label" id="lbl_password">
+                @AppData.LangResource[AppData.LanguageID, 150]
+            </label>
+            <input type="password" @bind-value="accountLogin.PassWord" oninput="getInputEmailValuePassword();" class="form-control item passu" id="passwordemail" placeholder="@AppData.LangResource[AppData.LanguageID,150]" />
+            <span toggle="#passwordemail" class="far fa-eye field-icon eye-event-email toggle-password-email"></span>
+        </div>
+        <div class="form-group">
+            <label class="col-form-label" id="lbl_language">
+                @AppData.LangResource[AppData.LanguageID, 156]
+            </label>
+            <select class="form-control item" name="sel_languageEmail" @bind="AppData.LanguageID" id="sel_language">
+                <option value=0>English</option>
+                <option value=1>ไทย</option>
+            </select>
+        </div>
+
+        <div class="form-group text-center">
+            <button @onclick="OnUserAccountWihtEmail" type="button" class="btn btn-warning btn-sign-in" id='btn_SigninEmail'>@AppData.LangResource[AppData.LanguageID, 153]</button>
+            <hr style="margin-top:2rem; border-top: 1.5px solid #ccc; margin-bottom: 0.5rem;">
+            <a type="button" @onclick="@(() => Forgot?.Show())" style="margin-top: 0.5rem; text-decoration:none; color:#0066CC">@AppData.LangResource[AppData.LanguageID, 525]</a>
+        </div>
+
+    </form>
+
+</div>
+
+
+
+
+
+<!--BSAlert Color="Color.Danger" IsDismissible="true"  IsOpen="@isOpen">
+    <p class="text-center"> UserName Or Passwords is not Correct </p>
+</BSAlert-->
+
+
+<BSModal @ref="Forgot">
+    <BSModalHeader OnClick="@(() => Forgot?.Hide())" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID, 525]</BSModalHeader>
+    <BSModalBody>
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-3 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 79]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-9">
+                <div class="input-group input-box-bottom">
+                    <input type="text" @bind-value="registerAccount.Email" placeholder="@AppData.LangResource[AppData.LanguageID,79]" class="form-control" />
+                </div>
+
+            </div>
+
+        </div>
+
+    </BSModalBody>
+    <BSModalFooter>
+        <button type="submit" @onclick="ForgotPassword" class="btn btn-warning">@AppData.LangResource[AppData.LanguageID, 330]</button>
+        <button type="reset" class="btn btn-warning" @onclick="@(() => Forgot?.Hide())" name="Cancel" id="Cancel">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+
+<BSModal class="row style-justify mt-5" @ref="Load">
+    <BSModalBody>
+        <div class="form-icon text-center">
+            @if (logoR != "")
+            {
+                <img class="form-icon" src="@($"{Config["nurl"]}{Config["nurlFileLogo"]}{logoR}")" style="width:50%">
+            }
+        </div>
+
+        <div class="form-group text-center">
+            <div class="text-center pt-3" style=" font-size: 16pt">
+                @AppData.LangResource[AppData.LanguageID, 325]
+            </div>
+            <div class="text-center mt-3">
+                <span class="spinner-border spinner-border-sm " role="status" aria-hidden="true"
+                      style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+            </div>
+            <div class="text-center pt-3" style=" font-size: 16pt">
+            </div>
+            <BSProgress @bind-value="loadStatus" IsStriped="true" IsAnimated="true" />
+        </div>
+    </BSModalBody>
+
+</BSModal>
+
+<!--ModalResponseFormUsernameError-->
+<BSModal Class="text-center" @ref="ModalResponseError" IsCentered="true" Size="Size.Large">
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12 alert-modal-logo">
+                <img src="assets/images/img-common/delete_symbol.png" width="100" height="100" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                @if (accountLogin.UserName == string.Empty || accountLogin.PassWord == string.Empty)
+                {
+                    if (AppData.LanguageID == 0)
+                    {
+                        <p class="alert-modal">@loginFillEN</p>
+                    }
+                    else
+                    {
+                        <p class="alert-modal">@loginFillTH</p>
+                    }
+
+                }
+                else
+                {
+                    if (AppData.LanguageID == 0)
+                    {
+                        <p class="alert-modal">@loginCorrectEN</p>
+                    }
+                    else
+                    {
+                        <p class="alert-modal">@loginCorrectTH</p>
+                    }
+
+                }
+
+
+            </div>
+        </div>
+        <button type="button" @onclick="@(() => ModalResponseError?.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+    </BSModalBody>
+</BSModal>
+
+<!--ModalResponseFormEmailError-->
+<BSModal Class="text-center" @ref="ModalResponseEmailError" IsCentered="true" Size="Size.Large">
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12 alert-modal-logo">
+                <img src="assets/images/img-common/delete_symbol.png" width="100" height="100" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+
+                @if (accountLogin.Email == string.Empty || accountLogin.PassWord == string.Empty)
+                {
+                    if (AppData.LanguageID == 0)
+                    {
+                        <p class="alert-modal">@loginFillEmailEN</p>
+                    }
+                    else
+                    {
+                        <p class="alert-modal">@loginFillEmailTH</p>
+                    }
+                }
+                else
+                {
+                    if (AppData.LanguageID == 0)
+                    {
+                        <p class="alert-modal">@loginCorrectEmailEN</p>
+                    }
+                    else
+                    {
+                        <p class="alert-modal">@loginCorrectEmailTH</p>
+                    }
+                }
+
+            </div>
+        </div>
+        <button type="button" @onclick="@(() => ModalResponseEmailError?.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+    </BSModalBody>
+</BSModal>
+
+<!--ModalResponseLoginFormEmailError-->
+<BSModal Class="text-center" @ref="ModalResponseLoginFormEmailError" IsCentered="true" Size="Size.Large">
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12 alert-modal-logo">
+                <img src="assets/images/img-common/delete_symbol.png" width="100" height="100" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+
+                <p class="alert-modal">@MessageLoginError</p>
+
+            </div>
+        </div>
+        <button type="button" @onclick="@(() => ModalResponseLoginFormEmailError?.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+    </BSModalBody>
+</BSModal>
+
+<!--ModalResponseForgotError-->
+<BSModal Class="text-center" @ref="ModalResponseForgotPassword" IsCentered="true" Size="Size.Large">
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12 alert-modal-logo">
+                <img src="assets/images/img-common/delete_symbol.png" width="100" height="100" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                @if (registerAccount.Email == null || registerAccount.Email == "")
+                {
+                    if (AppData.LanguageID == 0)
+                    {
+                        <p class="alert-modal">@forgotFillEN</p>
+                    }
+                    else
+                    {
+                        <p class="alert-modal">@forgotFillTH</p>
+                    }
+
+                }
+
+
+            </div>
+        </div>
+        <button type="button" @onclick="@(() => ModalResponseForgotPassword?.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+    </BSModalBody>
+</BSModal>
+
+<!--ModalResponseMessageForgotPassword-->
+<BSModal Class="text-center" @ref="ModalResponseMessageForgotPassword" IsCentered="true" Size="Size.Large">
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12 alert-modal-logo">
+                <img src="assets/images/img-common/delete_symbol.png" width="100" height="100" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+
+                <p class="alert-modal">@MessageforgotPasswordError</p>
+
+            </div>
+        </div>
+        <button type="button" @onclick="@(() => ModalResponseMessageForgotPassword?.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+    </BSModalBody>
+</BSModal>
+
+<BSModal Class="text-center alert-modal-body" @ref="ModalResponseSuccessfullyForgotPassword" IsCentered="true" Size="Size.Large">
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12 alert-modal-logo">
+                <img src="assets/images/img-common/tick_symbol.png" width="100" height="100" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                @if (AppData.LanguageID == 0)
+                {
+                    <h4 class="alert-modal">@RequertMessageForgotPasswordEN</h4>
+                }
+                else
+                {
+                    <h4 class="alert-modal">@RequertMessageForgotPasswordTH</h4>
+                }
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <button @onclick="@(() => ModalResponseSuccessfullyForgotPassword?.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+            </div>
+        </div>
+    </BSModalBody>
+</BSModal>
+
+
+@code {
+
+    private bool IsLoaded { get; set; }
+
+    //private LanguageModels[] languages;
+    private List<LanguageModels> languages = new List<LanguageModels>();
+    private List<LoginF> logins = new List<LoginF>();
+    private List<AccountLogin> accountLogins = new List<AccountLogin>();
+    AccountLogin accountLogin = new AccountLogin();
+    LoginF loginF = new LoginF();
+    RegisterAccount registerAccount = new RegisterAccount();
+    private List<Account> accounts = new List<Account>();
+
+    BSModal? Load { get; set; }
+    BSModal? ModalResponseError { get; set; }
+    BSModal? ModalResponseEmailError { get; set; }
+    BSModal? ModalResponseLoginFormEmailError { get; set; }
+    BSModal? Forgot { get; set; }
+    BSModal? ModalResponseForgotPassword { get; set; }
+    BSModal? ModalResponseMessageForgotPassword { get; set; }
+    BSModal? ModalResponseSuccessfullyForgotPassword { get; set; }
+
+    string loginFillEN = "UserName or Password is not Fill!";
+    string loginFillEmailEN = "Email or Password is not Fill!";
+    string loginFillTH = "ชื่อผู้ใช้หรือรหัสผ่านไม่ได้กรอก !";
+    string loginFillEmailTH = "อีเมลหรือรหัสผ่านไม่ได้กรอก !";
+    string loginCorrectEN = "UserName Or Passwords is not Correct";
+    string loginCorrectEmailEN = "Email Or Passwords is not Correct";
+    string loginCorrectTH = "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง";
+    string loginCorrectEmailTH = "อีเมลหรือรหัสผ่านไม่ถูกต้อง";
+    string forgotFillEN = "Email is not Fill!";
+    string forgotFillTH = "อีเมลไม่ได้กรอก !";
+    string forgotCorrectEN = "Email is not Correct";
+    string forgotCorrectTH = "อีเมลไม่ถูกต้อง";
+
+    string? MessageLoginError;
+    string? MessageforgotPasswordError;
+    string RequertMessageForgotPasswordEN = "Saved Successfully Please Check Email";
+    string RequertMessageForgotPasswordTH = "บันทึกสำเร็จโปรดเช็คอีเมล";
+    int loadStatus = 0;
+    bool password;
+
+    //bool isOpen = false;
+
+    string logoEPR { get; set; } = string.Empty;
+    string logoR { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        //languages = await Http.GetFromJsonAsync<LanguageModels[]>("api/getlangresources");
+        //  AppData.locales = await Http.GetFromJsonAsync<List<Locale>>(config["aurl"]+"/api/GetLocale");
+
+        languages = await LanguageService.GetLanguageModels();
+
+        foreach (var item in languages)
+        {
+
+            AppData.LangResource[0, item.ResourceKeyID] = item.Value1;
+            AppData.LangResource[1, item.ResourceKeyID] = item.Value2;
+        }
+        if (AppData.LanguageID != 0 && AppData.LanguageID != 1)
+        {
+            AppData.LanguageID = 0;
+        }
+        if (AppData.UserID != null)
+        {
+            AppData.UserID = null;
+            //NavigationManager.NavigateTo("/");
+        }
+
+        AppData.permissionList = await Http.GetFromJsonAsync<List<Permission>>($"{config["aurl"]}/api/GetPermission");
+
+        AppData.imageLogos = await Http.GetFromJsonAsync<List<ImageLogo>>($"{config["nurl"]}/api/GetFileLogo");
+
+        var resultLogoE = AppData.imageLogos.Find(x => x.Id == 1);
+        if (resultLogoE != null)
+        {
+            logoEPR = resultLogoE.ImageName;
+        }
+        
+
+        var resultLogoR = AppData.imageLogos.Find(x => x.Id == 2);
+        if (resultLogoR != null)
+        {
+            logoR = resultLogoR.ImageName;
+        }
+        
+        
+        accounts = await Http.GetFromJsonAsync<List<Account>>($"{Config["aurl"]}/api/GetAccount");
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeAsync<object>("onClickEnter", "#btn_signin");
+            await jsRuntime.InvokeAsync<object>("showValuePassword");
+            await jsRuntime.InvokeAsync<object>("showEmailValuePassword");
+            await jsRuntime.InvokeAsync<object>("getValueDatePicker", "#dateRangePicker");
+            await jsRuntime.InvokeAsync<object>("OncilckLogin");
+            await jsRuntime.InvokeVoidAsync("clearURL");
+        }
+    }
+
+    /// <summary>
+    /// OnUserAccountFormUsername
+    /// </summary>
+    /// <returns></returns>
+    private async Task OnUserAccount()
+    {
+        try
+        {
+            if (accountLogin.UserName == string.Empty || accountLogin.PassWord == string.Empty)
+            {
+                ModalResponseError?.Show();
+            }
+            else
+            {
+                logins = await Http.GetFromJsonAsync<List<LoginF>>(config["aurl"] + $"/api/GetLogin/N/{accountLogin.UserName}/{accountLogin.PassWord}");
+                // Console.WriteLine(logins.Count());
+                if (!logins.Any())
+                {
+                    ModalResponseError?.Show();
+                }
+                else
+                {
+
+                    AppData.UserID = logins.First().UserID;
+
+                    ///GetLookUp  Initail AppData
+
+                    /*
+                    AppData.SetPermission(await Http.GetFromJsonAsync<List<UserPermission>>($"{config["aurl"]}/api/GetPermissionByUserID/{AppData.UserID}"));
+                    Load.Show();
+                    loadStatus = 10;
+                    AppData.SetNoti(await Http.GetFromJsonAsync<List<InstrumentCalibration>>($"api/GetDueInstrumentCalibration"), await Http.GetFromJsonAsync<List<InstrumentMaintenance>>($"api/GetDueInstrumentMaintenance")
+                    , await Http.GetFromJsonAsync<List<Instrument>>($"api/GetInstrument"));
+                    Load.Show();
+                    loadStatus = 20;
+                    AppData.SetLookUpLocation(await Http.GetFromJsonAsync<List<RecordEventProvince>>( $"api/GetProvince"), await Http.GetFromJsonAsync<List<RecordEventDistrict>>( $"/api/GetDistrict"),await Http.GetFromJsonAsync<List<SubDistrict>>($"api/GetSubDistrict"));
+                    ///User Corrected => Main Layout
+    ///
+    */
+
+                    NavigationManager.NavigateTo("/Splash");
+                }
+
+            }
+        }
+        catch (Exception e)
+        {
+            MessageLoginError = e.Message;
+            ModalResponseLoginFormEmailError?.Show();
+        }
+
+
+
+        //ls =  await Http.GetFromJsonAsync<List<Account>>($"https://ppunix.org:4003/api/GetAccount");
+
+        /// <summary>
+        /// ถ้า Login เป็น TH-EN ให้ไปหน้า main
+        /// </summary>
+
+
+    }
+
+    /// <summary>
+    /// OnUserAccountFormEmail
+    /// </summary>
+    /// <returns></returns>
+    private async Task OnUserAccountWihtEmail()
+    {
+        try
+        {
+            if (accountLogin.Email == string.Empty || accountLogin.PassWord == string.Empty)
+            {
+                ModalResponseEmailError?.Show();
+            }
+            else
+            {
+                logins = await Http.GetFromJsonAsync<List<LoginF>>(config["aurl"] + $"/api/GetLogin/E/{accountLogin.Email}/{accountLogin.PassWord}");
+                // Console.WriteLine(logins.Count());
+                if (!logins.Any())
+                {
+                    ModalResponseEmailError?.Show();
+                }
+                else
+                {
+
+                    AppData.UserID = logins.First().UserID;
+
+
+                    NavigationManager.NavigateTo("/Splash");
+                }
+
+            }
+        }
+        catch (Exception e)
+        {
+            MessageLoginError = e.Message;
+            ModalResponseLoginFormEmailError?.Show();
+            // ToastService.ShowError($"Error:{e.Message}:{logins.ToString()}");
+        }
+
+    }
+
+    /// <summary>
+    /// ForgotPassword
+    /// </summary>
+    private async void ForgotPassword()
+    {
+        try
+        {
+            if (registerAccount.Email == null || registerAccount.Email == "")
+            {
+                ModalResponseForgotPassword?.Show();
+
+            }
+            else
+            {
+                var resultUserID = accounts.Find(a => a.Email == registerAccount.Email).UserID;
+
+                await Http.PostAsync($"{Config["aurl"]}/api/EmailSender/Forget/{registerAccount.Email}/{resultUserID}", null);
+                ModalResponseSuccessfullyForgotPassword?.Show();
+            }
+        }
+        catch (Exception e)
+        {
+            var value = e.Message;
+            if (AppData.LanguageID == 0)
+            {
+                MessageforgotPasswordError = forgotCorrectEN;
+                ModalResponseMessageForgotPassword?.Show();
+            }
+            else
+            {
+                MessageforgotPasswordError = forgotCorrectTH;
+                ModalResponseMessageForgotPassword?.Show();
+            }
+
+        }
+
+    }
+
+
+
+
+
+
+
+
+    //protected override Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    jsRuntime.InvokeVoidAsync("clearURL");
+    //    return base.OnAfterRenderAsync(firstRender);
+
+    //}
+    // protected override void OnInitialized()
+    // {
+    //   if(AppData.UserID != null)
+    //  {
+    //    NavigationManager.NavigateTo("/");
+        //}
+    //}
+
+    //void OnDismiss()
+    //{
+    //    Console.WriteLine("OnDismiss");
+    //    isOpen = !isOpen;
+    //    StateHasChanged();
+    //}
+
+}
+

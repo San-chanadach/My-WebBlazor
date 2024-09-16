@@ -1,0 +1,697 @@
+﻿@page "/Record/EventRegister/{EventNumber}"
+@inject IRecordService RecordService
+@inject IJSRuntime jsRuntime
+@inject NavigationManager NavigationManager
+@inject IRecordEventTypeService RecordEventTypeService
+@inject IRecordEventDistrictService RecordEventDistrictService
+@inject IRecordEventProvinceService RecordEventProvinceService
+@inject AppData AppData
+@inject IMasterDataRecord _masterDataRecord
+@inject IToastService ToastService
+@inject HttpClient Http
+@inject IConfiguration Config
+@inject IMasterData _masterData
+@inject IMasterDataPhase2 _masterDataPhase2
+
+<PageTitle>Register Event Page</PageTitle>
+
+<EditForm Model="@recordEvent" OnValidSubmit="CreateEventRegister">
+    <div class="row margin-row-card">
+        <div class="col-md-12">
+            <div class="card-dashbord h-100">
+                <div class="card-header p-3 pt-2">@AppData.LangResource[AppData.LanguageID, 8]</div>
+                <div class="card-body style-justify">
+                    <div class="row">
+                        <label for="eventnumber" class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 28]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <InputText id="eventnumber" @bind-Value="EventNumber" placeholder="@AppData.LangResource[AppData.LanguageID, 28]" class="form-control" />
+                                <span class="input-icon-search" @onclick="OnSearch"><i class="fa fa-search instrumentnumber-search"></i></span>
+                            </div>
+                            <ValidationMessage For="@(() => EventNumber)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="eventname" class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 29]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-8">
+                            <div class="input-group input-box-bottom">
+                                <InputText id="eventname" @bind-Value="recordEvent.EventName" placeholder="@AppData.LangResource[AppData.LanguageID,29]" class="form-control" />
+                            </div>
+                            <ValidationMessage For="@(() => recordEvent.EventName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="eventdate" class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 231]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <input type="date" id="eventdate"  @bind-value="recordEvent.EventRegisterDate"  placeholder="@AppData.LangResource[AppData.LanguageID, 231]" class="form-control" />
+                            </div>
+                            <ValidationMessage For="@(() => recordEvent.EventRegisterDate)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="eventType" class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 31]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <InputSelect class="form-control" @bind-Value="recordProject.ProjectType" disabled id="eventType">
+                                    <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                    @foreach (var item in recordEventTypes)
+                                    {
+                                        if (item.IsActive == true && item.IsActive != null)
+                                        {
+                                            @if (AppData.LanguageID == 0)
+                                            {
+                                                <option value="@item.EventTypeID">@item.EventTypeENName</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.EventTypeID">@item.EventTypeTHName</option>
+                                            }
+                                        }
+                                        
+
+                                    }
+                                </InputSelect>
+                                <span class="span-btn-eventtype">
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 1).permissionE)
+                                    {
+                                        <!--button type="button" @onclick="@(() => AddEventtype.Show())" class="btn btn-warning margin-btn">
+                                            <i class="fas fa-plus"></i>
+                                        </button-->
+                                    }
+                                </span>
+                            </div>
+                            <ValidationMessage For="@(() => recordEvent.EventType)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 199]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-8">
+                            <div class="input-group input-box-bottom">
+                                <InputText @bind-Value="recordEvent.EventLocationName" placeholder="@AppData.LangResource[AppData.LanguageID, 199]" class="form-control" />
+                            </div>
+                            <ValidationMessage For="@(() => recordEvent.EventLocationName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="eventProvince" class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 41]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <InputSelect class="form-control" @bind-Value="recordEvent.ProvinceID" id="eventProvince" @oninput="OnProvinceSelected">
+                                    <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                    @foreach (var item in recordEventProvinces)
+                                    {
+                                        @if (AppData.LanguageID == 0)
+                                        {
+                                            <option value="@item.ProvinceID">@item.ProvinceENName</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.ProvinceID">@item.ProvinceTHName</option>
+                                        }
+                                    }
+                                </InputSelect>
+                            </div>
+                            <ValidationMessage For="@(() => recordEvent.ProvinceID)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" />
+                        </div>
+                        <label for="district" class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 233]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <select class="form-control" @bind="recordEvent.DistrictID" id="district" @oninput="OnDistrictSelected">
+                                    <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                    @foreach (var item in recordEventDistricts)
+                                    {
+                                        @if (AppData.LanguageID == 0)
+                                        {
+                                            <option value="@item.DistrictID">@item.DistrictENName</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.DistrictID">@item.DistrictTHName</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <ValidationMessage For="@(() => recordEvent.DistrictID)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="subdistrict" class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 234]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <select class="form-control" @bind="recordEvent.SubDistrictID" id="subdistrict" @oninput="OnSubDistrictSelected">
+                                    <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                    @foreach (var item in subDistricts)
+                                    {
+                                        zipCode = item.subDistrictCode;
+
+                                        @if (AppData.LanguageID == 0)
+                                        {
+                                            <option value="@item.subDistrictID">@item.subDistrictENName</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.subDistrictID">@item.subDistrictTHName</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <ValidationMessage For="@(() => recordEvent.SubDistrictID)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" />
+                        </div>
+                        <label for="eventZipCode" class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 43]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <InputNumber disabled @bind-Value="recordEvent.zipCode" placeholder="@AppData.LangResource[AppData.LanguageID, 43]" class="form-control" />
+                            </div>
+                            <ValidationMessage For="@(() => recordEvent.zipCode)" style="margin-top: -0.8rem; font-size:12px;" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="informer" class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 235]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-8">
+                            <div class="input-group input-box-bottom">
+                                <InputText @bind-Value="recordProject.ProjectInformerName" disabled class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,235]" />
+                            </div>
+                            <ValidationMessage For="@(() => recordEvent.EventInformerName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 236]</span>
+                        </label>
+                        <div class="col-12 col-md-12 col-lg-8 input-box-bottom">
+                            <InputTextArea @bind-Value="recordEvent.EventInformation" rows="2" placeholder="@AppData.LangResource[AppData.LanguageID, 236]" class="form-control"></InputTextArea>
+                        </div>
+                        <ValidationMessage For="@(() => recordEvent.EventInformation)" id="validationTextArea" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center" style="margin-top: -0.5rem">
+        @if (recordEvent.EventName != "" && AppData.CurrentPermission.Find(i => i.permissionID == 1).permissionC && AppData.CurrentPermission.Find(i => i.permissionID == 1).permissionU)
+        {
+            <button type="submit" class="btn margin-btn" style="background-color:#4CBB17; color:#fff">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+        else
+        {
+            <button type="button" disabled class="btn margin-btn" style="background-color:#4CBB17; color:#fff">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+
+        @if (recordEvent.EventNumber != null && recordEvent.EventNumber != "" && AppData.CurrentPermission.Find(i => i.permissionID == 1).permissionE)
+        {
+            @if (projectID != null && projectID != 0)
+            {
+                <button type="button" @onclick="OnManage" class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID, 270]</button>
+            }
+            else
+            {
+                <button type="button" disabled class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID, 270]</button>
+            }
+
+            <button type="button" @onclick="OnReport" class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID, 271]</button>
+            @if(projectID != null && projectID != 0)
+            {
+                <a href="@($"Record/ManageProject/{projectID}")" type="button"  class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID,560]</a>
+            }
+            else
+            {
+                <button type="button" disabled class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID, 560]</button>
+            }
+        }
+        else
+        {
+            <button type="button" disabled class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID, 270]</button>
+
+            <button type="button" disabled class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID, 271]</button>
+        }
+
+        <button type="button" @onclick="OnClear" class="btn margin-btn" style="background-color:#B90F1B; color:#fff">@AppData.LangResource[AppData.LanguageID, 45]</button>
+
+    </div>
+
+</EditForm>
+<!-- Modal Add New Even Type-->
+<EditForm Model="@recordEventType" OnValidSubmit="PostRecordEventType">
+    <BSModal @ref="AddEventtype">
+        <BSModalHeader OnClick="@(() => AddEventtype.Hide())" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID, 31]</BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <label for="nameThai" class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 64]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText id="nameThai" @bind-Value="recordEventType.EventTypeTHName" placeholder="@AppData.LangResource[AppData.LanguageID,64]" class="form-control" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <label for="nameEng" class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 65]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText id="nameEng" @bind-Value="recordEventType.EventTypeENName" placeholder="@AppData.LangResource[AppData.LanguageID,65]" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+        </BSModalBody>
+        <BSModalFooter>
+            <button type="submit" class="btn btn-warning" @onclick="@(() => AddEventtype.Hide())">@AppData.LangResource[AppData.LanguageID, 44]</button>
+            <button type="reset" class="btn btn-warning" @onclick="@(() => AddEventtype.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+        </BSModalFooter>
+    </BSModal>
+</EditForm>
+
+
+
+
+@code {
+    private int select;
+    private string zipCode = "";
+    /// <summary>
+    /// Number Parameter
+    /// </summary>
+    [Parameter]
+    public string EventNumber { get; set; } 
+
+
+
+
+    /// <summary>
+    /// List RecordType
+    /// </summary>
+    private List<RecordEventType> recordEventTypes = new List<RecordEventType>();
+
+    List<ProjectEventRecord> listprojectEventRecord = new List<ProjectEventRecord>();
+
+    /// <summary>
+    /// Province List
+    /// </summary>
+    private List<RecordEventProvince> recordEventProvinces = new List<RecordEventProvince>();
+
+    /// <summary>
+    /// District List
+    /// </summary>
+    private List<RecordEventDistrict> recordEventDistricts = new List<RecordEventDistrict>();
+
+    /// <summary>
+    /// sub DistrictList
+    /// </summary>
+    private List<SubDistrict> subDistricts = new List<SubDistrict>();
+
+    /// <summary>
+    /// Main Model From Add RecordEventType
+    /// </summary>
+    RecordEventType recordEventType = new RecordEventType();
+
+    /// <summary>
+    /// Modal AddType
+    /// </summary>
+    BSModal AddEventtype { get; set; }
+
+    /// <summary>
+    /// Main Model Form Record
+    /// </summary>
+    RecordEvent recordEvent = new RecordEvent()
+    {
+        EventRegisterDate = DateTime.Today
+    };
+
+    int? projectID;
+    int? projectStatusID;
+
+
+    protected RecordProject recordProject = new RecordProject();
+
+    /// <summary>
+    /// On Create New EventType
+    /// </summary>
+    /// <returns></returns>
+    private async Task PostRecordEventType()
+    {
+        var respond = await Http.PostAsJsonAsync($"{Config["nurl"]}/api/RegisterEventType", recordEventType);
+        ToastService.ShowSuccess("Successfully added EventType");
+        List<RecordEventType> type = await respond.Content.ReadFromJsonAsync<List<RecordEventType>>();
+
+        recordEventTypes.Add(type.First<RecordEventType>());
+        //((IJSInProcessRuntime)jsRuntime).InvokeVoid("clearURL");
+    }
+
+    //private async Task PostRecordEvent()
+    //{
+
+    //}
+
+    // RapidNrims.Shared.Model.RecordModel recordRegister = new RapidNrims.Shared.Model.RecordModel();
+
+    /// <summary>
+    /// On Save Click Event
+    /// </summary>
+    /// <returns></returns>
+    async Task CreateEventRegister()
+    {
+        // var result = await RecordService.CreateEventRegister(recordRegister);
+        //NavigationManager.NavigateTo($"/Record/posts/{result.City}");
+        if (recordEvent.EventID != 0)
+        {
+            if (recordProject.ProjectInsStatusID == 3)
+            {
+                ToastService.ShowError("This project has been completed.");
+            }
+            else
+            {
+                if (recordEvent.EventRegisterDate.HasValue &&
+                           recordEvent.EventRegisterDate.Value.Date >= recordProject.ProjectStartDate.Date &&
+                           recordEvent.EventRegisterDate.Value.Date <= recordProject.ProjectEndDate.Date)
+                {
+                    if (AppData.CurrentPermission.Find(i => i.permissionID == 1).permissionU)
+                    {
+
+                        recordEvent.eventUpdateBy = (Guid)AppData.UserID;
+                        recordEvent.eventUpdateDate = DateTime.Now;
+                        recordEvent.EventStartDate = recordEvent.EventRegisterDate;
+                        recordEvent.EventEndDate = recordEvent.EventRegisterDate;
+                        recordEvent.EventType = recordProject.ProjectType;
+                        recordEvent.EventInformerName = recordProject.ProjectInformerName;
+                        var respond = await Http.PutAsJsonAsync<RecordEvent>($"{Config["nurl"]}/api/UpdateEventRecord/{recordEvent.EventID}", recordEvent);
+                        if (respond.StatusCode == System.Net.HttpStatusCode.OK)
+                        {
+                            ToastService.ShowSuccess("Successfully");
+                            try
+                            {
+                                List<RecordEvent> result = await respond.Content.ReadFromJsonAsync<List<RecordEvent>>();
+                                // var rec =result.First<RecordEvent>();
+                                this.recordEvent = result.First<RecordEvent>();
+
+                                EventNumber = recordEvent.EventNumber;
+                            }
+                            catch (Exception e)
+                            {
+                                var val = e.Message;
+                                ToastService.ShowError($"{val}Error! ");
+                            }
+                        }
+                        else
+                        {
+                            ToastService.ShowError("Error! "); //
+                                                               //Console.WriteLine(respond);
+                        }
+                    }
+                }
+                else
+                {
+                    ToastService.ShowError($"The registration date is outside the project's dates.");
+                }
+            }
+        }
+        // else
+        // {
+        //     if (AppData.CurrentPermission.Find(i => i.permissionID == 1).permissionC)
+        //     {
+        //         recordEvent.eventCreateBy = (Guid)AppData.UserID;
+        //         recordEvent.eventCreateDate = DateTime.Now;
+        //         recordEvent.EventStatusID = 1;
+        //         var respond = await Http.PostAsJsonAsync<RecordEvent>($"{Config["nurl"]}/api/RegisterEventRecord", recordEvent);
+        //         if (respond.StatusCode == System.Net.HttpStatusCode.OK)
+        //         {
+        //             ToastService.ShowSuccess("Successfully");
+        //             try
+        //             {
+        //                 List<RecordEvent> result = await respond.Content.ReadFromJsonAsync<List<RecordEvent>>();
+        //                 // var rec =result.First<RecordEvent>();
+        //                 this.recordEvent = result.First<RecordEvent>();
+
+        //                 EventNumber = recordEvent.EventNumber;
+        //             }
+        //             catch (Exception e)
+        //             {
+        //                 var val = e.Message;
+        //                 ToastService.ShowError($"{val}Error!");
+        //             }
+
+        //         }
+        //         else
+        //         {
+        //             ToastService.ShowError("Error! "); //
+        //             Console.WriteLine(respond);
+        //         }
+        //     }
+        // }
+    }
+
+
+    /// <summary>
+    /// Oninit
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("clearURL");
+        }
+    }
+
+    /// <summary>
+    /// OnInit Async
+    /// </summary>
+    /// <returns></returns>
+    protected override async Task OnInitializedAsync()
+    {
+
+        await OnSearch();
+        //var activeEventType = recordEventTypes.Find(i => i.IsActive == true).IsActive;
+        //if (activeEventType == true)
+        //    recordEventTypes = await _masterData.GetAllActiveMasterDataAsync<RecordEventType>("ActiveEventType");
+        //*(อันเก่าเวอร์ชั่น 1.5)*recordEventTypes = await RecordEventTypeService.GetRecordEventTypes();
+        recordEventTypes = AppData.recordEventTypes;
+        recordEventProvinces = AppData.Provinces;
+        if(recordEvent.ProvinceID >0)
+        {
+            recordEventDistricts = AppData.Districts.Where(i=>i.DistrictProvinceID==recordEvent.ProvinceID).ToList();
+        }
+        if(recordEvent.DistrictID >0)
+        {
+            subDistricts = AppData.subDistricts.Where(i=>i.subDistrictDistrictID==recordEvent.DistrictID).ToList();
+        }
+
+
+        ///OrderBy Provinces and Districts
+        if (AppData.LanguageID == 0)
+        {
+            var resultEventProvinces = recordEventProvinces.OrderBy(pEN => pEN.ProvinceENName).ToList();
+            recordEventProvinces = resultEventProvinces;
+            var resultEventTypes = recordEventTypes.OrderBy(tEN => tEN.EventTypeENName).ToList();
+            recordEventTypes = resultEventTypes;
+            /*   var resultEventDistricts = recordEventDistricts.OrderBy(dEN => dEN.DistrictENName).ToList();
+               recordEventDistricts = resultEventDistricts;
+               var resultsubDistricts = subDistricts.OrderBy(sdEN => sdEN.subDistrictENName).ToList();
+               subDistricts = resultsubDistricts;*/
+        }
+        else
+        {
+            var resultEventProvinces = recordEventProvinces.OrderBy(pTH => pTH.ProvinceTHName).ToList();
+            recordEventProvinces = resultEventProvinces;
+            var resultEventTypes = recordEventTypes.OrderBy(tTH => tTH.EventTypeTHName).ToList();
+            recordEventTypes = resultEventTypes;
+            /* var resultEventDistricts = recordEventDistricts.OrderBy(dTH => dTH.DistrictTHName).ToList();
+             recordEventDistricts = resultEventDistricts;
+             var resultsubDistricts = subDistricts.OrderBy(sdTH => sdTH.subDistrictTHName).ToList();
+             subDistricts = resultsubDistricts;*/
+        }
+
+        listprojectEventRecord = await Http.GetFromJsonAsync<List<ProjectEventRecord>>($"{Config["nurl"]}/api/GetProjectEventRecord");
+        var resultProject = listprojectEventRecord.Find(x => x.EventID == recordEvent.EventID);
+        if (resultProject != null)
+        {
+            projectID = resultProject.ProjectID;
+        }
+
+        var resultProjetRecord = await _masterDataPhase2.GetMasterDataAsyncByID<RecordProject>("ProjectRecordByID", projectID);
+        if (resultProjetRecord != null)
+        {
+            recordProject = resultProjetRecord;
+        }
+
+        
+
+
+    }
+
+    
+    
+    /// <summary>
+    /// OnProvinceSelected
+    /// </summary>
+    /// <param name="e"></param>
+    private void OnProvinceSelected(ChangeEventArgs e)
+    {
+
+        // แปลงค่าที่ผู้ใช้ป้อนเข้ามาเป็น int
+        if (int.TryParse(e.Value.ToString(), out int parsedValueProvinceID))
+        {
+            recordEvent.ProvinceID = parsedValueProvinceID;
+            if (this.recordEvent.ProvinceID != null && this.recordEvent.ProvinceID != 0)
+            {
+                recordEventDistricts = recordEventProvinces.Find(i => i.ProvinceID == recordEvent.ProvinceID).Districts;
+                if (AppData.LanguageID == 0)
+                {
+                    var resultEventDistricts = recordEventDistricts.OrderBy(dEN => dEN.DistrictENName).ToList();
+                    recordEventDistricts = resultEventDistricts;
+
+                }
+                else
+                {
+                    var resultEventDistricts = recordEventDistricts.OrderBy(dTH => dTH.DistrictTHName).ToList();
+                    recordEventDistricts = resultEventDistricts;
+                }
+
+                recordEvent.DistrictID = 0;
+                recordEvent.SubDistrictID = 0;
+                recordEvent.zipCode = 0;
+            }
+            else
+            {
+                recordEventDistricts = new List<RecordEventDistrict>();
+                subDistricts = new List<SubDistrict>();
+                recordEvent.zipCode = 0;
+
+            }
+        }
+
+    }
+
+    /// <summary>
+    /// OnDistrictSelected
+    /// </summary>
+    /// <param name="e"></param>
+    public void OnDistrictSelected(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value.ToString(), out int parsedValueDistrictsID))
+        {
+            recordEvent.DistrictID = parsedValueDistrictsID;
+            if (this.recordEvent.DistrictID != null && this.recordEvent.DistrictID != 0)
+            {
+                this.subDistricts = recordEventDistricts.Find(i => i.DistrictID == recordEvent.DistrictID).SubDistricts;
+                if (AppData.LanguageID == 0)
+                {
+                    var resultsubDistricts = subDistricts.OrderBy(sdEN => sdEN.subDistrictENName).ToList();
+                    subDistricts = resultsubDistricts;
+
+                }
+                else
+                {
+                    var resultsubDistricts = subDistricts.OrderBy(sdTH => sdTH.subDistrictTHName).ToList();
+                    subDistricts = resultsubDistricts;
+                }
+
+                recordEvent.SubDistrictID = 0;
+                recordEvent.zipCode = 0;
+            }
+            else
+            {
+                subDistricts = new List<SubDistrict>();
+                recordEvent.zipCode = 0;
+            }
+
+        }
+
+    }
+
+    /// <summary>
+    /// OnSubDistrictSelected
+    /// </summary>
+    /// <param name="e"></param>
+    public void OnSubDistrictSelected(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value.ToString(), out int parsedValueSubDistrictsID))
+        {
+            recordEvent.SubDistrictID = parsedValueSubDistrictsID;
+            if (this.recordEvent.SubDistrictID != null && this.recordEvent.SubDistrictID != 0)
+            {
+                recordEvent.zipCode = Int32.Parse(subDistricts.Find(i => i.subDistrictID == this.recordEvent.SubDistrictID).subDistrictCode);
+            }
+            else
+            {
+                recordEvent.zipCode = 0;
+            }
+        }
+
+    }
+
+    /// <summary>
+    /// On Search Event for Edit
+    /// </summary>
+    public async Task OnSearch()
+    {
+        if (EventNumber != "")
+        {
+            List<RecordEvent> re = await Http.GetFromJsonAsync<List<RecordEvent>>($"{Config["nurl"]}/api/GetEventRecord/{EventNumber}");
+            if (re.Count >= 1)
+            {
+                recordEvent = re.First<RecordEvent>();
+            }
+            else
+            {
+                EventNumber = "";
+                //ToastService.ShowError("There is no Event Number in the Database !");
+            }
+        }
+    }
+
+    /// <summary>
+    /// OnClear
+    /// </summary>
+    public void OnClear()
+    {
+        recordEvent = new RecordEvent();
+        EventNumber = "";
+        recordEventDistricts = new List<RecordEventDistrict>();
+        subDistricts = new List<SubDistrict>();
+        recordEvent.EventRegisterDate = DateTime.Today;
+    }
+
+    /// <summary>
+    /// Record/ManageEvent
+    /// </summary>
+    public void OnManage()
+    {
+
+        NavigationManager.NavigateTo($"/Record/ManageEvent/{EventNumber}/{projectID}");
+
+    }
+    /// <summary>
+    /// OnReport Click
+    /// </summary>
+    public void OnReport()
+    {
+        string url = $"{Config["rurl"]}/api/Register?ID={recordEvent.EventID}";
+        jsRuntime.InvokeVoidAsync("OpenURL", url);
+        //((IJSInProcessRuntime)jsRuntime).InvokeVoid("OpenURL", url);
+    }
+
+    
+}

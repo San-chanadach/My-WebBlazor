@@ -1,0 +1,548 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+@namespace RapidNRIMs.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="~/" />
+    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/dashboard.css" />
+    <link href="css/app.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="assets/fonts/fontawesome-all.min.css">
+    <link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/fonts/fontawesome5-overrides.min.css">
+    <link href="_content/Blazored.Toast/blazored-toast.min.css" rel="stylesheet" />
+
+    <link href="css/dataTables.bootstrap4.min.css" rel="stylesheet" crossorigin="anonymous" />
+    <link href="https://cdn.datatables.net/select/1.3.4/css/select.dataTables.min.css" />
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <link rel="stylesheet" href="dist/css/lightbox.css" />
+    <link rel="stylesheet" href="assets/bootstrap-datepicker1.7/dist/css/bootstrap-datepicker.css">
+
+    <!-- เพิ่ม CSS ของ Select2 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+</head>
+<body style="background-color: #E7F4FC; position: relative;display: flex; flex-direction: column;">
+    @RenderBody()
+
+    <div id="blazor-error-ui">
+        <environment include="Staging,Production">
+            An error has occurred. This application may no longer respond until reloaded.
+        </environment>
+        <environment include="Development">
+            An unhandled exception has occurred. See browser dev tools for details.
+        </environment>
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+
+
+    <!--script src="js/jquery.min.js"></!--script-->
+    @* <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script> *@
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="js/dataTables.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/select/1.3.4/js/dataTables.select.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <!---script src="https://unpkg.com/bootstrap@4.1.0/dist/js/bootstrap.min.js"></script-->
+    <script src="js/dataTables.bootstrap4.min.js" crossorigin="anonymous"></script>
+    <script src="_content/BlazorStrap/blazorStrap.js"></script>
+    <!--------Show Password Form Username------------------>
+    <script src="js/ShowPassword.js"></script>
+    <!--------Show Password Form Email------------------>
+    <script src="js/ShowEmailPassword.js"></script>
+    <!--------Login Form Username and Email------------------>
+    <script src="js/LoginFormUsernameAndEmail.js"></script>
+    <!--------onClickEnter In Login------------------>
+    <script src="js/EnterLogin.js"></script>
+    <!--------Show NewPassword ------------------>
+    <script src="js/ShowNewPassword.js"></script>
+    <!--------Show ConfirmPassword ------------------>
+    <script src="js/ShowConfirmPassword.js"></script>
+    <!--------Shownamefiledocument------------------>
+    <script src="js/ShowNameFileDocument.js"></script>
+    <!--------ActiveMenu------------------>
+    <script src="js/ActiveMenu.js"></script>
+    <!--------DownloadFile------------------>
+    <script src="js/DownloadFile.js"></script>
+    <!--------Calendar------------------>
+    <!---script src="js/BlazorFullCalendar.js"></script--->
+    <!--script src="_content/BlazorFullCalendar/js/BlazorFullCalendar.js"></script-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/litepicker/2.0.11/litepicker.js"></script>
+    <!--------BlazorFullCalendar-Master------------------>
+    <script src="js/BlazorFullCalendar-Master.js"></script>
+    <!--------PSC.Blazor.Components.Chartjs------------------>
+    <script src="lib/Chart.js/chart.js"></script>
+    <script src="Chart/Chart.js"></script>
+    <!--------Lightbox------------------>
+    <script src="dist/js/lightbox.js"></script>
+    <script src="js/Lightbox.js"></script>
+    <script src="js/SetTime.js"></script>
+    <script src="assets/bootstrap-datepicker1.7/dist/js/bootstrap-datepicker.js"></script>
+    <script src="assets/bootstrap-datepicker1.7/dist/js/bootstrap-datepicker-thai.js"></script>
+    <script src="assets/bootstrap-datepicker1.7/dist/locales/bootstrap-datepicker.th.js"></script>
+    <script src="js/DatePicker.js"></script>
+    <!-- เพิ่ม JavaScript ของ Select2 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+    <script>
+        window.addClickHandler = () => {
+            document.addEventListener('click', function (event) {
+                var suggestions = document.getElementById('suggestions');
+                var input = document.getElementById('input');
+                var iconSugges = document.getElementById('icon-suggestion');
+                if (suggestions && input && iconSugges) {
+                    if (event.target !== input && event.target !== suggestions && event.target !== iconSugges) {
+                        suggestions.style.display = 'none'; // เมื่อคลิกที่พื้นที่อื่น ๆ ให้ซ่อน <ul> tag
+                    }
+                    else{
+                        suggestions.style.display = 'block';
+                    }
+                }
+            });
+        };
+
+
+
+
+        
+    </script>
+
+    <script>
+
+        window.clearFileInput = (inputId, labelId) => {
+            var fileInput = document.getElementById(inputId);
+            var label = document.getElementById(labelId);
+
+            // เคลียร์ค่าของ file input
+            fileInput.value = '';
+
+            // ตั้งข้อความของ label เป็นค่าเริ่มต้น
+            if (fileInput.hasAttribute('data-browse')) {
+                label.textContent = fileInput.getAttribute('data-browse');
+            } else {
+                label.textContent = 'Choose file';
+            }
+        };
+
+
+    </script>
+
+    <script>
+        window.addClickSupportHandler = () => {
+            document.addEventListener('click', function (event) {
+                var suggestions = document.getElementById('supportsuggestions');
+                var input = document.getElementById('supportinput');
+                var iconSugges = document.getElementById('icon-suggestion-support');
+                if (suggestions && input && iconSugges) {
+                    if (event.target !== input && event.target !== suggestions && event.target !== iconSugges) {
+                        suggestions.style.display = 'none'; // เมื่อคลิกที่พื้นที่อื่น ๆ ให้ซ่อน <ul> tag
+                    }
+                    else {
+                        suggestions.style.display = 'block';
+                    }
+                }
+                // if (suggestions && input && iconSugges) {
+                //     if (event.target !== input && event.target !== suggestions && event.target !== iconSugges) {
+                //         suggestions.style.display = 'none'; // เมื่อคลิกที่พื้นที่อื่น ๆ ให้ซ่อน <ul> tag
+                //     }
+                //     else {
+                //         if (suggestions.style.display === 'block' && event.target === iconSugges) {
+                //             // ตรวจสอบว่า input text ว่างเปล่าหรือไม่
+                //             if (input.value.trim() === '') {
+                //                 suggestions.style.display = 'block'; // เมื่อ input text ว่างเปล่าให้แสดง dropdown list
+                //             }
+                //             else {
+                //                 suggestions.style.display = 'none'; // เมื่อคลิกที่ icon เพื่อเปิด dropdown list อีกครั้ง ให้ซ่อน dropdown list
+                //             }
+                //         } else {
+                //             suggestions.style.display = 'block'; // เปิด dropdown list เมื่อคลิกที่ input หรือ dropdown list เอง
+                //         }
+                //     }
+                // }
+            });
+        };
+
+
+    </script>
+
+    <script>
+        window.addClickTeamHandler = () => {
+            document.addEventListener('click', function (event) {
+                var suggestions = document.getElementById('teamsuggestions');
+                var input = document.getElementById('teaminput');
+                var iconSugges = document.getElementById('icon-suggestion-team');
+                if (suggestions && input && iconSugges) {
+                    if (event.target !== input && event.target !== suggestions && event.target !== iconSugges) {
+                        suggestions.style.display = 'none'; // เมื่อคลิกที่พื้นที่อื่น ๆ ให้ซ่อน <ul> tag
+                    }
+                    else {
+                        suggestions.style.display = 'block';
+                    }
+                }
+                // if (suggestions && input && iconSugges) {
+                //     if (event.target !== input && event.target !== suggestions && event.target !== iconSugges) {
+                //         suggestions.style.display = 'none'; // เมื่อคลิกที่พื้นที่อื่น ๆ ให้ซ่อน <ul> tag
+                //     }
+                //     else {
+                //         if (suggestions.style.display === 'block' && event.target === iconSugges) {
+                //             suggestions.style.display = 'none'; // เมื่อคลิกที่ icon เพื่อเปิด dropdown list อีกครั้ง ให้ซ่อน dropdown list
+                //         } else {
+                //             suggestions.style.display = 'block'; // เปิด dropdown list เมื่อคลิกที่ input หรือ dropdown list เอง
+                //         }
+                //     }
+                // }
+            });
+        };
+    </script>
+
+    <script>
+        window.addEnterKeyPressListener = () => {
+            const addListener = () => {
+                const inputElement = document.getElementById('instrumentnumber-project');
+                if (inputElement) {
+                    inputElement.addEventListener('keydown', function (event) {
+                        if (event.key === 'Enter') {
+                            event.preventDefault(); // Prevent the default action
+                            document.getElementById('addinstrument-project').click(); // Simulate the button click
+                        }
+                    });
+                } else {
+                    // Retry after a slight delay if the element is not found
+                    setTimeout(addListener, 100);
+                }
+            };
+
+            addListener(); // Initial call to add the event listener
+        };
+
+
+    </script>
+
+
+    <script>
+        function initializeCarousel() {
+            // $(document).ready(function() {
+            //     $('#carouselExampleIndicators').carousel({ interval: 9000 });
+
+            //     //see step 2 to understand these news id's:
+            //     $('#carouselExampleIndicators-prev').click(
+            //         () => $('#carouselExampleIndicators').carousel('prev'));
+            //     $('#carouselExampleIndicators-next').click(
+            //         () => $('#carouselExampleIndicators').carousel('next'));
+            // });
+
+            $(document).ready(function () {
+                $('#carouselExampleIndicators').carousel({ interval: 9000 });
+
+                $('#carouselExampleIndicators-prev').click(function () {
+                    $('#carouselExampleIndicators').carousel('prev');
+                });
+
+                $('#carouselExampleIndicators-next').click(function () {
+                    $('#carouselExampleIndicators').carousel('next');
+                });
+            });
+        }
+
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll('.toggle-newpassword').forEach(function (toggle) {
+                toggle.addEventListener('click', function () {
+                    const input = document.querySelector(this.getAttribute('toggle'));
+                    if (input.getAttribute('type') === 'password') {
+                        input.setAttribute('type', 'text');
+                        this.classList.remove('fa-eye');
+                        this.classList.add('fa-eye-slash');
+                    } else {
+                        input.setAttribute('type', 'password');
+                        this.classList.remove('fa-eye-slash');
+                        this.classList.add('fa-eye');
+                    }
+                });
+            });
+
+            document.querySelectorAll('.toggle-confirmpassword').forEach(function (toggle) {
+                toggle.addEventListener('click', function () {
+                    const input = document.querySelector(this.getAttribute('toggle'));
+                    if (input.getAttribute('type') === 'password') {
+                        input.setAttribute('type', 'text');
+                        this.classList.remove('fa-eye');
+                        this.classList.add('fa-eye-slash');
+                    } else {
+                        input.setAttribute('type', 'password');
+                        this.classList.remove('fa-eye-slash');
+                        this.classList.add('fa-eye');
+                    }
+                });
+            });
+        });
+
+        function getInputValueNewPassword() {
+            const passwordInput = document.getElementById('newpassword');
+            const toggleIcon = document.querySelector('.toggle-newpassword');
+            if (passwordInput.value === '') {
+                // Hide the eye icon when the input is empty
+                toggleIcon.style.display = 'none';
+            } else {
+                // Show the eye icon when the input is not empty
+                toggleIcon.style.display = 'block';
+            }
+        }
+
+        function getInputValueConfirmPassword() {
+            const passwordInput = document.getElementById('confirmpassword');
+            const toggleIcon = document.querySelector('.toggle-confirmpassword');
+            if (passwordInput.value === '') {
+                // Hide the eye icon when the input is empty
+                toggleIcon.style.display = 'none';
+            } else {
+                // Show the eye icon when the input is not empty
+                toggleIcon.style.display = 'block';
+            }
+        }
+
+
+    </script>
+
+    <script>
+        /* When the user clicks on the button,
+        toggle between hiding and showing the dropdown content */
+        function myFunction() {
+            document.getElementById("myDropdown").classList.toggle("show");
+        }
+
+        // Close the dropdown if the user clicks outside of it
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropbtn')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                var i;
+                for (i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!--------clearURL------------------>
+    <script>
+        function clearURL() {
+            window.history.replaceState('', '', '/');
+
+        }
+    </script>
+
+    <!--------OpenURL------------------>
+    <script>
+        function OpenURL(url) {
+            window.open(url, '_blank', 'toolbar=0,location=0,menubar=0');
+
+        }
+    </script>
+
+
+    <script>
+        function resetInputFile(elementId) {
+            $('#' + elementId).val(null);
+        }
+    </script>
+
+
+
+    <!--------LoadReport------------------>
+    <!---script>
+        function downloadFromUrl(options: { url: string, fileName?: string }): void {
+            const anchorElement = document.createElement('a');
+            anchorElement.href = options.url;
+            anchorElement.download = options.fileName ?? '';
+            anchorElement.click();
+            anchorElement.remove();
+        }
+    </script--->
+    <!--------ResponsiveDataTables------------------>
+    <script>
+        function ResponsiveDataTables(table) {
+            $(document).ready(function () {
+                if (!$.fn.DataTable.isDataTable('#dataTable')) {
+                    $(table).DataTable();
+
+                    $("tbody").on("click", "tr", function (e) {
+                        $(this)
+                            .toggleClass("selected")
+                            .addClass("selected")
+                            .siblings(".selected")
+                            .removeClass("selected");
+                    });
+
+                    // เพิ่มการเรียกฟังก์ชันเพื่อเคลียร์คลาสที่เกี่ยวกับสีของแถวที่เลือก
+                    $("#OnsearchDoseUserAll").click(function () {
+                        $("tr.selected").removeClass("selected");
+                    });
+                }
+            });
+        }
+    </script>
+
+    <script>
+        window.scrollToCardTwo = function () {
+            setTimeout(() => {
+                var cardTwo = document.getElementById('card-project');
+                if (cardTwo) {
+                    cardTwo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 0);
+        };
+
+
+    </script>
+
+    <script>
+        window.addNoneBgClassToSelectedRows = () => {
+            let selectedRows = document.querySelectorAll('tbody tr.selected');
+            selectedRows.forEach(row => {
+                row.classList.add('none-bg');
+            });
+        }
+    </script>
+
+    <script>
+        function resetshowFileName() {
+            $(document).ready(function() {
+                $('#clearInputFile').on('click', function() {
+                    // ล้างค่า InputFile โดยตั้งค่าค่าเป็นค่าว่าง
+                    document.getElementById('documentfile').value = '';
+                    // อัพเดท label เป็นข้อความเริ่มต้น (No file chosen)
+                    document.querySelector('#documentfile + .custom-file-label').innerHTML = 'Choose File';
+                });
+            });
+        }
+    </script>
+
+     <script>
+        function resetshowFileNameButtonSave() {
+            $(document).ready(function() {
+                $('#clearInputFileSave').on('click', function() {
+                    // ล้างค่า InputFile โดยตั้งค่าค่าเป็นค่าว่าง
+                    document.getElementById('documentfile').value = '';
+                    // อัพเดท label เป็นข้อความเริ่มต้น (No file chosen)
+                    document.querySelector('#documentfile + .custom-file-label').innerHTML = 'Choose File';
+                });
+            });
+        }
+    </script>
+
+
+    <script>
+
+        function ThisDataTablesAdd(table) {
+
+            $(document).ready(function() {
+
+                $('#example').DataTable().draw();
+                /*
+                var table = $('#example').DataTable();
+                $('#example tbody').on('click', 'tr', function () {
+                    if ($(this).hasClass('selected')) {
+                        $(this).removeClass('selected');
+                    }
+                    else {
+                        table.$('tr.selected').removeClass('selected');
+                        $(this).addClass('selected');
+                    }
+                });
+                $('#button').click(function () {
+                    table.row('.selected').remove().draw(false);
+                });
+                */
+            });
+
+
+        }
+
+    </script>
+
+    <script>
+        function init_datatable(table, searching) {
+            $(table).DataTable({
+                "searching": searching
+            });
+        }
+    </script>
+
+    <script>
+        function getValueDatePicker() {
+
+            window.onload = function() {/*from  w w  w.j a v a  2  s.  com*/
+                //dd/mm/yyyy
+                var date = new Date();
+                console.log(date);
+                var month = date.getMonth();
+                console.log(month);
+                var day = date.getDate();
+                console.log(day);
+                var year = date.getFullYear();
+                console.log(year);
+                console.log(month + "/" + day + "/" + year);
+            }
+
+
+        }
+
+    </script>
+    <!----script>
+        function ClerInputFile() {
+            $(document).ready(function () {
+                document.querySelector("documentfile").value = "";
+                $(".clearFileName").val('');
+
+            });
+        }
+    </script-->
+
+    <script>
+        function BSTabsCheckList() {
+            $(document).ready(function() {
+
+                // เลือก tab ที่ 2 และ tab content ที่เราต้องการให้เปิด
+                const profileTab = document.getElementById('profile-tab');
+                const profileTabLabel = document.querySelector('BSTabLabel:contains("Profile")');
+
+                // ตรวจสอบว่ามี tab และ label ของ tab ที่ 2 อยู่ใน DOM
+                if (profileTab && profileTabLabel) {
+                    // เปิด tab ที่ 2
+                    profileTab.classList.add('show', 'active');
+
+                    // เปิด label ของ tab ที่ 2
+                    profileTabLabel.classList.add('active');
+                }
+            });
+        }
+    </script>
+    <script>
+        function ShowNameTeamEvent(message) {
+
+            alert(message);
+
+        }
+
+
+    </script>
+
+
+
+
+    <script src="_framework/blazor.server.js"></script>
+</body>
+</html>

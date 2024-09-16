@@ -1,0 +1,27 @@
+﻿@inherits CalendarPageBase
+
+@page "/monthviewjson"
+
+<h3>MonthView (JSON Feed Source)</h3>
+
+<FullCalendar settings="@calendarSettings" />
+
+@code {
+    public CalendarSettings calendarSettings { get; set; }  = new CalendarSettings
+    {
+        Plugins = new[] { CalendarPluginTypes.DayGrid, CalendarPluginTypes.Interaction },
+        InitialView = "dayGridWeek",
+        TimeZone = "UTC",
+        EventSources = new List<CalendarSourceFeed>()
+        {
+            new CalendarSourceFeed 
+            { 
+                Url = "https://fullcalendar.io/demo-events.json", 
+                ExtraParams = new Dictionary<string, string>()
+                { 
+                    { "custom","dummy"} 
+                } 
+            }
+        }
+    };
+}

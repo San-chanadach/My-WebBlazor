@@ -1,0 +1,16 @@
+
+@page "/Security/TeamScheduleTest"
+@inject IJSRuntime IJSRuntime
+
+     <div id='calendar'></div>
+@code{
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            await IJSRuntime.InvokeAsync<object>("calenders");
+            StateHasChanged();
+        }
+
+    }
+}

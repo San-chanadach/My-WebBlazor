@@ -1,0 +1,659 @@
+﻿@page "/Security/UserProfile/{userID}/{Admin}"
+@using System.Threading
+@inject IJSRuntime jsRuntime
+@inject AppData AppData
+@inject NavigationManager NavigationManager
+@inject IRecordEventDistrictService RecordEventDistrictService
+@inject IRecordEventProvinceService RecordEventProvinceService
+@inject IToastService ToastService
+@inject IConfiguration Config
+@inject HttpClient Http
+
+<PageTitle>User Profile Page</PageTitle>
+
+<EditForm Model="@showaccount" OnInvalidSubmit="UpdateUserAccount">
+    <!---DataAnnotationsValidator /-->
+    <div class="row margin-row-card">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">@AppData.LangResource[AppData.LanguageID, 181]</div>
+                <div class="card-body">
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 142]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <InputText class="form-control" @bind-Value="showaccount.UserName" placeholder="@AppData.LangResource[AppData.LanguageID,142]" />
+                            </div>
+                        </div>
+                        <label for="email" class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 79]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <InputText class="form-control" @bind-Value="showaccount.Email" id="email" placeholder="@AppData.LangResource[AppData.LanguageID,79]" />
+                            </div>
+                            <ValidationMessage For="@(() => showaccount.Email)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="firstName" class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 143]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <InputText @bind-Value="showaccount.FirstName" class="form-control" id="firstName" placeholder="@AppData.LangResource[AppData.LanguageID,143]" />
+                            </div>
+                            <ValidationMessage For="@(() => showaccount.FirstName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" />
+                        </div>
+                        <label for="lastName" class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 144]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <InputText @bind-Value="showaccount.LastName" class="form-control" id="lastName" placeholder="@AppData.LangResource[AppData.LanguageID,144]" />
+                            </div>
+                            <ValidationMessage For="@(() => showaccount.LastName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="Position" class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 454]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <InputText @bind-Value="showaccount.PositionName" class="form-control" id="firstName" placeholder="@AppData.LangResource[AppData.LanguageID,454]" />
+                            </div>
+                            <ValidationMessage For="@(() => showaccount.PositionName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" />
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row margin-row-card">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">@AppData.LangResource[AppData.LanguageID, 183]</div>
+                <div class="card-body">
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 39]</span>
+                        </label>
+                        <div class="col-12 col-md-12 col-lg-8 input-box-bottom">
+                            <InputTextArea @bind-Value="showaccount.Address" class="form-control" rows="2" placeholder="@AppData.LangResource[AppData.LanguageID,39]"></InputTextArea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="eventProvince" class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 41]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <InputSelect class="form-control" @bind-Value="showaccount.ProvinceID" id="eventProvince" @onclick="OnProvinceSelected">
+                                    <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                    @foreach (var item in recordEventProvinces)
+                                    {
+                                        @if (AppData.LanguageID == 0)
+                                        {
+                                            <option value="@item.ProvinceID">@item.ProvinceENName</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.ProvinceID">@item.ProvinceTHName</option>
+                                        }
+                                    }
+                                </InputSelect>
+                            </div>
+                            <ValidationMessage For="@(() => showaccount.ProvinceID)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" />
+                        </div>
+                        <label for="district" class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 233]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <InputSelect class="form-control" @bind-Value="showaccount.DistrictID" id="district" @onclick="OnDistrictSelected">
+                                    <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                    @foreach (var item in recordEventDistricts)
+                                    {
+
+
+                                        @if (item.DistrictProvinceID == showaccount.ProvinceID)
+                                        {
+                                            @if (AppData.LanguageID == 0)
+                                            {
+                                                <option value="@item.DistrictID">@item.DistrictENName</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.DistrictID">@item.DistrictTHName</option>
+                                            }
+                                        }
+                                    }
+                                </InputSelect>
+                            </div>
+                            <ValidationMessage For="@(() => showaccount.DistrictID)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="subdistrict" class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 234]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <InputSelect class="form-control" @bind-Value="showaccount.SubDistrictID" id="subdistrict" @onclick="OnSubDistrictSelected">
+                                    <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                    @foreach (var item in subDistricts)
+                                    {
+                                        @if (item.subDistrictDistrictID == showaccount.DistrictID)
+                                        {
+                                            @if (AppData.LanguageID == 0)
+                                            {
+                                                <option value="@item.subDistrictID">@item.subDistrictENName</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.subDistrictID">@item.subDistrictTHName</option>
+                                            }
+
+                                        }
+                                    }
+                                </InputSelect>
+                            </div>
+                            <ValidationMessage For="@(() => showaccount.SubDistrictID)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" />
+                        </div>
+                        <label for="eventZipCode" class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 43]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <InputNumber disabled @bind-Value="showaccount.ZipCode" placeholder="@AppData.LangResource[AppData.LanguageID, 43]" class="form-control" />
+                            </div>
+                            <ValidationMessage For="@(() => showaccount.ZipCode)" style="margin-top: -0.8rem; font-size:12px;" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 184]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <InputText @bind-Value="showaccount.PhoneNumber" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,184]" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Admin != "0")
+    {
+        <div class="row margin-row-card">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-header"><i class="fas fa-table mr-1"></i>@AppData.LangResource[AppData.LanguageID, 281]</div>
+                    <div class="card-body">
+                        <div class="scrollBar table-responsive scroll-inner" style="height:300px;">
+                            <table class="table table-bordered table-striped text-center">
+                                <thead>
+                                    <tr>
+                                        <th>@AppData.LangResource[AppData.LanguageID, 305]</th>
+                                        <th>@AppData.LangResource[AppData.LanguageID, 306]</th>
+                                        <th>
+                                            <div class="custom-control custom-checkbox mr-sm-2">
+                                                <input class="form-check-input" type="checkbox" @onchange="eventArgs => { CheckboxClicked(1, eventArgs.Value); }" name="Create" id="Create">
+                                                @AppData.LangResource[AppData.LanguageID, 307]
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="custom-control custom-checkbox mr-sm-2">
+                                                <input class="form-check-input" type="checkbox" @onchange="eventArgs => { CheckboxClicked(2, eventArgs.Value); }" name="Update" id="update">
+                                                @AppData.LangResource[AppData.LanguageID, 308]
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="custom-control custom-checkbox mr-sm-2">
+                                                <input class="form-check-input" type="checkbox" @onchange="eventArgs => { CheckboxClicked(3, eventArgs.Value); }" name="View" id="View">
+                                                @AppData.LangResource[AppData.LanguageID, 309]
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="custom-control custom-checkbox mr-sm-2">
+                                                <input class="form-check-input" type="checkbox" @onchange="eventArgs => { CheckboxClicked(4, eventArgs.Value); }" name="Delete" id="Delete">
+                                                @AppData.LangResource[AppData.LanguageID, 146]
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="custom-control custom-checkbox mr-sm-2">
+                                                <input class="form-check-input" type="checkbox" @onchange="eventArgs => { CheckboxClicked(5, eventArgs.Value); }" name="Execute" id="Execute">
+                                                @AppData.LangResource[AppData.LanguageID, 310]
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+
+                                    @foreach (var item in userPermission)
+                                    {
+                                        <tr>
+                                            @if (AppData.LanguageID == 0)
+                                            {
+                                                <td>@(item.permission != null ? item.permission.permissionENName:"-")</td>
+                                                <td>@(item.permission != null ? item.permission.subPermissionENName:"-")</td>
+                                            }
+                                            else
+                                            {
+                                                <td>@(item.permission != null ? item.permission.permissionTHName:"-")</td>
+                                                <td>@(item.permission != null ? item.permission.subPermissionTHName:"-")</td>
+                                            }
+                                            <td>
+                                                <div class="custom-control custom-checkbox mr-sm-2">
+                                                    <input class="form-check-input" type="checkbox" @bind="item.permissionC" value="Create" id="update">
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="custom-control custom-checkbox mr-sm-2">
+                                                    <input class="form-check-input" type="checkbox" @bind="item.permissionU" value="Update" id="update">
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="custom-control custom-checkbox mr-sm-2">
+                                                    <input class="form-check-input" type="checkbox" @bind="item.permissionV" value="View" id="View">
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="custom-control custom-checkbox mr-sm-2">
+                                                    <input class="form-check-input" type="checkbox" @bind="item.permissionD" value="Delete" id="Delete">
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="custom-control custom-checkbox mr-sm-2">
+                                                    <input class="form-check-input" type="checkbox" @bind="item.permissionE" value="Execute" id="Execute">
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <div class="text-center">
+        <a href="Security/UserManagement" class="btn" style="background-color:#7F7F7F; color:#fff">@AppData.LangResource[AppData.LanguageID, 49]</a>
+        @if (AppData.CurrentPermission.Find(i => i.permissionID == 18).permissionU)
+        {
+            <button type="submit" @onclick="UpdateUserAccount" class="btn"  style="margin-left: 0.5rem; background-color:#4CBB17; color:#fff"> @AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+
+    </div>
+</EditForm>
+
+<!--EditForm Modal Loading--->
+<BSModal class="row style-justify mt-5" @ref="Load" IsCentered="true" Size="Size.Small" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+    <BSModalBody>
+        <div class="text-center mt-3">
+            <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+                  style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+        </div>
+        <div class="text-center pt-3" style=" font-size: 16pt">
+            @AppData.LangResource[AppData.LanguageID, 325]
+        </div>
+    </BSModalBody>
+</BSModal>
+
+
+@code {
+    Account account = new Account();
+    UserAccount showaccount = new UserAccount();
+    UserAccount userAccount = new UserAccount();
+    int progress = 0;
+    BSModal Load { get; set; }
+
+    /// <summary>
+    /// Province List
+    /// </summary>
+    private List<RecordEventProvince> recordEventProvinces = new List<RecordEventProvince>();
+
+    /// <summary>
+    /// District List
+    /// </summary>
+    private List<RecordEventDistrict> recordEventDistricts = new List<RecordEventDistrict>();
+
+
+    /// <summary>
+    /// sub DistrictList
+    /// </summary>
+    List<SubDistrict> subDistricts = new List<SubDistrict>();
+    /// <summary>
+    /// User Permission
+    /// </summary>
+    List<UserPermission> userPermission = new List<UserPermission>();
+    /// <summary>
+    /// PErmnissionList
+    /// </summary>
+    List<Permission> permissionList = new List<Permission>();
+
+
+    [Parameter]
+    public string userID { get; set; }
+
+    [Parameter]
+    public string Admin { get; set; }
+
+
+    private List<UserAccount> userAccounts = new List<UserAccount>();
+
+
+    /// <summary>
+    /// UpdateUserAccount
+    /// </summary>
+    public async Task UpdateUserAccount()
+    {
+        await Task.Run(Loading);
+        Load.Show();
+        var upresult = await Http.PutAsJsonAsync($"{Config["aurl"]}/api/UpdateUserAccount/{Guid.Parse(userID)}", showaccount);
+        if (int.Parse(Admin) != 0)
+        {
+            ///รูปแบบนี้ AppData.CurrentPermission มันจะซิงค์กันกับหน้า Splash ซึ่งทำให้ตอนกำหนดตรง Permission มันจะทำงานทันทีโดยที่ยังไม่ได้กด Save เช่นถ้าติ๊ก View ของ User อื่น มันจะทำงานทันทีโดยที่ยังไม่ได้กด Save
+            //foreach (var i in AppData.CurrentPermission)
+            //{
+            //    await Http.PutAsJsonAsync($"{Config["aurl"]}/api/UpdatePermissionByUserID/{i.userPermissionID}", i);
+            //}
+
+            foreach (var i in userPermission)
+            {
+                await Http.PutAsJsonAsync($"{Config["aurl"]}/api/UpdatePermissionByUserID/{i.userPermissionID}", i);
+            }
+
+        }
+        if (upresult.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            //NavigationManager.NavigateTo("Security/UserProfile");
+            ToastService.ShowSuccess("UserAccount Save Successfully");
+            await SetUserpermission();
+        }
+        else
+        {
+            ToastService.ShowError("UserAccount Save Failed!");
+        }
+        Load.Hide();
+
+    }
+
+    public async Task SetUserpermission()
+    {
+        permissionList = AppData.permissionList;
+
+        if (Admin != "0")
+        {
+            ///รูปแบบนี้ AppData.CurrentPermission มันจะซิงค์กันกับหน้า Splash ซึ่งทำให้ตอนกำหนดตรง Permission มันจะทำงานทันทีโดยที่ยังไม่ได้กด Save เช่นถ้าติ๊ก View ของ User อื่น มันจะทำงานทันทีโดยที่ยังไม่ได้กด Save
+            //AppData.CurrentPermission = await Http.GetFromJsonAsync<List<UserPermission>>($"{Config["aurl"]}/api/GetPermissionByUserID/{userID}");
+
+            //foreach (var i in AppData.CurrentPermission)
+            //{
+            //    i.Getlookup(AppData.permissionList);
+            //}
+
+            userPermission = await Http.GetFromJsonAsync<List<UserPermission>>($"{Config["aurl"]}/api/GetPermissionByUserID/{userID}");
+
+            foreach (var i in userPermission)
+            {
+                i.Getlookup(AppData.permissionList);
+            }
+
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+
+
+        permissionList = AppData.permissionList;
+
+        //AppData.CurrentPermission = await Http.GetFromJsonAsync<List<UserPermission>>($"{Config["aurl"]}/api/GetPermissionByUserID/{userID}");
+
+        var result = await Http.GetFromJsonAsync<List<UserAccount>>($"{Config["aurl"]}/api/GetUserAccount/{userID}");
+        if (result != null && result.Any())
+        {
+            showaccount = result.First();
+        }
+        recordEventProvinces = AppData.Provinces;
+        recordEventDistricts = AppData.Districts;
+        subDistricts = AppData.subDistricts;
+
+        if (showaccount.ProvinceID > 0)
+        {
+            recordEventDistricts = AppData.Districts.Where(i => i.DistrictProvinceID == showaccount.ProvinceID).ToList();
+        }
+        if (showaccount.DistrictID > 0)
+        {
+            subDistricts = AppData.subDistricts.Where(i => i.subDistrictDistrictID == showaccount.DistrictID).ToList();
+        }
+
+
+        if (Admin != "0")
+        {
+            ///รูปแบบนี้ AppData.CurrentPermission มันจะซิงค์กันกับหน้า Splash ซึ่งทำให้ตอนกำหนดตรง Permission มันจะทำงานทันทีโดยที่ยังไม่ได้กด Save เช่นถ้าติ๊ก View ของ User อื่น มันจะทำงานทันทีโดยที่ยังไม่ได้กด Save
+            ////AppData.CurrentPermission = await Http.GetFromJsonAsync<List<UserPermission>>($"{Config["aurl"]}/api/GetPermissionByUserID/{userID}");
+
+            //foreach (var i in AppData.CurrentPermission)
+            //{
+            //    i.Getlookup(AppData.permissionList);
+            //}
+
+            userPermission = await Http.GetFromJsonAsync<List<UserPermission>>($"{Config["aurl"]}/api/GetPermissionByUserID/{userID}");
+
+            foreach (var i in userPermission)
+            {
+                i.Getlookup(AppData.permissionList);
+            }
+        }
+
+        ///OrderBy Provinces and Districts
+        if (AppData.LanguageID == 0)
+        {
+            var resultEventProvinces = recordEventProvinces.OrderBy(pEN => pEN.ProvinceENName).ToList();
+            recordEventProvinces = resultEventProvinces;
+
+        }
+        else
+        {
+            var resultEventProvinces = recordEventProvinces.OrderBy(pTH => pTH.ProvinceTHName).ToList();
+            recordEventProvinces = resultEventProvinces;
+
+        }
+
+    }
+
+
+    /// <summary>
+    /// On ProvinecSelect
+    /// </summary>
+    //public void OnProvinceSelected(ChangeEventArgs e)
+    //{
+
+    //    this.recordEventDistricts = recordEventProvinces.Find(i => i.ProvinceID == (int)e.Value).Districts;
+    //}
+
+    /// <summary>
+    /// On District Select
+    /// </summary>
+    //public void OnDistrictSelected(ChangeEventArgs e)
+    //{
+    //    if (this.showaccount.DistrictID != null)
+    //    {
+    //        this.subDistricts = recordEventDistricts.Find(i => i.DistrictID == (int)e.Value).SubDistricts;
+    //    }
+
+    //}
+
+    /// <summary>
+    /// On SubDistrict Select
+    /// </summary>
+    //public void OnSubDistrictSelected(EventArgs e)
+    //{
+    //    if (this.showaccount.SubDistrictID != 0)
+    //    {
+    //        showaccount.ZipCode = Int32.Parse(subDistricts.Find(i => i.subDistrictID == this.showaccount.SubDistrictID).subDistrictCode);
+    //    }
+    //}
+
+    /// <summary>
+    /// clearURL
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("clearURL");
+            await jsRuntime.InvokeAsync<object>("ResponsiveDataTables", "#dataTable");
+        }
+    }
+
+    public void CheckboxClicked(int permisiontype, object aChecked)
+    {
+        /*if ((bool)aChecked)
+        {
+            if (!SelectedValues.Contains(aSelectedId))
+            {
+                SelectedValues.Add(aSelectedId);
+            }
+        }
+        else
+        {
+            if (SelectedValues.Contains(aSelectedId))
+            {
+                SelectedValues.Remove(aSelectedId);
+            }
+        }*/
+
+
+
+        foreach (var i in userPermission)
+        {
+            switch (permisiontype)
+            {
+                case 1:
+                    i.permissionC = (bool)aChecked;
+                    //  ToastService.ShowInfo(i.permission.subPermissionTHName+"::"+i.permissionC.ToString());
+                    break;
+                case 2:
+                    i.permissionU = (bool)aChecked;
+                    break;
+                case 3:
+                    i.permissionV = (bool)aChecked;
+                    break;
+                case 4:
+                    i.permissionD = (bool)aChecked;
+                    break;
+                case 5:
+                    i.permissionE = (bool)aChecked;
+                    break;
+
+            }
+
+
+        }
+
+        StateHasChanged();
+    }
+
+
+    /// <summary>
+    /// On Province Select
+    /// </summary>
+    public void OnProvinceSelected()
+    {
+        if (this.showaccount.ProvinceID != null && this.showaccount.ProvinceID != 0)
+        {
+            recordEventDistricts = recordEventProvinces.Find(i => i.ProvinceID == showaccount.ProvinceID).Districts;
+            if (AppData.LanguageID == 0)
+            {
+                var resultEventDistricts = recordEventDistricts.OrderBy(dEN => dEN.DistrictENName).ToList();
+                recordEventDistricts = resultEventDistricts;
+
+            }
+            else
+            {
+                var resultEventDistricts = recordEventDistricts.OrderBy(dTH => dTH.DistrictTHName).ToList();
+                recordEventDistricts = resultEventDistricts;
+            }
+
+            showaccount.DistrictID = 0;
+            showaccount.SubDistrictID = 0;
+            showaccount.ZipCode = 0;
+        }
+        else
+        {
+            recordEventDistricts = new List<RecordEventDistrict>();
+            subDistricts = new List<SubDistrict>();
+
+        }
+    }
+
+    /// <summary>
+    /// On District Select
+    /// </summary>
+    public void OnDistrictSelected()
+    {
+        if (this.showaccount.DistrictID != null && this.showaccount.DistrictID != 0)
+        {
+            this.subDistricts = recordEventDistricts.Find(i => i.DistrictID == showaccount.DistrictID).SubDistricts;
+            if (AppData.LanguageID == 0)
+            {
+                var resultsubDistricts = subDistricts.OrderBy(sdEN => sdEN.subDistrictENName).ToList();
+                subDistricts = resultsubDistricts;
+
+            }
+            else
+            {
+                var resultsubDistricts = subDistricts.OrderBy(sdTH => sdTH.subDistrictTHName).ToList();
+                subDistricts = resultsubDistricts;
+            }
+
+
+            showaccount.SubDistrictID = 0;
+        }
+        else
+        {
+            subDistricts = new List<SubDistrict>();
+
+        }
+    }
+
+    /// <summary>
+    /// On SubDistrict Select
+    /// </summary>
+    public void OnSubDistrictSelected()
+    {
+        if (this.showaccount.SubDistrictID != null && this.showaccount.SubDistrictID != 0)
+        {
+            showaccount.ZipCode = Int32.Parse(subDistricts.Find(i => i.subDistrictID == this.showaccount.SubDistrictID).subDistrictCode);
+        }
+        else
+        {
+            showaccount.ZipCode = 0;
+        }
+    }
+
+
+    private void Loading()
+    {
+        System.Threading.Thread.Sleep(300);
+        // Retrieve data from the server and initialize
+        // Employees property which the View will bind
+    }
+
+
+}

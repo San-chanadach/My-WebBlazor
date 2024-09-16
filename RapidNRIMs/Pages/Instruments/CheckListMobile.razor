@@ -1,0 +1,751 @@
+﻿@page "/Instruments/CheckListMobile/{type}/{Number}/{id}"
+@inject IJSRuntime jsRuntime
+@inject HttpClient Http
+@inject IToastService ToastService
+@inject IConfiguration Config
+@inject AppData AppData
+@inject NavigationManager NavigationManager
+@inject IMasterData _masterData
+@inject ImageService _imageService
+
+<PageTitle>Check List Mobile Page</PageTitle>
+
+<div class="row margin-row-card">
+    <div class="col-md-12">
+        <div class="card shadow-lg">
+            <div class="card-header" style="margin-bottom: 5px;">@AppData.LangResource[AppData.LanguageID, 395]</div>
+            <div class="card-header">
+                @AppData.LangResource[AppData.LanguageID, 61]: @Number <br />
+                @if (AppData.LanguageID == 0)
+                {
+                    @($"{AppData.LangResource[AppData.LanguageID, 258]} : {instrument.InstrumentENName}") <br />
+                }
+                else
+                {
+                    @($"{AppData.LangResource[AppData.LanguageID, 258]} : {instrument.InstrumentTHName}") <br />
+                }
+
+                @AppData.LangResource[AppData.LanguageID, 511]: @CheckListNumber
+            </div>
+            <div class="card-body">
+                <div class="table-responsive" style="margin-top: 0.5rem;">
+                    <table class="table table-bordered table-striped text-center" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>@AppData.LangResource[AppData.LanguageID, 244]</th>
+                                <th>@AppData.LangResource[AppData.LanguageID, 117]</th>
+                                <th>@AppData.LangResource[AppData.LanguageID, 170]</th>
+                                <th>@AppData.LangResource[AppData.LanguageID, 171]</th>
+                                <th>@AppData.LangResource[AppData.LanguageID, 238]</th>
+                                <th>@AppData.LangResource[AppData.LanguageID, 105]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int Id = 1;
+                            }
+                            @foreach (var item in Result)
+                            {
+
+                                <tr>
+                                    <td>@Id</td>
+                                    <td>@item.checklist.InstrumentChecklistName</td>
+
+                                    <td>
+                                        @if (instrument.InstrumentStatusID == 2 || instrument.InstrumentStatusID == 5 || instrument.InstrumentStatusID == 6)
+                                        {
+                                            <input class="form-check-input" type="radio" disabled @onclick="()=>PassChacked(item)" bind="@item.InstrumentChecklistResultChecked" name="@item.InstrumentCheckllistID" id="@item.InstrumentCheckllistID">
+                                        }
+                                        else
+                                        {
+                                            <input class="form-check-input" type="radio" @onclick="()=>PassChacked(item)" bind="@item.InstrumentChecklistResultChecked" name="@item.InstrumentCheckllistID" id="@item.InstrumentCheckllistID">
+                                        }
+                                        
+                                    </td>
+                                    <td>
+                                        @if (instrument.InstrumentStatusID == 2 || instrument.InstrumentStatusID == 5 || instrument.InstrumentStatusID == 6)
+                                        {
+                                            <input class="form-check-input" disabled type="radio" @onclick="()=>FailChacked(item)" bind="@item.FailChecked" name="@item.InstrumentCheckllistID" id="@item.InstrumentCheckllistID">
+                                        }
+                                        else
+                                        {
+                                            <input class="form-check-input" type="radio" @onclick="()=>FailChacked(item)" bind="@item.FailChecked" name="@item.InstrumentCheckllistID" id="@item.InstrumentCheckllistID">
+                                        }
+                                        
+                                    </td>
+
+                                    <td @onclick="@(() => OnAddPicture(item))">
+                                        @if (!string.IsNullOrEmpty(item.InstrumentChecklistImage))
+                                        {
+                                            <a href="@("data:image/png;base64," + item.InstrumentChecklistImage)" data-lightbox="gallery" data-title="@AppData.LangResource[AppData.LanguageID, 296]">
+                                                <img class="img-show m-2" loading="lazy" src="@("data:image/png;base64," + item.InstrumentChecklistImage)" />
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <img class="img-show " src="assets/images/no-img/ImageNotFount.png">
+                                        }
+
+                                    </td>
+
+
+                                    <td>
+                                        <textarea rows="2" @bind="@item.InstrumentChecklistComment" />
+                                    </td>
+                                    <!--<td><i class="far fa-trash-alt" @onclick="() => ExpireInstrumentChecklist(item.InstrumentChecklistID)"></i></td-->
+                                </tr>
+                                Id++;
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="text-center">
+    @if (AppData.CurrentPermission.Find(i => i.permissionID == 7).permissionC)
+    {
+        <a href="@($"Instruments/CheckListHistory/{type}/{Number}/{id}")" class="btn margin-btn" name="ShowCAl" id="ShowInstrument" style="background-color:#7F7F7F; color:#fff">
+            @AppData.LangResource[AppData.LanguageID, 49]
+        </a>
+        @if (Result.Count == 0 || instrument.InstrumentStatusID == 2 || instrument.InstrumentStatusID == 5 || instrument.InstrumentStatusID == 6)
+        {
+            <button type="button" disabled class="btn margin-btn" name="SaveSettings" id="SaveSettings" style="background-color:#4CBB17; color:#fff">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+        else
+        {
+            <button type="submit" @onclick="OnRegisterResult" class="btn margin-btn" name="SaveSettings" id="SaveSettings" style="background-color:#4CBB17; color:#fff">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+        
+    }
+</div>
+
+<div class="modal @((showModalCheckList) ? "show" : "")" tabindex="-1" role="dialog" style="display:@((showModalCheckList) ? "block" : "none")">
+
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header btn-header-color">
+
+                <h5 class="modal-title">@AppData.LangResource[AppData.LanguageID, 163]</h5>
+
+                <button type="button" class="close" aria-label="Close" @onclick="OnClose">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-3 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 238]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-9">
+                        <div class="input-group input-box-bottom">
+                            <div class="col-12 col-md-8 col-lg-9">
+                                <div class="input-group input-box-bottom">
+
+                                    <InputFile OnChange="@OnInputFileDefaultChange" class="custom-file-input file-name-custom" id="documentfile" />
+                                    @if (AppData.LanguageID == 0)
+                                    {
+                                        <label class="custom-file-label" id="documentfile" for="documentfile" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                                    }
+                                    else
+                                    {
+                                        <label class="custom-file-label" id="documentfile" for="documentfile" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                                    }
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!---ValidationMessage For="@(() => recordEvent.EventDetail)" id="validationTextArea" /-->
+                </div>
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-3 col-form-label">
+                        <span></span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-9">
+                        <div class="input-group input-box-bottom">
+                            @if (!string.IsNullOrEmpty(addpicture.InstrumentChecklistImage))
+                            {
+                                <a href="@("data:image/png;base64," + addpicture.InstrumentChecklistImage)" data-lightbox="gallery" data-title="@AppData.LangResource[AppData.LanguageID, 296]">
+                                    <img class="img-show m-2" loading="lazy" src="@("data:image/png;base64," + addpicture.InstrumentChecklistImage)" />
+                                </a>
+                            }
+                            else
+                            {
+                                <img class="img-show " src="assets/images/no-img/ImageNotFount.png">
+                            }
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="submit" id="clearInputFileSave" class="btn" style="background-color:#4CBB17; color:#fff" @onclick="SaveImage">@AppData.LangResource[AppData.LanguageID, 44]</button>
+                <button type="reset" id="clearInputFile" class="btn" style="background-color:#B90F1B; color:#fff" @onclick="OnClose">@AppData.LangResource[AppData.LanguageID, 158]</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<BSModal class="row style-justify mt-5" @ref="Load" IsCentered="true" Size="Size.Small" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+    <BSModalBody>
+        <div class="text-center mt-3">
+            <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+                  style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+        </div>
+        <div class="text-center pt-3" style=" font-size: 16pt">
+            @AppData.LangResource[AppData.LanguageID, 325]
+        </div>
+    </BSModalBody>
+</BSModal>
+
+@code {
+
+    [Parameter]/// Weekly-1,Montly-2,Yearly-3
+    public string type { get; set; } = "";
+    [Parameter]///InstrumentNumber
+    public string Number { get; set; } = "";
+    [Parameter]///ModelID
+    public string id { get; set; } = "";
+
+    public string CheckListNumber { get; set; }
+    ElementReference inputFileElement;
+    public InstrumentChecklistResult addpicture = new InstrumentChecklistResult();
+    BSModal AddPicture;
+    private bool showModalCheckList = false;
+    private ElementReference fileInput;
+
+    public InstrumentChecklistNumber CheckNumber { get; set; } = new InstrumentChecklistNumber();
+    public Instrument instrument = new Instrument();
+    public Instrument updateinstrument = new Instrument();
+    public List<InstrumentChecklist> checklists = new List<InstrumentChecklist>();
+    public List<InstrumentChecklistResult> Result = new List<InstrumentChecklistResult>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        checklists = await Http.GetFromJsonAsync<List<InstrumentChecklist>>($"{Config["nurl"]}/api/GetInstrumentChecklist/{id}/{type}");
+        foreach (var i in checklists)
+        {
+            Result.Add(new InstrumentChecklistResult()
+                {
+                    InstrumentCheckllistID = i.InstrumentChecklistID,
+                    checklist = i
+                });
+            //Console.WriteLine(checklist);
+        }
+
+        instrument = (await Http.GetFromJsonAsync<List<Instrument>>($"{Config["nurl"]}/api/GetInstrumentByInstrumentNumber/{Number}")).First();
+    }
+
+
+    /// <summary>
+    /// clearURL
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            CheckListNumber = Number + "-" + DateTime.Now.ToString("dd-MM-yyyy-HH-mm");
+
+            await jsRuntime.InvokeVoidAsync("clearURL");
+            await jsRuntime.InvokeAsync<object>("showFileName");
+            await jsRuntime.InvokeAsync<object>("ResponsiveDataTables");
+        }
+    }
+
+    public void PassChacked(InstrumentChecklistResult r)
+    {
+        r.InstrumentChecklistResultChecked = true;
+        r.FailChecked = false;
+        Console.WriteLine(r.InstrumentCheckllistID + "Check Pass:" + r.InstrumentChecklistResultChecked + ":: CheckFail: " + r.FailChecked);
+    }
+    public void FailChacked(InstrumentChecklistResult r)
+    {
+        r.FailChecked = true;
+        r.InstrumentChecklistResultChecked = false;
+        Console.WriteLine(r.InstrumentCheckllistID + "Check Pass:" + r.InstrumentChecklistResultChecked + ":: CheckFail: " + r.FailChecked);
+    }
+
+
+    private IBrowserFile? fileImageDefault;
+
+    private string ImageShow { get; set; }
+
+    private string StoreImage { get; set; } = "";
+
+    private string pathPictureDefaultFolder { get; set; } = "PictureDefault";
+
+    private byte[] UploadPathDefault { get; set; }
+
+    /// <summary>
+    /// Image Default
+    /// </summary>
+    private async Task OnInputFileDefaultChange(InputFileChangeEventArgs e)
+    {
+        fileImageDefault = e.File;
+        var imageType = fileImageDefault.ContentType;
+        var sizefile = fileImageDefault.Size;
+
+        if (sizefile > 5542880)
+        {
+            ToastService.ShowError("The file size cannot exceed 5MB.");
+            addpicture.InstrumentChecklistImageData = "";
+
+        }
+        else if (imageType != "image/png" && imageType != "image/jpeg")
+        {
+            ToastService.ShowError("File Type Image Incorrect !");
+            addpicture.InstrumentChecklistImageData = "";
+
+        }
+        else if (imageType == "image/jpeg")
+        {
+            imageType = "image/png";
+            Load.Show();
+            await Task.Run(Loading);
+
+            var resizedImage = await fileImageDefault.RequestImageFileAsync(imageType, 550, 550);
+            // อ่านข้อมูลรูปภาพและแปลงเป็น Base64
+            using (var stream = resizedImage.OpenReadStream(resizedImage.Size))
+            {
+                var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream);
+                var buffer = memoryStream.ToArray();
+                ImageShow = Convert.ToBase64String(buffer);
+                // StoreImage = ImageShow;
+            }
+
+
+            int maxWidth = 640;
+            int maxHeight = 480;
+            int quality = 90;
+
+            byte[] compressedImage = _imageService.CompressBase64Image(ImageShow, maxWidth, maxHeight, quality);
+            string compressedBase64 = Convert.ToBase64String(compressedImage);
+            ImageShow = compressedBase64;
+            UploadPathDefault = compressedImage;
+
+            string newFileImageName = await GenerateUniqueFileName(fileImageDefault.Name, pathPictureDefaultFolder);
+            addpicture.InstrumentChecklistImageData = newFileImageName;
+            addpicture.InstrumentChecklistImage = compressedBase64;
+
+            //using MemoryStream memoryStream = new MemoryStream();
+            //await fileImageDefault.OpenReadStream(sizefile).CopyToAsync(memoryStream);
+            //var buffer = memoryStream.GetBuffer();
+            //var imageLeftDataUrl = $"data:{imageType};base64,{Convert.ToBase64String(buffer)}";
+            //ImageShow = imageLeftDataUrl;
+            //string newFileImageName = await GenerateUniqueFileName(fileImageDefault.Name, pathPictureDefaultFolder);
+            //addpicture.InstrumentChecklistImageData = newFileImageName;
+
+            //string base64Image = Convert.ToBase64String(buffer);
+            //int maxWidth = 800;
+            //int maxHeight = 600;
+            //int quality = 95;
+
+            //byte[] compressedImage = _imageService.CompressBase64Image(base64Image, maxWidth, maxHeight, quality);
+            //string compressedBase64 = Convert.ToBase64String(compressedImage);
+            //addpicture.InstrumentChecklistImage = compressedBase64;
+
+            Load.Hide();
+        }
+        else
+        {
+            Load.Show();
+            await Task.Run(Loading);
+
+            var resizedImage = await fileImageDefault.RequestImageFileAsync(imageType, 550, 550);
+            // อ่านข้อมูลรูปภาพและแปลงเป็น Base64
+            using (var stream = resizedImage.OpenReadStream(resizedImage.Size))
+            {
+                var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream);
+                var buffer = memoryStream.ToArray();
+                ImageShow = Convert.ToBase64String(buffer);
+                // StoreImage = ImageShow;
+            }
+            int maxWidth = 640;
+            int maxHeight = 480;
+            int quality = 90;
+
+            byte[] compressedImage = _imageService.CompressBase64Image(ImageShow, maxWidth, maxHeight, quality);
+            string compressedBase64 = Convert.ToBase64String(compressedImage);
+            ImageShow = compressedBase64;
+
+            UploadPathDefault = compressedImage;
+
+            string newFileImageName = await GenerateUniqueFileName(fileImageDefault.Name, pathPictureDefaultFolder);
+            addpicture.InstrumentChecklistImageData = newFileImageName;
+            addpicture.InstrumentChecklistImage = compressedBase64;
+
+            Load.Hide();
+        }
+
+    }
+    /// <summary>
+    /// Image Default
+    /// </summary>
+    private async Task ImageDefaultFile()
+    {
+
+        if (fileImageDefault != null)
+        {
+            try
+            {
+                var imageType = fileImageDefault.ContentType;
+                var sizefile = fileImageDefault.Size;
+                if (sizefile > 5542880)
+                {
+                    //ToastService.ShowError("The file size cannot exceed 5MB.");
+                    addpicture.InstrumentChecklistImageData = "";
+                }
+                else if (imageType != "image/png" && imageType != "image/jpeg")
+                {
+                    ///ToastService.ShowError("File Type Image Incorrect !");
+                    addpicture.InstrumentChecklistImageData = "";
+                }
+                else if (imageType == "image/jpeg")
+                {
+                    foreach (var x in Result)
+                    {
+                        if (x.InstrumentCheckllistID == addpicture.InstrumentCheckllistID)
+                        {
+                            imageType = "image/png";
+                            string newFileImageName = await GenerateUniqueFileName(fileImageDefault.Name, pathPictureDefaultFolder);
+                            string path = Path.Combine(Config.GetValue<string>("FileStorage")!, "Instrument", "CheckList", "Picture", pathPictureDefaultFolder, newFileImageName);
+                            Directory.CreateDirectory(Path.Combine(Config.GetValue<string>("FileStorage")!, "Instrument", "CheckList", "Picture", pathPictureDefaultFolder)); // Ensure the directory exists
+
+                            await File.WriteAllBytesAsync(path, UploadPathDefault);
+
+                            x.InstrumentChecklistImageData = newFileImageName;
+                        }
+                    }
+
+
+                    //string newFileImageName = await GenerateUniqueFileName(fileImageDefault.Name, pathPictureDefaultFolder);
+                    ////string prefixedNewFileName = $"Update_{showinstrument.InstrumentNumber}_" + newFileImageName;
+                    //string path = Path.Combine(Config.GetValue<string>("FileStorage")!, "Instrument", "CheckList", "Picture", pathPictureDefaultFolder, newFileImageName);
+
+                    //Directory.CreateDirectory(Path.Combine(Config.GetValue<string>("FileStorage")!, "Instrument", "CheckList", "Picture", pathPictureDefaultFolder));
+
+                    //await using FileStream fs = new(path, FileMode.Create);
+                    //await fileImageDefault.OpenReadStream(sizefile).CopyToAsync(fs);
+                }
+                else
+                {
+                    foreach (var x in Result)
+                    {
+                        if (x.InstrumentCheckllistID == addpicture.InstrumentCheckllistID)
+                        {
+                            string newFileImageName = await GenerateUniqueFileName(fileImageDefault.Name, pathPictureDefaultFolder);
+                            string path = Path.Combine(Config.GetValue<string>("FileStorage")!, "Instrument", "CheckList", "Picture", pathPictureDefaultFolder, newFileImageName);
+                            Directory.CreateDirectory(Path.Combine(Config.GetValue<string>("FileStorage")!, "Instrument", "CheckList", "Picture", pathPictureDefaultFolder)); // Ensure the directory exists
+
+                            await File.WriteAllBytesAsync(path, UploadPathDefault);
+
+                            x.InstrumentChecklistImageData = newFileImageName;
+                        }
+                    }
+
+
+
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowError($"File: {fileImageDefault.Name} Error: {ex.Message}");
+            }
+        }
+
+    }
+
+    /// <summary>
+    /// GenerateUniqueFileDocument
+    /// </summary>
+    private async Task<string> GenerateUniqueFileName(string originalFileName, string folderName)
+    {
+        string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(originalFileName);
+        string fileExtension = Path.GetExtension(originalFileName);
+        string newFileName = fileNameWithoutExtension + fileExtension;
+
+        int counter = 1;
+        string path = Path.Combine(Config.GetValue<string>("FileStorage")!, "Instrument", "CheckList", "Picture", folderName, newFileName);
+
+        while (File.Exists(path))
+        {
+            newFileName = $"{fileNameWithoutExtension}({counter}){fileExtension}";
+            path = Path.Combine(Config.GetValue<string>("FileStorage")!, "Instrument", "CheckList", "Picture", folderName, newFileName);
+            counter++;
+        }
+
+
+
+        return newFileName;
+    }
+
+    /// <summary>
+    /// Image Default
+    /// </summary>
+    // private IList<string> imageDefaultDataUrls = new List<string>();
+    //private long sizeFileImage;
+    //private string typeFileImage;
+    //private async Task OnInputFileDefaultChange(InputFileChangeEventArgs e)
+    //{
+    //    var formatImageDefault = e.File.ContentType;
+    //    var sizefile = e.File.Size;
+    //    typeFileImage = formatImageDefault;
+    //    sizeFileImage = sizefile;
+    //    if (sizeFileImage > 5542880)
+    //    {
+    //        ToastService.ShowError("The file size cannot exceed 5MB.");
+    //        addpicture.InstrumentChecklistImage = "";
+    //    }
+    //    else if (typeFileImage != "image/png" && typeFileImage != "image/jpeg")
+    //    {
+    //        ToastService.ShowError("File Type Image Incorrect !");
+    //        addpicture.InstrumentChecklistImage = "";
+    //    }
+    //    else if (typeFileImage == "image/jpeg")
+    //    {
+    //        typeFileImage = "image/png";
+    //        Load.Show();
+    //        await Task.Run(Loading);
+    //        //using MemoryStream memoryStream = new MemoryStream();
+    //        //await e.File.OpenReadStream(5542880).CopyToAsync(memoryStream);
+    //        //var buffer = memoryStream.GetBuffer();
+    //        //var imageDefaultDataUrl = $"data:{formatImageDefault};base64,{Convert.ToBase64String(buffer)}";
+    //        var resizedImage = await e.File.RequestImageFileAsync(formatImageDefault, 550, 550);
+    //        var buffer = new byte[resizedImage.Size];
+    //        await resizedImage.OpenReadStream(resizedImage.Size).ReadAsync(buffer);
+    //        var imageDefaultDataUrl = $"data:{typeFileImage};base64,{Convert.ToBase64String(buffer)}";
+
+    //        addpicture.InstrumentChecklistImage = Convert.ToBase64String(buffer);
+    //        Console.WriteLine(imageDefaultDataUrl);
+    //        Load.Hide();
+    //    }
+    //    else
+    //    {
+    //        Load.Show();
+    //        await Task.Run(Loading);
+    //        //using MemoryStream memoryStream = new MemoryStream();
+    //        //await e.File.OpenReadStream(5542880).CopyToAsync(memoryStream);
+    //        //var buffer = memoryStream.GetBuffer();
+    //        //var imageDefaultDataUrl = $"data:{formatImageDefault};base64,{Convert.ToBase64String(buffer)}";
+    //        var resizedImage = await e.File.RequestImageFileAsync(formatImageDefault, 550, 550);
+    //        var buffer = new byte[resizedImage.Size];
+    //        await resizedImage.OpenReadStream(resizedImage.Size).ReadAsync(buffer);
+    //        var imageDefaultDataUrl = $"data:{formatImageDefault};base64,{Convert.ToBase64String(buffer)}";
+
+    //        addpicture.InstrumentChecklistImage = Convert.ToBase64String(buffer);
+    //        Console.WriteLine(imageDefaultDataUrl);
+    //        Load.Hide();
+    //    }
+
+    //    //var formatImageDefault = "image/png";
+    //    //using MemoryStream memoryStream = new MemoryStream();
+    //    //await e.File.OpenReadStream().CopyToAsync(memoryStream);
+    //    //var buffer = memoryStream.GetBuffer();
+    //    //var imageDefaultDataUrl = $"data:{formatImageDefault};base64,{Convert.ToBase64String(buffer)}";
+    //    //Console.WriteLine(imageDefaultDataUrl);
+    //    //addpicture.InstrumentChecklistImage = Convert.ToBase64String(buffer);
+    //}
+
+    /// <summary>
+    /// Variable
+    /// </summary>
+    private string RequertMessage;
+    BSModal ModalResponseError { get; set; }
+
+    public async Task OnAddPicture(InstrumentChecklistResult item)
+    {
+
+
+
+        Load.Show();
+        await Task.Run(Loading);
+
+        addpicture = item;
+        //ImageShow = ImageShowItem; // กำหนด ImageShow จาก ImageShowItem ของรายการที่ถูกเลือก
+
+        showModalCheckList = true;
+
+        await jsRuntime.InvokeAsync<object>("resetshowFileNameButtonSave");
+        await jsRuntime.InvokeAsync<object>("resetshowFileName");
+        Load.Hide();
+
+
+    }
+
+    public async Task SaveImage()
+    {
+        Load.Show();
+        //ImageShow = "";
+        await jsRuntime.InvokeAsync<object>("resetshowFileNameButtonSave");
+
+        showModalCheckList = false;
+        Load.Hide();
+    }
+
+    public async Task OnClose()
+    {
+
+        Load.Show();
+        await jsRuntime.InvokeAsync<object>("resetshowFileName");
+        addpicture.InstrumentChecklistImage = "";
+        addpicture.InstrumentChecklistImageData = "";
+        showModalCheckList = false;
+        Load.Hide();
+    }
+
+    // public async Task OnRegisterResult()
+    // {
+    //     try
+    //     {
+    //         await Task.Run(Loading);
+    //         Load.Show();
+    //         var res = await Http.PostAsync($"{Config["nurl"]}/api/RegisterInstrumentChecklistNumber/{CheckListNumber}/{Number}/{type}", null);
+    //         List<InstrumentChecklistNumber> l = await res.Content.ReadFromJsonAsync<List<InstrumentChecklistNumber>>();
+    //         CheckNumber = l.FirstOrDefault();
+
+    //         HttpResponseMessage resC = new HttpResponseMessage();
+    //         foreach (var i in Result)
+    //         {
+    //             i.InstrumentChecklistNumberID = CheckNumber.InstrumentChecklistNumberID;
+    //             resC = await Http.PostAsJsonAsync($"{Config["nurl"]}/api/RegisterInstrumentChecklistResult", i);
+    //             if (resC.StatusCode == System.Net.HttpStatusCode.OK)
+    //             {
+    //                 ToastService.ShowSuccess(" CheckList Result Are Save.");
+    //             }
+    //         }
+
+    //         string url = $"{Config["rurl"]}/api/InstrumentCheckListReport?CheckOutID={CheckNumber.InstrumentChecklistNumberID}";
+    //         await jsRuntime.InvokeVoidAsync("OpenURL", url);
+    //         //((IJSInProcessRuntime)jsRuntime).InvokeVoid("OpenURL", url);
+    //         await ImageDefaultFile();
+    //         ImageShow = "";
+    //         Load.Hide();
+    //         NavigationManager.NavigateTo($"Instruments/CheckListHistory/{type}/{Number}/{id}");
+    //     }
+    //     catch (Exception e)
+    //     {
+    //         ToastService.ShowError($"Error:{e.Message}");
+    //     }
+
+
+    // }
+
+    public async Task OnRegisterResult()
+    {
+        await Task.Run(Loading);
+        Load.Show();
+        try
+        {
+
+            var res = await Http.PostAsync($"{Config["nurl"]}/api/RegisterInstrumentChecklistNumber/{CheckListNumber}/{Number}/{type}", null);
+            List<InstrumentChecklistNumber> l = await res.Content.ReadFromJsonAsync<List<InstrumentChecklistNumber>>();
+            CheckNumber = l.FirstOrDefault();
+
+            HttpResponseMessage resC = new HttpResponseMessage();
+            bool hasFail = false;
+
+            foreach (var i in Result)
+            {
+                i.InstrumentChecklistNumberID = CheckNumber.InstrumentChecklistNumberID;
+                resC = await Http.PostAsJsonAsync($"{Config["nurl"]}/api/RegisterInstrumentChecklistResult", i);
+                if (resC.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    ToastService.ShowSuccess(" CheckList Result Are Save.");
+                    if (i.InstrumentChecklistResultChecked == false) // ถ้าผลลัพธ์เป็น fail
+                    {
+                        hasFail = true;
+                    }
+                }
+            }
+
+            if (hasFail)
+            {
+                // อัปเดตสถานะ Instrument เป็น 2 (fail) หากมี fail หนึ่งครั้ง
+                await UpdateInstrumentStatus();
+            }
+
+            string url = $"{Config["rurl"]}/api/InstrumentCheckListReport?CheckOutID={CheckNumber.InstrumentChecklistNumberID}";
+            await jsRuntime.InvokeVoidAsync("OpenURL", url);
+            //((IJSInProcessRuntime)jsRuntime).InvokeVoid("OpenURL", url);
+            await ImageDefaultFile();
+            ImageShow = "";
+
+            NavigationManager.NavigateTo($"Instruments/CheckListHistory/{type}/{Number}/{id}");
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError($"Error:{e.Message}");
+        }
+        Load.Hide();
+    }
+
+    private async Task UpdateInstrumentStatus()
+    {
+        var updatedInstrument = new Instrument();
+        updatedInstrument.InstrumentID = instrument.InstrumentID; // Assuming you need to keep the same InstrumentID
+        updatedInstrument.InstrumentNumber = instrument.InstrumentNumber;
+        updatedInstrument.InstrumentAssetNumber = instrument.InstrumentAssetNumber;
+        updatedInstrument.InstrumentSerialNumber = instrument.InstrumentSerialNumber;
+        updatedInstrument.InstrumentTHName = instrument.InstrumentTHName;
+        updatedInstrument.InstrumentENName = instrument.InstrumentENName;
+        updatedInstrument.InstrumentCatagoryID = instrument.InstrumentCatagoryID;
+        updatedInstrument.InstrumentTypeID = instrument.InstrumentTypeID;
+        updatedInstrument.InstrumentUnitID = instrument.InstrumentUnitID;
+        updatedInstrument.InstrumentModelID = instrument.InstrumentModelID;
+        updatedInstrument.InstrumentBrandID = instrument.InstrumentBrandID;
+        updatedInstrument.InstrumentAgencyID = instrument.InstrumentAgencyID;
+        updatedInstrument.InstrumentPrice = instrument.InstrumentPrice;
+
+        updatedInstrument.InstrumentUserID = instrument.InstrumentUserID;
+        updatedInstrument.InstrumentRegisterDate = instrument.InstrumentRegisterDate;
+        updatedInstrument.InstrumentLocationID = instrument.InstrumentLocationID;
+        updatedInstrument.InstrumentDescription = instrument.InstrumentDescription;
+        updatedInstrument.InstrumentFileName = instrument.InstrumentFileName;
+        updatedInstrument.InstrumentFile = instrument.InstrumentFile;
+        updatedInstrument.InstrumentPictureDefault = instrument.InstrumentPictureDefault;
+        updatedInstrument.InstrumentPictureLeft = instrument.InstrumentPictureLeft;
+        updatedInstrument.InstrumentPictureRight = instrument.InstrumentPictureRight;
+
+        updatedInstrument.InstrumentWeekly = instrument.InstrumentWeekly;
+        updatedInstrument.InstrumentMonthly = instrument.InstrumentMonthly;
+        updatedInstrument.InstrumentYearly = instrument.InstrumentYearly;
+        updatedInstrument.InstrumentStatusID = 2;
+        updatedInstrument.InstrumentDiscardByID = instrument.InstrumentDiscardByID;
+        updatedInstrument.InstrumentDiscardDate = instrument.InstrumentDiscardDate;
+        updatedInstrument.InstrumentReason = instrument.InstrumentReason;
+        updatedInstrument.IsActive = instrument.IsActive;
+
+        // Perform the update
+        var upresult = await Http.PutAsJsonAsync($"{Config["nurl"]}/api/UpdateInstrument/Checklist/{instrument.InstrumentID}", updatedInstrument);
+        if (upresult != null)
+        {
+            instrument = (await Http.GetFromJsonAsync<List<Instrument>>($"{Config["nurl"]}/api/GetInstrumentByInstrumentNumber/{Number}")).First();
+        }
+    }
+
+
+    BSModal Load { get; set; }
+
+    private void Loading()
+    {
+        System.Threading.Thread.Sleep(300);
+        // Retrieve data from the server and initialize
+        // Employees property which the View will bind
+    }
+
+
+
+
+
+}

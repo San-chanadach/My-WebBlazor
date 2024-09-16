@@ -1,0 +1,40 @@
+﻿@page "/"
+@using BC.Service;
+@using Append.Blazor.Printing;
+@inject IPrintingService PrintingService;
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+<button class="btn btn-primary" @onclick="BarcodeGeneratre">Generate Barcode128</button>
+<button class="btn btn-primary" @onclick="BarcodeDMGeneratre">Generate DATAMETRIX</button>
+<button class="btn btn-primary" @onclick="BarcodeQRGeneratre">Generate QR</button>
+@code{
+
+    string InputLabel { get; set; } = "TEST-1234";
+    string barcode { get; set; } = "";
+
+    public async void BarcodeGeneratre()
+    {
+        Barcode sticker = new Barcode();
+        var pdf = await sticker.GenerateBarcodeAsync(InputLabel, BarcodeType.Code128);
+        barcode = Convert.ToBase64String(pdf);
+        await PrintingService.Print(new PrintOptions(barcode) { Base64 = true });
+    }
+
+    public async void BarcodeDMGeneratre()
+    {
+        Barcode sticker = new Barcode();
+        var pdf = await sticker.GenerateBarcodeAsync(InputLabel, BarcodeType.Datametrix);
+        barcode = Convert.ToBase64String(pdf);
+        await PrintingService.Print(new PrintOptions(barcode) { Base64 = true });
+    }
+    public async void BarcodeQRGeneratre()
+    {
+        Barcode sticker = new Barcode();
+        var pdf = await sticker.GenerateBarcodeAsync(InputLabel, BarcodeType.QRCode);
+        barcode = Convert.ToBase64String(pdf);
+        await PrintingService.Print(new PrintOptions(barcode) { Base64 = true });
+    }
+}

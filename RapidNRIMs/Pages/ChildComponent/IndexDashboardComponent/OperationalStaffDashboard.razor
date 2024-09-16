@@ -1,0 +1,57 @@
+﻿@inherits OperationalStaffDashboardBase
+
+<div class="col-lg-6 col-md-6 mt-4 mb-4">
+    <div class="card-dashbord z-index-2 text-wrap  " style="height: 480px;">
+        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+            <div class="card-header text-white txt-size-paper-two" style="background-color:#FFCC00">
+                <b>@AppData.LangResource[AppData.LanguageID, 548]</b>
+            </div>
+            <div class="scrollBar fixTableHead table-responsive scroll-inner height-size-popular" style="height: 445px;">
+                <table class="table table-striped text-wrap txt-size-paper-two-content-popular" width="100%">
+                    <thead>
+                        <tr>
+                            <th class="text-left">@AppData.LangResource[AppData.LanguageID, 117]</th>
+                            <th>@AppData.LangResource[AppData.LanguageID, 549]</th>
+                            <th>@AppData.LangResource[AppData.LanguageID, 584]</th>
+                            <th>@AppData.LangResource[AppData.LanguageID, 32]</th>
+                            <th>@AppData.LangResource[AppData.LanguageID, 33]</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in schedulerlist)
+                        {
+
+                            <tr>
+                                <td class="text-left" style="cursor:default">@(item.User != null ? item.User.FirstName:"-") @(item.User != null ? item.User.LastName:"-")</td>
+                                
+                                @if (item.ScheduleTypeID == 7)
+                                {
+                                    <td style="cursor:default">0892006243 1296</td>
+                                }
+                                else
+                                {
+                                    <td style="cursor:default">@(item.User != null ? item.User.PhoneNumber:"-")</td>
+                                   
+                                }
+                                    
+                                
+                                @if (item.ScheduleTypeID == 7)
+                                {
+                                    <td class="text-left" style="cursor:default"><img src="assets/icons/icon-dashbord/telephone.png" width="20" height="20" /></td>
+                                }
+                                else
+                                {
+                                    <td class="text-left" style="cursor:default">@item.Scheduletype.ScheduleTypeName</td>
+                                }
+                                <td style="cursor:default">@String.Format("{0:dd/MM/yyyy}", item.ScheduleStartDate)</td>
+                                <td style="cursor:default">@String.Format("{0:dd/MM/yyyy}", item.ScheduleEndDate)</td>
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

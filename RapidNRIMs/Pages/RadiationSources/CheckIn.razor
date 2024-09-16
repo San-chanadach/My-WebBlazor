@@ -1,0 +1,811 @@
+﻿@page "/RadiationSources/CheckIn"
+@inject IJSRuntime jsRuntime
+@inject AppData AppData
+@inject NavigationManager NavigationManager
+@inject IToastService ToastService
+@inject HttpClient Http
+@inject IMasterData _masterData
+@using System.Threading
+@inject IConfiguration Config
+@inject ILanguageService LanguageService
+@inject ImageService _imageService
+
+<PageTitle>Check In Page</PageTitle>
+
+<EditForm Model="@radiationSourceCheckIn" OnValidSubmit="PostRadiationSourceCheckIn">
+    <!--DataAnnotationsValidator /-->
+    <div class="row margin-row-card">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">@AppData.LangResource[AppData.LanguageID, 223]</div>
+                <div class="card-body">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-sm-2">
+                            <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 279] <strong class="color-necessary">*</strong></span></label>
+                        </div>
+                        <div class="col-sm-3">
+                            <InputText class="form-control" @bind-Value="radiationSourceCheckIn.RadiationSourceNumber" placeholder="@AppData.LangResource[AppData.LanguageID,279]" id="sourceNumber" />
+                        </div>
+
+                    </div>
+
+                    <div class="row g-3 align-items-center mt-2">
+                        <div class="col-sm-2">
+                            <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 30] <strong class="color-necessary">*</strong></span></label>
+                        </div>
+                        <div class="col-sm-3">
+                            <InputSelect class="form-control" @bind-Value="radiationSourceCheckIn.RadiationSourceCheckInLocation" id="location">
+                                <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                @foreach (var item in radiationSourceLocations)
+                                {
+                                    if (item.IsActive == true && item.IsActive != null)
+                                    {
+                                        @if (AppData.LanguageID == 0)
+                                        {
+                                            <option value="@item.RadiationSourceLocationID">@item.RadiationSourceLocationENName</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.RadiationSourceLocationID">@item.RadiationSourceLocationTHName</option>
+                                        }
+                                    }
+                                }
+                            </InputSelect>
+                            <span class="span-btn-location">
+                                @if (AppData.CurrentPermission.Find(i => i.permissionID == 16).permissionE)
+                                {
+                                    <!--button type="button" @onclick="@(() => AddSourceLocation.Show())" class="btn btn-warning margin-btn">
+                                        <i class="fas fa-plus"></i>
+                                    </button-->
+                                }
+                            </span>
+
+                        </div>
+                        <div class="col-sm-1">
+                            <label class="col-form-label">@AppData.LangResource[AppData.LanguageID, 512]<strong class="color-necessary">*</strong> </label>
+                        </div>
+                        <div class="col-sm-4 d-flex align-items-center">
+                            <span class="col-auto d-flex align-items-center">
+                                <input @bind="radiationSourceCheckIn.IsStaff" @onclick="@(()=> radiationSourceCheckIn.RadiationSourceCheckInGiveTo = null)" class="form-check-input" type="checkbox" name="inlineRadioOptions" id="inlineRadioOptions" />@AppData.LangResource[AppData.LanguageID, 475]
+                            </span>
+                            <div class="flex-grow-1">
+                                @if (radiationSourceCheckIn.IsStaff)
+                                {
+                                    <div style="display: flex; align-items: center;">
+                                        <InputSelect class="form-control" @bind-Value="radiationSourceCheckIn.RadiationSourceCheckInGiveTo">
+                                            <option value="">@AppData.LangResource[AppData.LanguageID, 2]-Staff</option>
+                                            @foreach (var item in accounts)
+                                            {
+                                                if (item.IsActive)
+                                                {
+                                                    <option value="@item.UserID">@item.FirstName</option>
+                                                }
+                                            }
+                                        </InputSelect>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div style="display: flex; align-items: center;">
+                                        <InputSelect class="form-control" @bind-Value="radiationSourceCheckIn.RadiationSourceCheckInGiveTo">
+                                            <option value="">@AppData.LangResource[AppData.LanguageID, 2]-OutSide</option>
+                                            @foreach (var item in other)
+                                            {
+                                                <option value="@item.UserID">@item.UserName</option>
+                                            }
+                                        </InputSelect>
+                                        <span class="ml-2">
+                                            <button type="button" @onclick="@(() => AddOtherUser.Show())" class="btn btn-warning ">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (!radiationSourceCheckIn.IsStaff && radiationSourceCheckIn.RadiationSourceCheckInGiveTo != null)
+                    {
+                        <div Class="card bg-light mt-2">
+                            <div Class="card-bordy">
+
+                                <div class="row g-3 align-items-center mt-2">
+                                    <div class="col-sm-2">
+                                        <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 401] <strong class="color-necessary">*</strong> </span></label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <InputText disabled @bind-Value="@other.Find(i=>i.UserID == radiationSourceCheckIn.RadiationSourceCheckInGiveTo).UserName" class="form-control" />
+                                    </div>
+
+                                    <div class="col-sm-1">
+                                        <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 402] <strong class="color-necessary">*</strong></span></label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <InputText disabled @bind-Value="@other.Find(i=>i.UserID == radiationSourceCheckIn.RadiationSourceCheckInGiveTo).Department" class="form-control" />
+                                    </div>
+
+                                </div>
+
+                                <div class="row g-3 align-items-center mt-2">
+                                    <div class="col-sm-2">
+                                        <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 403] <strong class="color-necessary">*</strong></span></label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <InputText disabled @bind-Value="@other.Find(i=>i.UserID == radiationSourceCheckIn.RadiationSourceCheckInGiveTo).PhoneNumber" class="form-control" />
+                                    </div>
+
+                                    <div class="col-sm-1">
+                                        <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 404] <strong class="color-necessary">*</strong></span></label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <InputText disabled @bind-Value="@other.Find(i=>i.UserID == radiationSourceCheckIn.RadiationSourceCheckInGiveTo).Email" class="form-control" />
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="row g-3 align-items-center mt-2">
+                        <div class="col-sm-2">
+                            <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 177]</span></label>
+                        </div>
+                        <div class="col-sm-3">
+                            <InputDate id="setReturnDate" @bind-Value="radiationSourceCheckIn.RadiationSourceCheckInReturnDate" placeholder="@AppData.LangResource[AppData.LanguageID,177]" class="form-control" />
+                        </div>
+
+                    </div>
+                    <div class="row g-3 align-items-center mt-2">
+                        <div class="col-sm-2">
+                            <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 75]</span></label>
+                        </div>
+                        <div class="col-sm-3" style="margin-left:15px;">
+                            <InputFile OnChange="@OnInputFileDefaultChange" class="custom-file-input file-name-custom " id="picture" />
+                            @if (AppData.LanguageID == 0)
+                            {
+                                <label class="custom-file-label mr-4" for="picture" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                            }
+                            else
+                            {
+                                <label class="custom-file-label mr-4" for="picture" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                            }
+                        </div>
+
+                    </div>
+
+                    <div class="row g-3 align-items-center mt-2">
+                        <div class="col-sm-2">
+                            <label class="col-form-label"><span></span></label>
+                        </div>
+                        <div class="col-sm-3">
+                            @if (radiationSourceCheckIn.RadiationSourceCheckInImageData != "")
+                            {
+                                <div class="card shadow-lg" style="width:30rem;">
+                                    <div class="card-body">
+                                        @if (!string.IsNullOrEmpty(ImageShow))
+                                        {
+                                            <a href="@("data:image/png;base64,"+ImageShow+"")" data-lightbox="gallery" data-title="@AppData.LangResource[AppData.LanguageID, 296]">
+                                                <img class="img-show float-left m-2" src="@("data:image/png;base64,"+ImageShow+"")" />
+                                            </a>
+
+                                        }
+                                        else
+                                        {
+                                            <a href="@($"{Config["nurl"]}{Config["nurlFileRadiationSource"]}{radiationSourceCheckIn.RadiationSourceCheckInImageData}")" data-lightbox="gallery" data-title="@AppData.LangResource[AppData.LanguageID, 296]">
+                                                <img class="img-show float-left m-2" src="@($"{Config["nurl"]}{Config["nurlFileRadiationSource"]}{radiationSourceCheckIn.RadiationSourceCheckInImageData}")" />
+                                            </a>
+
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <img class="img-show float-left" src="assets/images/no-img/ImageNotFount.png">
+                            }
+                        </div>
+
+                    </div>
+
+                    <div class="row g-3 align-items-center mt-2">
+                        <div class="col-sm-2">
+                            <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 105]</span></label>
+                        </div>
+                        <div class="col-sm-8">
+                            <textarea @bind="radiationSourceCheckIn.RadiationSourceCheckInNote" class="form-control" id="note" rows="2" placeholder="@AppData.LangResource[AppData.LanguageID,105]" />
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin-left: 0.5rem;">
+        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+            <span></span>
+        </label>
+        <div class="col-12 col-md-8 col-lg-3">
+            <div class="input-group input-box-bottom">
+            </div>
+        </div>
+    </div>
+    <div class="text-center" style="margin-bottom: 10px;">
+        @if (radiationSourceCheckIn.RadiationSourceNumber != "" && radiationSourceCheckIn.RadiationSourceCheckInLocation != 0 && radiationSourceCheckIn.RadiationSourceCheckInGiveTo != null && AppData.CurrentPermission.Find(i => i.permissionID == 16).permissionC)
+        {
+            <button type="submit" class="btn margin-btn" style="background-color:#2E2BFF; color:#fff" name="CheckInSources" id="CheckInSources">@AppData.LangResource[AppData.LanguageID, 17]</button>
+        }
+        else
+        {
+            <button type="submit" disabled class="btn margin-btn" style="background-color:#2E2BFF; color:#fff">@AppData.LangResource[AppData.LanguageID, 17]</button>
+        }
+        <button type="reset" @onclick="OnClear" class="btn margin-btn" style="background-color:#B90F1B; color:#fff" name="Clear" id="Clear">@AppData.LangResource[AppData.LanguageID, 45]</button>
+
+
+    </div>
+</EditForm>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header">
+                <button type="submit" @onclick="Onsearch" class="btn" style="background-color:#2E2BFF; color:#fff"><i class="fas fa-table mr-1"> </i>@AppData.LangResource[AppData.LanguageID, 513]</button>
+                <span class="txt-span-checkAll">
+                    <!--input @bind="IsAll" class="form-check-input checkAll" type="checkbox" name="isall" id="isall" /-->
+                    <!--label for="isall">@AppData.LangResource[AppData.LanguageID, 406]</!--label-->
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height:350px;">
+                    <table id="dataTable" class="table table-bordered table-striped text-center">
+                        <thead class="fixedthead">
+                            <tr>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,177]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,279]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,514]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,512]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,23]</th>
+                            </tr>
+                        </thead>
+                        <tbody class="scrollContent">
+                            @foreach (var item in radiationSourceCheckInList)
+                            {
+                                <tr>
+                                    <td data-label="">@String.Format("{0:dd/MM/yyyy}", item.RadiationSourceCheckInReturnDate)</td>
+                                    <td data-label="">@item.RadiationSourceNumber</td>
+                                    <td data-label="">@(item.radiationSource != null ? item.radiationSource.RadiationSourceNuclide:"-")</td>
+                                    <td data-label="">
+                                        @if (item.IsStaff)
+                                        {
+                                            @(accounts.Find(i => i.UserID == @item.RadiationSourceCheckInGiveTo) != null? accounts.Find(i => i.UserID == @item.RadiationSourceCheckInGiveTo).FirstName:"-")
+                                        }
+                                        else
+                                        {
+                                            @(other.Find(i => i.UserID == @item.RadiationSourceCheckInGiveTo) != null? other.Find(i => i.UserID == @item.RadiationSourceCheckInGiveTo).UserName:"-")
+                                        }
+                                    </td>
+                                    <td>
+                                        <a type="button" class="btn btn-warning " href="@Config["rurl"]/api/RadiationCheckInReport?CheckInID=@item.RadiationSourceCheckInID&USerID=@item.ByUserID&isstaff=@(item.IsStaff?1:0)" download="" target="_blank">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<EditForm Model="@radiationSourceLocation" OnValidSubmit="PostRadiationSourceLocation">
+    <BSModal @ref="AddSourceLocation">
+        <BSModalHeader OnClick="@(() => AddSourceLocation.Hide())" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID,211]</BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 212]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="radiationSourceLocation.RadiationSourceLocationTHName" placeholder="@AppData.LangResource[AppData.LanguageID,212]" class="form-control" />
+                    </div>
+
+                    <ValidationMessage For="@(() => radiationSourceLocation.RadiationSourceLocationTHName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 213]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="radiationSourceLocation.RadiationSourceLocationENName" placeholder="@AppData.LangResource[AppData.LanguageID,213]" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => radiationSourceLocation.RadiationSourceLocationENName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+        </BSModalBody>
+        <BSModalFooter>
+            <button type="submit" class="btn btn-warning">@AppData.LangResource[AppData.LanguageID,44]</button>
+            <button type="reset" class="btn btn-warning" @onclick="@(() => AddSourceLocation.Hide())">@AppData.LangResource[AppData.LanguageID,158]</button>
+        </BSModalFooter>
+    </BSModal>
+</EditForm>
+
+<EditForm Model="@newOtherUser" OnValidSubmit="PostOtherUser">
+    <BSModal @ref="AddOtherUser">
+        <BSModalHeader OnClick="@(() => AddOtherUser.Hide())" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID, 644]</BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <label for="retrunDate" class="col-4  col-form-label">
+                    <span>Name*:</span>
+                </label>
+                <div class="col-8">
+                    <div class="input-group input-box-bottom">
+                        <InputText id="UserName" @bind-Value="newOtherUser.UserName" disable placeholder="UserName" class="form-control" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <label for="checkoutDate" class="col-4 col-form-label ">
+                    <span>Department* :</span>
+                </label>
+                <div class="col-8">
+                    <div class="input-group input-box-bottom">
+                        <InputText id="Department" @bind-Value="newOtherUser.Department" placeholder="Department" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <label for="retrunDate" class="col-4 col-form-label">
+                    <span>PhoneNumber* :</span>
+                </label>
+                <div class=" col-8 ">
+                    <div class="input-group input-box-bottom">
+                        <InputText id="instrumentNumber" @bind-Value="newOtherUser.PhoneNumber" placeholder="PhoneNumber" class="form-control" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <label for="checkoutDate" class="col-md-4 col-form-label ">
+                    <span>E-mail</span>
+                </label>
+                <div class=" col-8 ">
+                    <div class="input-group input-box-bottom">
+                        <InputText id="instrumentNumber" @bind-Value="newOtherUser.Email" placeholder="email" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+        </BSModalBody>
+        <BSModalFooter>
+            <button type="submit" class="btn" style="background-color:#4CBB17; color:#fff">@AppData.LangResource[AppData.LanguageID, 44]</button>
+            <button type="reset" class="btn" style="background-color:#B90F1B; color:#fff" @onclick="@(() => AddOtherUser.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+        </BSModalFooter>
+    </BSModal>
+</EditForm>
+
+<BSModal class="row style-justify mt-5" @ref="Load" IsCentered="true" Size="Size.Small" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+    <BSModalBody>
+        <div class="text-center mt-3">
+            <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+                  style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+        </div>
+        <div class="text-center pt-3" style=" font-size: 16pt">
+            @AppData.LangResource[AppData.LanguageID, 325]
+        </div>
+    </BSModalBody>
+</BSModal>
+
+@code {
+    private List<RadiationSourceLocation> radiationSourceLocations = new List<RadiationSourceLocation>();
+    private List<LanguageModels> languages = new List<LanguageModels>();
+    RadiationSourceCheckIn radiationSourceCheckIn = new RadiationSourceCheckIn();
+    RadiationSourceLocation radiationSourceLocation = new RadiationSourceLocation();
+
+    private List<Account> accounts = new List<Account>();
+    private List<RadiationSourceCheckIn> radiationSourceCheckInList = new List<RadiationSourceCheckIn>();
+    OtherUser newOtherUser = new OtherUser();
+    OtherUser choose = new OtherUser();
+    List<OtherUser> other = new List<OtherUser>();
+    private List<RadiationSourceCheckOut> radiationSourceCheckOuts = new List<RadiationSourceCheckOut>();
+    string CheckOutNumber { get; set; } = "";
+    DateTime? CheckOutDate { get; set; }
+
+    /// <summary>
+    /// PostRadiationSourceCheckIn
+    /// </summary>
+    private async Task PostRadiationSourceCheckIn()
+    {
+        await Task.Run(Loading);
+        Load.Show();
+        try
+        {
+            // หารายการที่ SourceCheckOutStatus == 1 ทั้งหมด
+            var checkedOutSources = radiationSourceCheckOuts.Where(x => x.RadiationSourceCheckOutStatus == true).ToList();
+            if (checkedOutSources.Any())
+            {
+                var resultCheckOutDate = checkedOutSources.FirstOrDefault(x => x.RadiationSourceNumber == radiationSourceCheckIn.RadiationSourceNumber);
+                if (resultCheckOutDate != null)
+                {
+                    CheckOutNumber = resultCheckOutDate.RadiationSourceNumber;
+                    CheckOutDate = resultCheckOutDate.RadiationSourceCheckOutDate;
+
+                    if (radiationSourceCheckIn.RadiationSourceCheckInReturnDate.HasValue != null && CheckOutDate.HasValue != null &&
+                        radiationSourceCheckIn.RadiationSourceCheckInReturnDate.Value.Date >= CheckOutDate.Value.Date)
+                    {
+                        var checkNumber = (await Http.GetFromJsonAsync<List<RadiationSource>>($"{Config["nurl"]}/api/GetRadiationSourceBynumber?number={radiationSourceCheckIn.RadiationSourceNumber}")).Find(i => i.RadiationSourceNumber == radiationSourceCheckIn.RadiationSourceNumber);
+                        if (checkNumber == null)
+                        {
+                            ToastService.ShowError("This number is not an Source Number.");
+                        }
+                        else if (checkNumber.RadiationSourceStatusID == 1 || checkNumber.RadiationSourceStatusID == 4 || checkNumber.RadiationSourceStatusID == 5)
+                        {
+                            ToastService.ShowError($"Failed to check in. Check Source status.");
+                        }
+                        else
+                        {
+                            radiationSourceCheckIn.ByUserID = AppData.UserID;
+                            using var respond = await Http.PostAsJsonAsync($"{Config["nurl"]}/api/RegisterRadiationSourceCheckIn", radiationSourceCheckIn);
+                            if (respond.StatusCode == System.Net.HttpStatusCode.OK)
+                            {
+                                List<RadiationSourceCheckIn> CheckIn = await respond.Content.ReadFromJsonAsync<List<RadiationSourceCheckIn>>();
+                                radiationSourceCheckIn = CheckIn.First();
+
+                                string url = $"{Config["rurl"]}/api/RadiationCheckInReport?CheckInID={radiationSourceCheckIn.RadiationSourceCheckInID}&USerID={AppData.UserID}&isstaff={(radiationSourceCheckIn.IsStaff ? 1 : 0)}";
+                                await jsRuntime.InvokeVoidAsync("OpenURL", url);
+                                //((IJSInProcessRuntime)jsRuntime).InvokeVoid("OpenURL", url);
+                                await ImageDefaultFile();
+                                ToastService.ShowSuccess("Successfully CheckIn");
+                            }
+
+                        }
+                    }
+                }
+                else
+                {
+                    ToastService.ShowError("This number has been returned.");
+                }
+            }
+            else
+            {
+                ToastService.ShowError("No source found with CheckOut status.");
+            }
+
+
+            // var resultCheckOutDate = radiationSourceCheckOuts.Find(x => x.RadiationSourceCheckOutStatus == true);
+            // if (resultCheckOutDate != null)
+            // {
+            //     CheckOutNumber = resultCheckOutDate.RadiationSourceNumber;
+            //     CheckOutDate = resultCheckOutDate.RadiationSourceCheckOutDate;
+            // }
+            // if (radiationSourceCheckIn.RadiationSourceNumber == CheckOutNumber)
+            // {
+            //     if (radiationSourceCheckIn.RadiationSourceCheckInReturnDate.HasValue != null && CheckOutDate.HasValue != null &&
+            //     radiationSourceCheckIn.RadiationSourceCheckInReturnDate.Value.Date >= CheckOutDate.Value.Date)
+            //     {
+            //         radiationSourceCheckIn.ByUserID = AppData.UserID;
+            //         using var respond = await Http.PostAsJsonAsync($"{Config["nurl"]}/api/RegisterRadiationSourceCheckIn", radiationSourceCheckIn);
+            //         if (respond.StatusCode == System.Net.HttpStatusCode.OK)
+            //         {
+            //             List<RadiationSourceCheckIn> CheckIn = await respond.Content.ReadFromJsonAsync<List<RadiationSourceCheckIn>>();
+            //             radiationSourceCheckIn = CheckIn.First();
+
+            //             string url = $"{Config["rurl"]}/api/RadiationCheckInReport?CheckInID={radiationSourceCheckIn.RadiationSourceCheckInID}&USerID={AppData.UserID}&isstaff={(radiationSourceCheckIn.IsStaff ? 1 : 0)}";
+            //             await jsRuntime.InvokeVoidAsync("OpenURL", url);
+            //             //((IJSInProcessRuntime)jsRuntime).InvokeVoid("OpenURL", url);
+            //             await ImageDefaultFile();
+            //             ToastService.ShowSuccess("Successfully CheckIn");
+            //         }
+            //     }
+            //     else
+            //     {
+            //         ToastService.ShowError($"Return date must be after Check Out date");
+            //     }
+            // }
+            // else
+            // {
+            //     ToastService.ShowError("This number has been returned.");
+            // }
+
+            
+
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError($"Can not Check In:{e.Message}");
+        }
+        //Console.WriteLine(res);
+        Load.Hide();
+
+
+        //NavigationManager.NavigateTo("RadiationSources/SourcesSearch");
+
+
+    }
+
+    private async Task PostOtherUser()
+    {
+        try
+        {
+            var res = await Http.PostAsJsonAsync($"{Config["nurl"]}/api/OtherUser", newOtherUser);
+            if (res.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+
+                var o = await res.Content.ReadFromJsonAsync<OtherUser>();
+                this.other.Add(o);
+                this.radiationSourceCheckIn.RadiationSourceCheckInGiveTo = o.UserID;
+                ToastService.ShowSuccess("OtherUser Save Successfully");
+            }
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError($"Error:{e.Message}");
+        }
+        AddOtherUser.Hide();
+        StateHasChanged();
+
+    }
+
+    public async void Onsearch()
+    {
+        await Task.Run(Loading);
+        Load.Show();
+        try
+        {
+
+            radiationSourceCheckInList = await Http.GetFromJsonAsync<List<RadiationSourceCheckIn>>($"{Config["nurl"]}/api/GetRadiationSourceCheckIn");
+            foreach (var item in radiationSourceCheckInList)
+            {
+                item.GetLookUp(AppData.radiationSources);
+            }
+
+            StateHasChanged();
+
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError($"Error: {e.Message}");
+        }
+        Load.Hide();
+    }
+
+    /// <summary>
+    /// OnClear
+    /// </summary>
+    public void OnClear()
+    {
+        radiationSourceCheckIn = new RadiationSourceCheckIn();
+        this.radiationSourceCheckIn.IsStaff = true;
+    }
+
+    /// <summary>
+    /// PostRadiationSourceLocation
+    /// </summary>
+    private async Task PostRadiationSourceLocation()
+    {
+
+        await Http.PostAsJsonAsync($"{Config["nurl"]}/api/RegisterRadiationSourceLocation", radiationSourceLocation);
+        ToastService.ShowSuccess("Successfully CheckInLocation");
+
+        AddSourceLocation.Hide();
+        await OnInitializedAsync();
+    }
+
+    /// <summary>
+    /// OnInitializedAsync
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        //*(อันเก่าเวอร์ชั่น 1.5)*radiationSourceLocations =  await Http.GetFromJsonAsync<List<RadiationSourceLocation>>("api/GetRadiationSourceLocation");
+        radiationSourceLocations = AppData.radiationSourceLocations;
+        //var activeRadiationSourceLocations = radiationSourceLocations.Find(r => r.IsActive == true).IsActive;
+        //if (activeRadiationSourceLocations == true)
+        //    radiationSourceLocations = await _masterData.GetAllActiveMasterDataAsync<RadiationSourceLocation>("ActiveRadiationSourceLocations");
+
+        this.radiationSourceCheckIn.IsStaff = true;
+        accounts = await Http.GetFromJsonAsync<List<Account>>($"{Config["aurl"]}/api/GetAccount");
+        other = await Http.GetFromJsonAsync<List<OtherUser>>($"{Config["nurl"]}/api/OtherUser");
+        radiationSourceCheckOuts = await Http.GetFromJsonAsync<List<RadiationSourceCheckOut>>($"{Config["nurl"]}/api/GetRadiationSourceCheckOut");
+
+        if (AppData.LanguageID == 0)
+        {
+            var resultradiationSourceLocationsEN = radiationSourceLocations.OrderBy(rl => rl.RadiationSourceLocationENName).ToList();
+            radiationSourceLocations = resultradiationSourceLocationsEN;
+            var resultAccount = accounts.OrderBy(a => a.FirstName).ToList();
+            accounts = resultAccount;
+            var resultOther = other.OrderBy(o => o.UserName).ToList();
+            other = resultOther;
+        }
+        else
+        {
+            var resultradiationSourceLocationsTH = radiationSourceLocations.OrderBy(rl => rl.RadiationSourceLocationTHName).ToList();
+            radiationSourceLocations = resultradiationSourceLocationsTH;
+            var resultOther = other.OrderBy(o => o.UserName).ToList();
+            other = resultOther;
+        }
+    }
+
+
+    private IBrowserFile? fileImageDefault;
+
+    private string? ImageShow { get; set; }
+
+    private string pathPictureDefaultFolder { get; set; } = "PictureDefault";
+
+    private byte[] UploadPathDefault { get; set; }
+
+    /// <summary>
+    /// Image Default
+    /// </summary>
+    private async Task OnInputFileDefaultChange(InputFileChangeEventArgs e)
+    {
+        fileImageDefault = e.File;
+        var imageType = fileImageDefault.ContentType;
+        var sizefile = fileImageDefault.Size;
+
+        if (sizefile > 5542880)
+        {
+            ToastService.ShowError("The file size cannot exceed 5MB.");
+            radiationSourceCheckIn.RadiationSourceCheckInImageData = "";
+        }
+        else if (imageType != "image/png" && imageType != "image/jpeg")
+        {
+            ToastService.ShowError("File Type Image Incorrect !");
+            radiationSourceCheckIn.RadiationSourceCheckInImageData = "";
+        }
+        else
+        {
+            Load.Show();
+            await Task.Run(Loading);
+            var resizedImage = await fileImageDefault.RequestImageFileAsync(imageType, 550, 550);
+            // อ่านข้อมูลรูปภาพและแปลงเป็น Base64
+            using (var stream = resizedImage.OpenReadStream(resizedImage.Size))
+            {
+                var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream);
+                var buffer = memoryStream.ToArray();
+                ImageShow = Convert.ToBase64String(buffer);
+            }
+            int maxWidth = 640;
+            int maxHeight = 480;
+            int quality = 90;
+
+            byte[] compressedImage = _imageService.CompressBase64Image(ImageShow, maxWidth, maxHeight, quality);
+            string compressedBase64 = Convert.ToBase64String(compressedImage);
+            ImageShow = compressedBase64;
+            UploadPathDefault = compressedImage;
+
+            string newFileImageName = await GenerateUniqueFileName(fileImageDefault.Name, pathPictureDefaultFolder);
+            radiationSourceCheckIn.RadiationSourceCheckInImageData = newFileImageName;
+            radiationSourceCheckIn.RadiationSourceCheckInFile = compressedBase64;
+            //using MemoryStream memoryStream = new MemoryStream();
+            //await fileImageDefault.OpenReadStream(sizefile).CopyToAsync(memoryStream);
+            //var buffer = memoryStream.GetBuffer();
+            //var imageLeftDataUrl = $"data:{imageType};base64,{Convert.ToBase64String(buffer)}";
+            //ImageShow = imageLeftDataUrl;
+            //string newFileImageName = await GenerateUniqueFileName(fileImageDefault.Name, pathPictureDefaultFolder);
+            //radiationSourceCheckIn.RadiationSourceCheckInImageData = newFileImageName;
+
+            //string base64Image = Convert.ToBase64String(buffer);
+            //int maxWidth = 800;
+            //int maxHeight = 600;
+            //int quality = 95;
+
+            //byte[] compressedImage = _imageService.CompressBase64Image(base64Image, maxWidth, maxHeight, quality);
+            //string compressedBase64 = Convert.ToBase64String(compressedImage);
+            //radiationSourceCheckIn.RadiationSourceCheckInFile = compressedBase64;
+
+            Load.Hide();
+        }
+
+
+    }
+    /// <summary>
+    /// Image Default
+    /// </summary>
+    private async Task ImageDefaultFile()
+    {
+
+        if (fileImageDefault != null)
+        {
+            try
+            {
+                var imageType = fileImageDefault.ContentType;
+                var sizefile = fileImageDefault.Size;
+                if (sizefile > 5542880)
+                {
+                    //ToastService.ShowError("The file size cannot exceed 5MB.");
+                    radiationSourceCheckIn.RadiationSourceCheckInImageData = "";
+                }
+                else if (imageType != "image/png" && imageType != "image/jpeg")
+                {
+                    ///ToastService.ShowError("File Type Image Incorrect !");
+                    radiationSourceCheckIn.RadiationSourceCheckInImageData = "";
+                }
+                else
+                {
+                    string newFileImageName = await GenerateUniqueFileName(fileImageDefault.Name, pathPictureDefaultFolder);
+                    string path = Path.Combine(Config.GetValue<string>("FileStorage")!, "RadiationSource", "CheckIn", "Picture", pathPictureDefaultFolder, newFileImageName);
+                    Directory.CreateDirectory(Path.Combine(Config.GetValue<string>("FileStorage")!, "RadiationSource", "CheckIn", "Picture", pathPictureDefaultFolder)); // Ensure the directory exists
+
+                    await File.WriteAllBytesAsync(path, UploadPathDefault);
+
+                    //string newFileImageName = await GenerateUniqueFileName(fileImageDefault.Name, pathPictureDefaultFolder);
+                    ////string prefixedNewFileName = $"Update_{showinstrument.InstrumentNumber}_" + newFileImageName;
+                    //string path = Path.Combine(Config.GetValue<string>("FileStorage")!, "RadiationSource", "CheckIn", "Picture", pathPictureDefaultFolder, newFileImageName);
+
+                    //Directory.CreateDirectory(Path.Combine(Config.GetValue<string>("FileStorage")!, "RadiationSource", "CheckIn", "Picture", pathPictureDefaultFolder));
+
+                    //await using FileStream fs = new(path, FileMode.Create);
+                    //await fileImageDefault.OpenReadStream(sizefile).CopyToAsync(fs);
+
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowError($"File: {fileImageDefault.Name} Error: {ex.Message}");
+            }
+        }
+
+    }
+
+    /// <summary>
+    /// GenerateUniqueFileDocument
+    /// </summary>
+    private async Task<string> GenerateUniqueFileName(string originalFileName, string folderName)
+    {
+        string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(originalFileName);
+        string fileExtension = Path.GetExtension(originalFileName);
+        string newFileName = fileNameWithoutExtension + fileExtension;
+
+        int counter = 1;
+        string path = Path.Combine(Config.GetValue<string>("FileStorage")!, "RadiationSource", "CheckIn", "Picture", folderName, newFileName);
+
+        while (File.Exists(path))
+        {
+            newFileName = $"{fileNameWithoutExtension}({counter}){fileExtension}";
+            path = Path.Combine(Config.GetValue<string>("FileStorage")!, "RadiationSource", "CheckIn", "Picture", folderName, newFileName);
+            counter++;
+        }
+
+        return newFileName;
+    }
+
+
+
+
+    /// <summary>
+    /// clearURL
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("clearURL");
+            await jsRuntime.InvokeAsync<object>("showFileName");
+        }
+    }
+
+    /// <summary>
+    /// ModalAddLocation
+    /// </summary>
+    BSModal AddSourceLocation { get; set; }
+    BSModal Load { get; set; }
+    BSModal AddOtherUser { get; set; }
+
+    private void Loading()
+    {
+        System.Threading.Thread.Sleep(300);
+        // Retrieve data from the server and initialize
+        // Employees property which the View will bind
+    }
+
+
+}

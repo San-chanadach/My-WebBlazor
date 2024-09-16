@@ -1,0 +1,140 @@
+﻿@page "/Instruments/CheckListHistory/{type}/{Number}/{id}"
+@inject IJSRuntime jsRuntime
+@inject HttpClient Http
+@inject IToastService ToastService
+@inject AppData AppData
+@inject NavigationManager NavigationManager
+@inject IConfiguration Config
+
+<PageTitle>Check List History Page</PageTitle>
+
+<div class="col-md-12">
+    <div class="card-header bg-warning" style="margin-bottom: 5px;">@AppData.LangResource[AppData.LanguageID, 15]</div>
+    <div class="card-header">
+        @AppData.LangResource[AppData.LanguageID, 61] : @Number<br />
+        @if(AppData.LanguageID == 0)
+        {
+             @($"{AppData.LangResource[AppData.LanguageID, 258]} : {instrument.InstrumentENName}") <br />
+        }
+        else
+        {
+             @($"{AppData.LangResource[AppData.LanguageID, 258]} : {instrument.InstrumentTHName}") <br />
+        }
+    </div>
+    <div class="card-body bg-light">
+        <div class="text-end">
+            <a href="@($"/Instruments/CheckListMobile/{type}/{Number}/{id}")" class="btn btn-warning" name="ShowCAl" id="ShowInstrument">
+                @AppData.LangResource[AppData.LanguageID, 395]
+            </a>
+        </div>
+        <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height:700px;">
+            <table id="dataTable" class="table table-bordered table-striped text-center">
+                <thead class="fixedthead">
+                    <tr>
+                        <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 56]</th>
+                        <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 62]</th>
+                        <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 63]</th>
+                        <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 397]</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollContent">
+                    @foreach (var item in LCheckList)
+                    {
+                        <tr>
+                            <td>@item.InstrumentChecklistNumber.Substring(12, 10)</td>
+                            <td>@instrument.InstrumentAssetNumber</td>
+                            <td>@instrument.InstrumentSerialNumber</td>
+                            <td>
+                                @*<a type="button" class="btn btn-warning margin-btn" href="" download="" target="_blank">
+                                        <i class="fas fa-download"></i>
+                                    </a>*@
+                                <a type="button" class="btn btn-warning margin-btn" href="@Config["rurl"]/api/InstrumentCheckListReport?CheckOutID=@item.InstrumentChecklistNumberID" download="@Config["rurl"]/api/InstrumentCheckListReport?CheckOutID=@item.InstrumentChecklistNumberID" target="_blank">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                            </td>
+                        </tr>
+
+                        @*<BSAlert Color="Color.Danger" IsDismissible="true">
+                                Alert Instrument Name:@item.instrument.InstrumentENName - Number: @item.instrument.InstrumentNumber   is Due Calibrate  in @item.InstrumentCalibrationNext.ToString("dd/MM/yyyy")
+                            </BSAlert>*@
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="text-center">
+        <a href="Instruments/CheckList" class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID, 49]</a>
+    </div>
+
+</div>
+
+
+@code {
+
+    [Parameter]/// Weekly-1,Montly-2,Yearly-3
+    public string type { get; set; } = "";
+    [Parameter]///InstrumentNumber
+    public string Number { get; set; } = "";
+    [Parameter]///ModelID
+    public string id { get; set; } = "";
+
+    public string CheckListNumber { get; set; }
+
+    List<ModelInstrumentChecklistNumber> LCheckList = new List<ModelInstrumentChecklistNumber>();
+    Instrument instrument = new Instrument();
+    List<Instrument> instruments = new List<Instrument>();
+    public InstrumentChecklistNumber CheckNumber { get; set; } = new InstrumentChecklistNumber();
+    public List<InstrumentChecklist> checklists = new List<InstrumentChecklist>();
+    public List<InstrumentChecklistResult> Result = new List<InstrumentChecklistResult>();
+    protected override async Task OnInitializedAsync()
+    {
+        // var res = await Http.PostAsync($"https://www.eprsmarttool.com/RapidNRIMS_Service/api/RegisterInstrumentChecklistNumber/{CheckListNumber}/{Number}", null);
+        var res = await Http.GetFromJsonAsync<List<ModelInstrumentChecklistNumber>>($"{Config["nurl"]}/api/GetInstrumentChecklistNumber/{Number}/{type}");
+        LCheckList = res;
+
+        instrument = (await Http.GetFromJsonAsync<List<Instrument>>($"{Config["nurl"]}/api/GetInstrumentByInstrumentNumber/{Number}")).First();
+
+        
+        //if (res.StatusCode == System.Net.HttpStatusCode.OK)
+        //{
+        //    List<InstrumentChecklistNumber> l = await res.Content.ReadFromJsonAsync<List<InstrumentChecklistNumber>>();
+        //    CheckNumber = l.First();
+        //    checklists = await Http.GetFromJsonAsync<List<InstrumentChecklist>>($"api/GetInstrumentChecklist/{id}/{type}");
+        //    foreach (var i in checklists)
+        //    {
+        //        Result.Add(new InstrumentChecklistResult()
+        //        {
+        //            InstrumentCheckllistID = i.InstrumentChecklistID,
+        //            InstrumentChecklistNumberID = CheckNumber.InstrumentChecklistNumberID,
+        //            checklist = i
+        //        });
+        //    }
+
+
+        //}
+
+    }
+    
+
+    public void PassChacked(InstrumentChecklistResult r)
+    {
+        r.FailChecked = !r.InstrumentChecklistResultChecked;
+        Console.WriteLine(r.InstrumentCheckllistID + "Check Pass:" + r.InstrumentChecklistResultChecked + ":: CheckFail: " + r.FailChecked);
+    }
+    public void FailChacked(InstrumentChecklistResult r)
+    {
+        r.InstrumentChecklistResultChecked = !r.FailChecked;
+        Console.WriteLine(r.InstrumentCheckllistID + "Check Pass:" + r.InstrumentChecklistResultChecked + ":: CheckFail: " + r.FailChecked);
+    }
+
+    /// <summary>
+    /// clearURL
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("clearURL");
+        }
+    }
+}

@@ -1,0 +1,64 @@
+﻿@page "/Record/ShowSubEvent/SubEventManage"
+@inject AppData AppData
+@inject IJSRuntime jsRuntime
+<div class="row margin-row-card">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">@AppData.LangResource[AppData.LanguageID,28]: 
+                <img class="img-qrcode float-right" src="assets/images/img-qrcode/qr-code.png">
+            </div> 
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">@AppData.LangResource[AppData.LanguageID,53]</div>
+            <div class="card-body table-responsive">
+                <table class="table table-striped table-bordered table-respon text-center">
+                    <thead>
+                        <tr>
+                            <th>@AppData.LangResource[AppData.LanguageID,54]</th>
+                            <th>@AppData.LangResource[AppData.LanguageID,55]</th>
+                            <th>@AppData.LangResource[AppData.LanguageID,56]</th>
+                            <th>@AppData.LangResource[AppData.LanguageID,30]</th>
+                            <th>@AppData.LangResource[AppData.LanguageID,57]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr>
+                            <td>SEV63-01-0001</td>
+                            <td>09:00 AM</td>
+                            <td>05/08/2020</td>
+                            <td>ศูนย์ราชการระยอง จ.ระยอง</td>
+                            <td>Team 1</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="text-center">
+            <a href="Record/ShowEvent/Event" class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID,49]</a>
+            <a href="Record/ShowSubEvent/SubEvent" class="btn btn-warning margin-btn" role="button" name="Show Sub Event" id="Show Sub Event">@AppData.LangResource[AppData.LanguageID,51]</a>
+            <a href="Record/ShowSubEvent/AddSubEvent" class="btn btn-warning margin-btn" name="AddSubEvent" id="AddSubEvent">@AppData.LangResource[AppData.LanguageID,58]</a>
+            <button type="submit" @onclick="@(() => DeleteSubEventManage.Show())" class="btn btn-warning margin-btn"  name="DeleteSubEvent" id="DeleteSubEvent">@AppData.LangResource[AppData.LanguageID,165]</button>
+            <button type="reset" class="btn btn-warning margin-btn" name="Clear" id="Clear">Clear</button>
+        </div>
+    </div>
+</div>
+<BSModal @ref="DeleteSubEventManage">
+    <BSModalHeader OnClick="@(() => DeleteSubEventManage.Hide())" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID,165]</BSModalHeader>
+    <BSModalBody><p>@AppData.LangResource[AppData.LanguageID,160]</p></BSModalBody>
+    <BSModalFooter>
+        <BSButton Color="Color.Warning" @onclick="@(() => DeleteSubEventManage.Hide())">@AppData.LangResource[AppData.LanguageID,161]</BSButton>
+        <BSButton Color="Color.Warning" @onclick="@(() => DeleteSubEventManage.Hide())">@AppData.LangResource[AppData.LanguageID,162]</BSButton>
+    </BSModalFooter>
+</BSModal>
+@code {
+    BSModal DeleteSubEventManage{ get; set; }
+    protected override void OnInitialized()
+    {
+        ((IJSInProcessRuntime)jsRuntime).InvokeVoid("clearURL");
+    }
+}

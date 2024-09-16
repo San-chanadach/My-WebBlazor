@@ -1,0 +1,111 @@
+﻿@inherits LayoutComponentBase
+@inject AppData AppData
+@inject HttpClient Http
+@inject IJSRuntime jsRuntime
+@inject NavigationManager NavigationManager
+@inject IToastService ToastService
+@inject IConfiguration config
+@using Blazored.Toast.Configuration
+
+
+<div class="sidebar">
+    <NavMenu />
+</div>
+
+<div class="main scrollBar content-color" style="background-color: #E7F4FC">
+    <div class="top-row px-4">
+
+        <!--div class="col-md-3">
+        <div class="input-group mb-0">
+            <input type="text" class="form-control" id="Search" name="Search" placeholder="Search for ...">
+            <button type="submit" class="btn search-for-color"><i class="fas fa-search"></i></button>
+        </div>
+        </div-->
+        <!--a href="http://blazor.net" target="_blank" class="ml-md-auto">About</a--->
+        <BlazoredToasts Position="ToastPosition.TopRight" Timeout="3" IconType="IconType.FontAwesome" SuccessIcon="fas fa-check-circle" ErrorIcon="fas fa-exclamation-circle" />
+        @foreach (var item in userAccounts)
+        {
+            <ul id="menu" class="nav flex-column">
+                <li class="nav-item px-3">
+                    <div class="half">
+                        <label for="profile2" class="profile-dropdown">
+                            <input type="checkbox" id="profile2">
+                            <img src="assets/images/img-userprofile/profileUser.png">
+                            <span>@item.FirstName @item.LastName</span>
+                            <label for="profile2">
+                                <i class="fas fa-chevron-circle-down"></i>
+                            </label>
+                            <ul class="Navigation-list is-dropdown is-hidden">
+                                @if (AppData.CurrentPermission.Find(i => i.permissionID == 18).permissionV)
+                                {
+                                    <li><a href="@($"Security/UserProfile/{AppData.UserID}/0")"><i class="far fa-user-circle"></i>@AppData.LangResource[AppData.LanguageID,3]</a></li>
+                                }
+                                @if (AppData.CurrentPermission.Find(i => i.permissionID == 20).permissionV)
+                                {
+                                    <li><a href="Security/ChangePassword"><i class="fas fa-cog"></i>@AppData.LangResource[AppData.LanguageID,27]</a></li>
+                                    <hr>
+                                }
+                                <li><a href="Accounting/Login"><i class="fas fa-sign-out-alt"></i>@AppData.LangResource[AppData.LanguageID,5]</a></li>
+                            </ul>
+                        </label>
+                    </div>
+                </li>
+            </ul>
+            <i class="fa-solid fa-print fa-2x" onclick="window.print();" style="cursor: pointer;"></i>
+        }
+    </div>
+
+    <div class="content px-4">
+        @Body
+    </div>
+
+
+</div>
+
+@code {
+
+    private enum NavSubmenu
+    {
+        None,
+        ProfileSubMenu,
+    }
+
+    private List<UserAccount> userAccounts = new List<UserAccount>();
+    protected override async Task OnInitializedAsync()
+    {
+        if (AppData.UserID != null)
+        {
+            userAccounts = await Http.GetFromJsonAsync<List<UserAccount>>($"{config["aurl"]}/api/GetUserAccount/{AppData.UserID}");
+        }
+    }
+
+    private NavSubmenu navSubmenu = NavSubmenu.None;
+
+    private void ToggleNavMenu(NavSubmenu? submenu = null)
+    {
+        navSubmenu = submenu ?? navSubmenu;
+    }
+
+    private void ToggleSubmenu(NavSubmenu submenu)
+    {
+        if (navSubmenu == submenu)
+            navSubmenu = NavSubmenu.None;
+        else
+            navSubmenu = submenu;
+    }
+
+
+    /// <summary>
+    /// clearURL
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("clearURL");
+      
+        }
+    }
+
+}
+

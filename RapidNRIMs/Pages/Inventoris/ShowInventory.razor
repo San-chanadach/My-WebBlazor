@@ -1,0 +1,1221 @@
+﻿@page "/Inventoris/ShowInventory/{id}"
+@inject IJSRuntime jsRuntime
+@inject NavigationManager NavigationManager
+@inject AppData AppData
+@inject IToastService ToastService
+@inject HttpClient Http
+@using System.Threading
+@inject ILanguageService LanguageService
+@inject IPrintingService PrintingService
+@inject IMasterData _masterData
+@inject IConfiguration config
+@inject ImageService _imageService
+
+<PageTitle>Show Stock Page</PageTitle>
+
+<EditForm Model="@Stock" OnValidSubmit="UpdateInventoryStock">
+    <div class="row margin-row-card">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">@AppData.LangResource[AppData.LanguageID, 116] : @Stock.InventoryStockNumber</div>
+                <div class="card-body">
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 106]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+
+                                @if (AppData.LanguageID == 0)
+                                {
+                                    <input disabled class="form-control" value="@Stock.inventory.InventoryENName">
+                                }
+                                else
+                                {
+                                    <input disabled class="form-control" value="@Stock.inventory.InventoryTHName">
+                                }
+
+
+                                <span class="span-btn-location">
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 10).permissionE)
+                                    {
+                                        <!--button type="button" @onclick="@(() => InventoryAddStock.Show())" class="btn btn-warning margin-btn">
+                                            <i class="fas fa-edit"></i>
+                                        </button-->
+                                    }
+                                </span>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="brand" class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 188]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                @if (Stock.IsActive != null && Stock.IsActive == true)
+                                {
+                                    <input type="text" disabled class="form-control" value="@(Stock.inventory.brand != null ? Stock.inventory.brand.InventoryBrandName:"-")" />
+                                }
+                                else
+                                {
+                                    <input disabled type="text" class="form-control" value="-" />
+                                }
+                            </div>
+                        </div>
+                        <label class="col-12 col-md-4 col-lg-1 col-form-label-ins margin-label-ins">
+                            <span class="txt-span-ins">@AppData.LangResource[AppData.LanguageID, 189]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom input-box-ins">
+                                @if (Stock.IsActive != null && Stock.IsActive == true)
+                                {
+                                    <input disabled type="text" class="form-control" value="@(Stock.inventory.brand != null ? Stock.inventory.brand.InventoryBrandDescription:"-")" />
+                                }
+                                else
+                                {
+                                    <input disabled type="text" class="form-control" value="-" />
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 201]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                @if (Stock.IsActive != null && Stock.IsActive == true)
+                                {
+                                    <input disabled type="text" class="form-control" value="@(Stock.inventory.agency != null ? Stock.inventory.agency.InventoryAgencyName:"-")" />
+                                }
+                                else
+                                {
+                                    <input disabled type="text" class="form-control" value="-" />
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 202]</span>
+                        </label>
+                        <div class="col-12 col-md-12 col-lg-9">
+                            <div class="input-group input-box-bottom">
+                                @if (Stock.IsActive != null && Stock.IsActive == true)
+                                {
+                                    <textarea disabled class="form-control" value="@(Stock.inventory.agency != null ? Stock.inventory.agency.InventoryAgencyAddress:"-")" />
+                                }
+                                else
+                                {
+                                    <textarea disabled class="form-control" value="-" />
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 203]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                @if (Stock.IsActive != null && Stock.IsActive == true)
+                                {
+                                    <input disabled type="text" class="form-control" value="@(Stock.inventory.agency != null ? Stock.inventory.agency.InventoryAgencyTel:"-")" />
+                                }
+                                else
+                                {
+                                    <input disabled type="text" class="form-control" value="-" />
+                                }
+                            </div>
+                        </div>
+                        <label class="col-12 col-md-4 col-lg-1 col-form-label-ins margin-label-ins">
+                            <span class="txt-span-ins">@AppData.LangResource[AppData.LanguageID, 204]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom input-box-ins">
+                                @if (Stock.IsActive != null && Stock.IsActive == true)
+                                {
+                                    <input disabled type="text" class="form-control" value="@(Stock.inventory.agency != null ? Stock.inventory.agency.InventoryAgencyEmail:"-")" />
+                                }
+                                else
+                                {
+                                    <input disabled type="text" class="form-control" value="-" />
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <label for="agency" class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 488]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <InputNumber disabled @bind-Value="Stock.inventory.minStock" placeholder="@AppData.LangResource[AppData.LanguageID,64]" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-8 col-lg-1">
+                            <div class="input-group input-box-bottom">
+                                <span style="margin-top: 5px;">
+                                    <input disabled @bind="Stock.inventory.IsNotif" class="form-check-input " type="checkbox" name="isall" id="isall" />
+                                    <label for=""> @AppData.LangResource[AppData.LanguageID, 489]</label>
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 30]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <InputSelect class="form-control" @bind-Value="Stock.InventoryStockLocationID">
+                                    <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                    @foreach (var item in inventoryLocations)
+                                    {
+                                        if (item.IsActive == true && item.IsActive != null)
+                                        {
+                                            <option value="@item.InventoryLocationID">@item.InventoryLocationName</option>
+                                        }
+                                    }
+                                </InputSelect>
+                                <!--span class="span-btn-location">
+                                @if (AppData.CurrentPermission.Find(i => i.permissionID == 10).permissionE)
+                                {
+                                        <button type="button" @onclick="@(() => AddLocation.Show())" class="btn btn-warning margin-btn">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                }
+                                </span-->
+                            </div>
+                            <ValidationMessage For="@(() => Stock.InventoryStockLocationID)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                        </div>
+                        <label class="col-12 col-md-4 col-lg-1 col-form-label-ins margin-label-ins">
+                            <span class="txt-span-ins">@AppData.LangResource[AppData.LanguageID, 108]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom input-box-ins">
+                                <InputSelect class="form-control" @bind-Value="Stock.InventoryStockStockTypeID">
+                                    <!----->
+                                    <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                    @foreach (var item in inventoryStockTypes)
+                                    {
+                                        if (item.IsActive == true && item.IsActive != null)
+                                        {
+                                            <option value="@item.InventoryStockTypeID">@item.InventoryStockTypeName</option>
+                                        }
+                                    }
+                                </InputSelect>
+                                <!--span class="span-btn-stockType">
+                                @if (AppData.CurrentPermission.Find(i => i.permissionID == 10).permissionE)
+                                {
+                                        <button type="button" @onclick="@(() => AddStockType.Show())" class="btn btn-warning margin-btn">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                }
+                                </span-->
+                            </div>
+                            <ValidationMessage For="@(() => Stock.InventoryStockStockTypeID)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 110]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <input type="number" disabled min="0" @bind-value="Stock.InventoryStockQuantity" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,110]" />
+                            </div>
+                            <ValidationMessage For="@(() => Stock.InventoryStockQuantity)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                        </div>
+                        <label class="col-12 col-md-4 col-lg-1 col-form-label-ins margin-label-ins">
+                            <span class="txt-span-ins">@AppData.LangResource[AppData.LanguageID, 111]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom input-box-ins">
+                                <input type="number" min="0" step=".01" @bind-value="Stock.InventoryStockPrice" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,111]" />
+                            </div>
+                            <ValidationMessage For="@(() => Stock.InventoryStockPrice)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 112]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <InputDate @bind-Value="Stock.InventoryStockPurchaseDate" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,112]" />
+                            </div>
+                            <ValidationMessage For="@(() => Stock.InventoryStockPurchaseDate)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                        </div>
+                        <label class="col-12 col-md-4 col-lg-1 col-form-label-ins margin-label-ins">
+                            <span class="txt-span-ins">@AppData.LangResource[AppData.LanguageID, 113]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom input-box-ins">
+                                <InputDate @bind-Value="Stock.InventoryStockExpireDate" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,113]" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 296]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <InputFile OnChange="@OnInputFileDefaultChange" class="custom-file-input file-name-custom" id="pictureDefault" />
+                                @if (AppData.LanguageID == 0)
+                                {
+                                    <label class="custom-file-label" for="pictureDefault" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                                }
+                                else
+                                {
+                                    <label class="custom-file-label" for="pictureDefault" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span></span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                @if (Stock.InventoryStockPictureDefault != "")
+                                {
+                                    <div class="card shadow-lg" style="width:30rem;">
+                                        <div class="card-body">
+                                            @if (!string.IsNullOrEmpty(ImageShow))
+                                            {
+                                                <a href="@("data:image/png;base64,"+ImageShow+"")" data-lightbox="gallery" data-title="@AppData.LangResource[AppData.LanguageID, 296]">
+                                                    <img class="img-show float-left m-2" src="@("data:image/png;base64,"+ImageShow+"")" />
+                                                </a>
+
+                                            }
+                                            else
+                                            {
+                                                <a href="@($"{config["nurl"]}{config["nurlFileInventory"]}{Stock.InventoryStockPictureDefault}")" data-lightbox="gallery" data-title="@AppData.LangResource[AppData.LanguageID, 296]">
+                                                    <img class="img-show float-left m-2" src="@($"{config["nurl"]}{config["nurlFileInventory"]}{Stock.InventoryStockPictureDefault}")" />
+                                                </a>
+
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <img class="img-show " src="assets/images/no-img/ImageNotFount.png">
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 298]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <InputFile OnChange="@OnInputFileLeftChange" class="custom-file-input file-name-custom" id="pictureLeft" />
+                                @if (AppData.LanguageID == 0)
+                                {
+                                    <label class="custom-file-label" for="pictureLeft" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                                }
+                                else
+                                {
+                                    <label class="custom-file-label" for="pictureLeft" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                                }
+                            </div>
+                        </div>
+
+                        <label class="col-12 col-md-4 col-lg-1 col-form-label-ins margin-label-ins">
+                            <span class="txt-span-ins">@AppData.LangResource[AppData.LanguageID, 299]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom input-box-ins">
+                                <InputFile OnChange="@OnInputFileRightChange" class="custom-file-input file-name-custom" id="pictureRight" />
+                                @if (AppData.LanguageID == 0)
+                                {
+                                    <label class="custom-file-label" for="pictureRight" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                                }
+                                else
+                                {
+                                    <label class="custom-file-label" for="pictureRight" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                                }
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span></span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                @if (Stock.InventoryStockPictureLeft != "")
+                                {
+                                    <div class="card shadow-lg" style="width:30rem;">
+                                        <div class="card-body">
+                                            @if (!string.IsNullOrEmpty(ImageLeftShow))
+                                            {
+                                                <a href="@("data:image/png;base64,"+ImageLeftShow+"")" data-lightbox="gallery" data-title="@AppData.LangResource[AppData.LanguageID, 298]">
+                                                    <img class="img-show float-left m-2" src="@("data:image/png;base64,"+ImageLeftShow+"")" />
+                                                </a>
+
+                                            }
+                                            else
+                                            {
+                                                <a href="@($"{config["nurl"]}{config["nurlFileInventory"]}{Stock.InventoryStockPictureLeft}")" data-lightbox="gallery" data-title="@AppData.LangResource[AppData.LanguageID, 298]">
+                                                    <img class="img-show float-left m-2" src="@($"{config["nurl"]}{config["nurlFileInventory"]}{Stock.InventoryStockPictureLeft}")" />
+                                                </a>
+
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <img class="img-show float-left" src="assets/images/no-img/ImageNotFount.png">
+                                }
+                            </div>
+                        </div>
+
+
+                        <!--inventoryStock.InventoryStockPictureRight-->
+                        <label class="col-12 col-md-4 col-lg-1 col-form-label-ins margin-label-ins">
+                            <span></span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom input-box-ins">
+                                @if (Stock.InventoryStockPictureRight != "")
+                                {
+                                    <div class="card shadow-lg" style="width:30rem;">
+                                        <div class="card-body">
+                                            @if (!string.IsNullOrEmpty(ImageRightShow))
+                                            {
+                                                <a href="@("data:image/png;base64,"+ImageRightShow+"")" data-lightbox="gallery" data-title="@AppData.LangResource[AppData.LanguageID, 299]">
+                                                    <img class="img-show float-left m-2" src="@("data:image/png;base64,"+ImageRightShow+"")" />
+                                                </a>
+
+                                            }
+                                            else
+                                            {
+                                                <a href="@($"{config["nurl"]}{config["nurlFileInventory"]}{Stock.InventoryStockPictureRight}")" data-lightbox="gallery" data-title="@AppData.LangResource[AppData.LanguageID, 299]">
+                                                    <img class="img-show float-left m-2" src="@($"{config["nurl"]}{config["nurlFileInventory"]}{Stock.InventoryStockPictureRight}")" />
+                                                </a>
+
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <img class="img-show float-left" src="assets/images/no-img/ImageNotFount.png">
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <a href="Inventoris/Expiry" class="btn margin-btn" style="background-color:#7F7F7F; color:#fff">@AppData.LangResource[AppData.LanguageID, 49]</a>
+                @if (AppData.CurrentPermission.Find(i => i.permissionID == 10).permissionE)
+                {
+                    <button type="button" @onclick="BarcodeQRGeneratre" class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID, 87]</button>
+                }
+                @if (AppData.CurrentPermission.Find(i => i.permissionID == 10).permissionU)
+                {
+                    <button type="submit" class="btn margin-btn" style="background-color:#4CBB17; color:#fff" name="SaveStock" id="SaveStock">@AppData.LangResource[AppData.LanguageID, 44]</button>
+                }
+            </div>
+        </div>
+    </div>
+
+</EditForm>
+
+<EditForm Model="@Stock.inventory" OnValidSubmit="PostInventory">
+    <!--<DataAnnotationsValidator />-->
+    <BSModal @ref="InventoryAddStock">
+        <BSModalHeader OnClick="@(() => InventoryAddStock.Hide())" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID, 19]</BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-3 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 64]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="Stock.inventory.InventoryTHName" placeholder="@AppData.LangResource[AppData.LanguageID,64]" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => Stock.inventory.InventoryTHName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-3 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 65]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="Stock.inventory.InventoryENName" placeholder="@AppData.LangResource[AppData.LanguageID,65]" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => Stock.inventory.InventoryENName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-3 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 71]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputSelect class="form-control" @bind-Value="Stock.inventory.InventoryBrandID">
+                            <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                            @foreach (var item in inventoryBrands)
+                            {
+                                <option value="@item.InventoryBrandID">@item.InventoryBrandName</option>
+                            }
+                        </InputSelect>
+                        <!--span class="span-btn-brand">
+                            <button type="button" @onclick="@(() => AddBrand.Show())" class="btn btn-warning margin-btn">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </span-->
+                    </div>
+                    <ValidationMessage For="@(() => Stock.inventory.InventoryBrandID)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label for="agency" class="col-12 col-md-4 col-lg-3 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 76]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputSelect class="form-control" @bind-Value="Stock.inventory.InventoryAgencyID">
+                            <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                            @foreach (var item in inventoryAgencys)
+                            {
+                                <option value="@item.InventoryAgencyID">@item.InventoryAgencyName</option>
+                            }
+                        </InputSelect>
+                        <!--span class="span-btn-agency">
+                            <button type="button" @onclick="@(() => AddAgency.Show())" class="btn btn-warning margin-btn">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </span-->
+                    </div>
+                    <ValidationMessage For="@(() => Stock.inventory.InventoryAgencyID)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label for="agency" class="col-12 col-md-4 col-lg-3 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID,488]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-3">
+                    <div class="input-group input-box-bottom">
+                        <InputNumber @bind-Value="Stock.inventory.minStock" placeholder="@AppData.LangResource[AppData.LanguageID,64]" class="form-control" />
+                    </div>
+                </div>
+                <div class="col-12 col-md-8 col-lg-2">
+                    <div class="input-group input-box-bottom">
+                        <span style="margin-top: 5px;">
+                            <input @bind="Stock.inventory.IsNotif" class="form-check-input " type="checkbox" name="isall" id="isall" />
+                            <label for="">@AppData.LangResource[AppData.LanguageID,489]</label>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </BSModalBody>
+        <BSModalFooter>
+            <button type="submit" class="btn" style="background-color:#4CBB17; color:#fff">@AppData.LangResource[AppData.LanguageID, 44]</button>
+            <button type="reset" class="btn" style="background-color:#B90F1B; color:#fff" @onclick="@(() => InventoryAddStock.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+        </BSModalFooter>
+    </BSModal>
+</EditForm>
+
+<EditForm Model="@inventoryStockType" OnValidSubmit="PostInventoryStockType">
+    <!--<DataAnnotationsValidator />-->
+    <BSModal @ref="AddStockType">
+        <BSModalHeader OnClick="@(() => AddStockType.Hide())" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID, 214]</BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 215]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="inventoryStockType.InventoryStockTypeName" placeholder="@AppData.LangResource[AppData.LanguageID,215]" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => inventoryStockType.InventoryStockTypeName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 216]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputTextArea @bind-Value="inventoryStockType.InventoryStockTypeDescription" rows="2" placeholder="@AppData.LangResource[AppData.LanguageID,216]" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => inventoryStockType.InventoryStockTypeDescription)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+        </BSModalBody>
+        <BSModalFooter>
+            <button type="submit" class="btn" style="background-color:#4CBB17; color:#fff">@AppData.LangResource[AppData.LanguageID, 44]</button>
+            <button type="reset" class="btn" style="background-color:#B90F1B; color:#fff" @onclick="@(() => AddStockType.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+        </BSModalFooter>
+    </BSModal>
+</EditForm>
+
+<EditForm Model="@inventoryLocation" OnValidSubmit="PostInventoryLocation">
+    <BSModal @ref="AddLocation">
+        <BSModalHeader OnClick="@(() => AddLocation.Hide())" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID, 211]</BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 199]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="inventoryLocation.InventoryLocationName" placeholder="@AppData.LangResource[AppData.LanguageID,199]" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => inventoryLocation.InventoryLocationName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 200]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputTextArea @bind-Value="inventoryLocation.InventoryLocationDescription" rows="2" placeholder="@AppData.LangResource[AppData.LanguageID,200]" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => inventoryLocation.InventoryLocationDescription)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+        </BSModalBody>
+        <BSModalFooter>
+            <button type="submit" class="btn" style="background-color:#4CBB17; color:#fff" name="Save" id="Save">@AppData.LangResource[AppData.LanguageID, 44]</button>
+            <button type="reset" class="btn" style="background-color:#B90F1B; color:#fff" @onclick="@(() => AddLocation.Hide())" name="Cancel" id="Cancel">@AppData.LangResource[AppData.LanguageID, 158]</button>
+        </BSModalFooter>
+    </BSModal>
+</EditForm>
+
+<BSModal class="row style-justify mt-5" @ref="Load" IsCentered="true" Size="Size.Small" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+    <BSModalBody>
+        <div class="text-center mt-3">
+            <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+                  style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+        </div>
+        <div class="text-center pt-3" style=" font-size: 16pt">
+            @AppData.LangResource[AppData.LanguageID, 325]
+        </div>
+    </BSModalBody>
+</BSModal>
+
+@code {
+    /// <summary>
+    /// Main Edit Variable
+    /// </summary>
+    InventoryStock Stock = new InventoryStock();
+
+    /// <summary>
+    ///  UseinModal
+    /// </summary>
+    InventoryStockType inventoryStockType = new InventoryStockType();
+    InventoryLocation inventoryLocation = new InventoryLocation();
+
+    /// <summary>
+    /// Initial
+    /// </summary>
+
+    private List<Inventory> inventorys = new List<Inventory>();
+    private List<InventoryStockType> inventoryStockTypes = new List<InventoryStockType>();
+    private List<InventoryAgency> inventoryAgencys = new List<InventoryAgency>();
+    private List<InventoryBrand> inventoryBrands = new List<InventoryBrand>();
+    private List<InventoryLocation> inventoryLocations = new List<InventoryLocation>();
+    private List<InventoryStock> inventoryStocks = new List<InventoryStock>();
+
+    [Parameter]
+    public string id { get; set; }
+
+    private async Task UpdateInventoryStock()
+    {
+        await Task.Run(Loading);
+        Load.Show();
+        try
+        {
+            var upresult = await Http.PutAsJsonAsync($"{config["nurl"]}/api/UpdateInventoryStock/{id}", Stock);
+            await ImageDefaultFile();
+            await ImageLeftFile();
+            await ImageRightFile();
+            ToastService.ShowSuccess("Update Consumable Successfully");
+        }
+        catch(Exception e)
+        {
+            ToastService.ShowError($"Error{e.Message}");
+        }
+    //NavigationManager.NavigateTo("Inventory/ShowInventory");
+        Load.Hide();
+
+    }
+    private async Task PostInventory()
+    {
+
+        var res = await Http.PutAsJsonAsync($"{config["nurl"]}/api/RegisterInventory", Stock.inventory);
+        ToastService.ShowSuccess("Successfully Inventory");
+
+        List<Inventory> l = await res.Content.ReadFromJsonAsync<List<Inventory>>();
+        foreach (var i in l)
+        {
+            i.Getlookup(AppData.inventoryBrands, AppData.inventoryAgencys);
+        }
+        Stock.inventory = l.First();
+        InventoryAddStock.Hide();
+
+
+    }
+
+    private async Task PostInventoryStockType()
+    {
+
+        var res = await Http.PostAsJsonAsync($"{config["nurl"]}/api/RegisterInventoryStockType", inventoryStockType);
+        ToastService.ShowSuccess("Successfully StockType");
+        List<InventoryStockType> l = await res.Content.ReadFromJsonAsync<List<InventoryStockType>>();
+        AppData.inventoryStockTypes.AddRange(l);
+        inventoryStockTypes = AppData.inventoryStockTypes;
+        Stock.InventoryStockStockTypeID = l.First().InventoryStockTypeID;
+
+        AddStockType.Hide();
+
+
+    }
+    private async Task PostInventoryLocation()
+    {
+        var res = await Http.PostAsJsonAsync($"{config["nurl"]}/api/RegisterInventoryLocation", inventoryLocation);
+        ToastService.ShowSuccess("Successfully Location");
+        List<InventoryLocation> l = await res.Content.ReadFromJsonAsync<List<InventoryLocation>>();
+        AppData.inventoryLocations.AddRange(l);
+        inventoryLocations = AppData.inventoryLocations;
+        Stock.InventoryStockLocationID = l.First().InventoryLocationID;
+        AddLocation.Hide();
+
+
+    }
+
+    /// <summary>
+    /// GetLookUp OnInitializedAsync
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Run(Loading);
+        Load.Show();
+        var respond = await Http.GetFromJsonAsync<List<InventoryStock>>($"{config["nurl"]}/api/GetInventoryStock/{(int.Parse(id))}");
+        if (respond != null)
+            Stock = respond.First();
+        Load.Hide();
+
+        inventorys = AppData.inventorys;
+        //var activeInventory = inventorys.Find(i => i.IsActive == true).IsActive;
+        //if (activeInventory == true)
+        //    inventorys = await _masterData.GetAllActiveMasterDataAsync<Inventory>("ActiveInventory");
+
+        inventoryStockTypes = AppData.inventoryStockTypes;
+        //var activeInventoryStockType = inventoryStockTypes.Find(i => i.IsActive == true).IsActive;
+        //if(activeInventoryStockType == true)
+        //    inventoryStockTypes = await _masterData.GetAllActiveMasterDataAsync<InventoryStockType>("ActiveInventoryStockType");
+
+        inventoryBrands = AppData.inventoryBrands;
+        //var activeInventoryBrand = inventoryBrands.Find(i => i.IsActive == true).IsActive;
+        //if (activeInventoryBrand == true)
+        //inventoryBrands = await _masterData.GetAllActiveMasterDataAsync<InventoryBrand>("ActiveInventoryBrand");
+
+        inventoryAgencys = AppData.inventoryAgencys;
+        //var activeInventoryAgency = inventoryAgencys.Find(i => i.IsActive == true).IsActive;
+        //if (activeInventoryAgency == true)
+        //    inventoryAgencys = await _masterData.GetAllActiveMasterDataAsync<InventoryAgency>("ActiveInventoryAgency");
+
+        inventoryLocations = AppData.inventoryLocations;
+        //var activeInventoryLocation = inventoryLocations.Find(i => i.IsActive == true).IsActive;
+        //if (activeInventoryLocation == true)
+        //    inventoryLocations = await _masterData.GetAllActiveMasterDataAsync<InventoryLocation>("ActiveInventoryLocation");
+
+        //inventorys = AppData.inventorys;
+        //inventoryStockTypes = await Http.GetFromJsonAsync<List<InventoryStockType>>($"api/GetInventoryStockType");
+        //inventoryBrands = await Http.GetFromJsonAsync<List<InventoryBrand>>($"api/GetInventoryBrand");
+        //inventoryAgencys = await Http.GetFromJsonAsync<List<InventoryAgency>>($"api/GetInventoryAgency");
+        //inventoryLocations = await Http.GetFromJsonAsync<List<InventoryLocation>>($"api/GetInventoryLocation");
+
+        foreach (var i in inventorys)
+        {
+            i.Getlookup(AppData.inventoryBrands, AppData.inventoryAgencys);
+        }
+
+        Stock.GetLookUp(inventorys, inventoryLocations, inventoryStockTypes);
+        Stock.inventory.minStock = Stock.inventory.minStock.HasValue ? Stock.inventory.minStock.Value : 1;
+        Stock.inventory.IsNotif = Stock.inventory.IsNotif.HasValue ? Stock.inventory.IsNotif.Value : false;
+
+        if (AppData.LanguageID == 0)
+        {
+            var resultInventoryLocation = inventoryLocations.OrderBy(l => l.InventoryLocationName).ToList();
+            inventoryLocations = resultInventoryLocation;
+            var resultInventoryStockTypes = inventoryStockTypes.OrderBy(c => c.InventoryStockTypeName).ToList();
+            inventoryStockTypes = resultInventoryStockTypes;
+        }
+
+    }
+
+    /// <summary>
+    /// onSelected Inventory  for Show BrandName and agency
+    /// </summary>
+    public void SelectInventory()
+    {
+        var item = this.inventorys.Find(i => i.InventoryNumber == Stock.InventoryNumber);
+        if (item != null)
+        {
+
+            this.Stock.inventory = this.inventorys.Find(i => i.InventoryNumber == Stock.InventoryNumber);
+            // ToastService.ShowSuccess(" " + this.inventoryStock.inventory.brand.InventoryBrandName);
+        }
+    }
+
+
+    private IBrowserFile? fileImageDefault;
+    private IBrowserFile? fileImageLeft;
+    private IBrowserFile? fileImageRight;
+
+    private string? ImageShow { get; set; }
+    private string? ImageLeftShow { get; set; }
+    private string? ImageRightShow { get; set; }
+
+    private string pathPictureDefaultFolder { get; set; } = "PictureDefault";
+    private string pathPictureLeftFolder { get; set; } = "PictureLeft";
+    private string pathPictureRightFolder { get; set; } = "PictureRight";
+
+    private byte[] UploadPathDefault { get; set; }
+    private byte[] UploadPathLeft { get; set; }
+    private byte[] UploadPathRight { get; set; }
+
+    /// <summary>
+    /// Image Default
+    /// </summary>
+    private async Task OnInputFileDefaultChange(InputFileChangeEventArgs e)
+    {
+        fileImageDefault = e.File;
+        var imageType = fileImageDefault.ContentType;
+        var sizefile = fileImageDefault.Size;
+
+        if (sizefile > 5542880)
+        {
+            ToastService.ShowError("The file size cannot exceed 5MB.");
+            Stock.InventoryStockPictureDefault = "";
+        }
+        else if (imageType != "image/png" && imageType != "image/jpeg")
+        {
+            ToastService.ShowError("File Type Image Incorrect !");
+            Stock.InventoryStockPictureDefault = "";
+        }
+        else
+        {
+            Load.Show();
+            await Task.Run(Loading);
+            var resizedImage = await fileImageDefault.RequestImageFileAsync(imageType, 550, 550);
+            // อ่านข้อมูลรูปภาพและแปลงเป็น Base64
+            using (var stream = resizedImage.OpenReadStream(resizedImage.Size))
+            {
+                var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream);
+                var buffer = memoryStream.ToArray();
+                ImageShow = Convert.ToBase64String(buffer);
+            }
+            int maxWidth = 640;
+            int maxHeight = 480;
+            int quality = 90;
+
+            byte[] compressedImage = _imageService.CompressBase64Image(ImageShow, maxWidth, maxHeight, quality);
+            string compressedBase64 = Convert.ToBase64String(compressedImage);
+            ImageShow = compressedBase64;
+            UploadPathDefault = compressedImage;
+
+            string newFileImageName = await GenerateUniqueFileName(fileImageDefault.Name, pathPictureDefaultFolder);
+            Stock.InventoryStockPictureDefault = newFileImageName;
+
+            //using MemoryStream memoryStream = new MemoryStream();
+            //await fileImageDefault.OpenReadStream(sizefile).CopyToAsync(memoryStream);
+            //var buffer = memoryStream.GetBuffer();
+            //var imageLeftDataUrl = $"data:{imageType};base64,{Convert.ToBase64String(buffer)}";
+            //ImageShow = imageLeftDataUrl;
+            //string newFileImageName = await GenerateUniqueFileName(fileImageDefault.Name, pathPictureDefaultFolder);
+            //Stock.InventoryStockPictureDefault = newFileImageName;
+            Load.Hide();
+        }
+
+
+    }
+    /// <summary>
+    /// Image Default
+    /// </summary>
+    private async Task ImageDefaultFile()
+    {
+
+        if (fileImageDefault != null)
+        {
+            try
+            {
+                var imageType = fileImageDefault.ContentType;
+                var sizefile = fileImageDefault.Size;
+                if (sizefile > 5542880)
+                {
+                    //ToastService.ShowError("The file size cannot exceed 5MB.");
+                    Stock.InventoryStockPictureDefault = "";
+                }
+                else if (imageType != "image/png" && imageType != "image/jpeg")
+                {
+                    ///ToastService.ShowError("File Type Image Incorrect !");
+                    Stock.InventoryStockPictureDefault = "";
+                }
+                else
+                {
+                    string newFileImageName = await GenerateUniqueFileName(fileImageDefault.Name, pathPictureDefaultFolder);
+                    string path = Path.Combine(config.GetValue<string>("FileStorage")!, "Inventory", "Edit", "Picture", pathPictureDefaultFolder, newFileImageName);
+                    Directory.CreateDirectory(Path.Combine(config.GetValue<string>("FileStorage")!, "Inventory", "Edit", "Picture", pathPictureDefaultFolder)); // Ensure the directory exists
+
+                    await File.WriteAllBytesAsync(path, UploadPathDefault);
+
+                    //string newFileImageName = await GenerateUniqueFileName(fileImageDefault.Name, pathPictureDefaultFolder);
+                    ////string prefixedNewFileName = $"Update_{showinstrument.InstrumentNumber}_" + newFileImageName;
+                    //string path = Path.Combine(config.GetValue<string>("FileStorage")!, "Inventory", "Edit", "Picture", pathPictureDefaultFolder, newFileImageName);
+
+                    //Directory.CreateDirectory(Path.Combine(config.GetValue<string>("FileStorage")!, "Inventory", "Edit", "Picture", pathPictureDefaultFolder));
+
+                    //await using FileStream fs = new(path, FileMode.Create);
+                    //await fileImageDefault.OpenReadStream(sizefile).CopyToAsync(fs);
+
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowError($"File: {fileImageDefault.Name} Error: {ex.Message}");
+            }
+        }
+
+    }
+
+
+    /// <summary>
+    /// Image Left
+    /// </summary>
+    private IList<string> imageLeftDataUrls = new List<string>();
+    private async Task OnInputFileLeftChange(InputFileChangeEventArgs e)
+    {
+        fileImageLeft = e.File;
+        var imageType = fileImageLeft.ContentType;
+        var sizefile = fileImageLeft.Size;
+
+        if (sizefile > 5542880)
+        {
+            ToastService.ShowError("The file size cannot exceed 5MB.");
+            Stock.InventoryStockPictureLeft = "";
+        }
+        else if (imageType != "image/png" && imageType != "image/jpeg")
+        {
+            ToastService.ShowError("File Type Image Incorrect !");
+            Stock.InventoryStockPictureLeft = "";
+        }
+        else
+        {
+            Load.Show();
+            await Task.Run(Loading);
+            var resizedImage = await fileImageLeft.RequestImageFileAsync(imageType, 550, 550);
+            // อ่านข้อมูลรูปภาพและแปลงเป็น Base64
+            using (var stream = resizedImage.OpenReadStream(resizedImage.Size))
+            {
+                var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream);
+                var buffer = memoryStream.ToArray();
+                ImageLeftShow = Convert.ToBase64String(buffer);
+            }
+            int maxWidth = 640;
+            int maxHeight = 480;
+            int quality = 90;
+
+            byte[] compressedImage = _imageService.CompressBase64Image(ImageLeftShow, maxWidth, maxHeight, quality);
+            string compressedBase64 = Convert.ToBase64String(compressedImage);
+            ImageLeftShow = compressedBase64;
+            UploadPathLeft = compressedImage;
+
+            string newFileImageName = await GenerateUniqueFileName(fileImageLeft.Name, pathPictureLeftFolder);
+            Stock.InventoryStockPictureLeft = newFileImageName;
+
+            //using MemoryStream memoryStream = new MemoryStream();
+            //await fileImageLeft.OpenReadStream(sizefile).CopyToAsync(memoryStream);
+            //var buffer = memoryStream.GetBuffer();
+            //var imageLeftDataUrl = $"data:{imageType};base64,{Convert.ToBase64String(buffer)}";
+            //ImageLeftShow = imageLeftDataUrl;
+            //string newFileImageName = await GenerateUniqueFileName(fileImageLeft.Name, pathPictureLeftFolder);
+            //Stock.InventoryStockPictureLeft = newFileImageName;
+            Load.Hide();
+        }
+    }
+
+    /// <summary>
+    /// Image Left
+    /// </summary>
+    private async Task ImageLeftFile()
+    {
+
+        if (fileImageLeft != null)
+        {
+            try
+            {
+                var imageType = fileImageLeft.ContentType;
+                var sizefile = fileImageLeft.Size;
+                if (sizefile > 5542880)
+                {
+                    //ToastService.ShowError("The file size cannot exceed 5MB.");
+                    Stock.InventoryStockPictureLeft = "";
+                }
+                else if (imageType != "image/png" && imageType != "image/jpeg")
+                {
+                    ///ToastService.ShowError("File Type Image Incorrect !");
+                    Stock.InventoryStockPictureLeft = "";
+                }
+                else
+                {
+                    string newFileImageName = await GenerateUniqueFileName(fileImageLeft.Name, pathPictureLeftFolder);
+                    string path = Path.Combine(config.GetValue<string>("FileStorage")!, "Inventory", "Edit", "Picture", pathPictureLeftFolder, newFileImageName);
+                    Directory.CreateDirectory(Path.Combine(config.GetValue<string>("FileStorage")!, "Inventory", "Edit", "Picture", pathPictureLeftFolder)); // Ensure the directory exists
+
+                    await File.WriteAllBytesAsync(path, UploadPathLeft);
+
+                    //string newFileImageName = await GenerateUniqueFileName(fileImageLeft.Name, pathPictureLeftFolder);
+                    ////string prefixedNewFileName = $"Update_{showinstrument.InstrumentNumber}_" + newFileImageName;
+                    //string path = Path.Combine(config.GetValue<string>("FileStorage")!, "Inventory", "Edit", "Picture", pathPictureLeftFolder, newFileImageName);
+
+                    //Directory.CreateDirectory(Path.Combine(config.GetValue<string>("FileStorage")!, "Inventory", "Edit", "Picture", pathPictureLeftFolder));
+
+                    //await using FileStream fs = new(path, FileMode.Create);
+                    //await fileImageLeft.OpenReadStream(sizefile).CopyToAsync(fs);
+
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowError($"File: {fileImageLeft.Name} Error: {ex.Message}");
+            }
+        }
+
+    }
+    
+    /// <summary>
+    /// Image Right
+    /// </summary>
+    private IList<string> imageRightDataUrls = new List<string>();
+    private async Task OnInputFileRightChange(InputFileChangeEventArgs e)
+    {
+        fileImageRight = e.File;
+        var imageType = fileImageRight.ContentType;
+        var sizefile = fileImageRight.Size;
+
+        if (sizefile > 5542880)
+        {
+            ToastService.ShowError("The file size cannot exceed 5MB.");
+            Stock.InventoryStockPictureRight = "";
+        }
+        else if (imageType != "image/png" && imageType != "image/jpeg")
+        {
+            ToastService.ShowError("File Type Image Incorrect !");
+            Stock.InventoryStockPictureRight = "";
+        }
+        else
+        {
+            Load.Show();
+            await Task.Run(Loading);
+            var resizedImage = await fileImageRight.RequestImageFileAsync(imageType, 550, 550);
+            // อ่านข้อมูลรูปภาพและแปลงเป็น Base64
+            using (var stream = resizedImage.OpenReadStream(resizedImage.Size))
+            {
+                var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream);
+                var buffer = memoryStream.ToArray();
+                ImageRightShow = Convert.ToBase64String(buffer);
+            }
+            int maxWidth = 640;
+            int maxHeight = 480;
+            int quality = 90;
+
+            byte[] compressedImage = _imageService.CompressBase64Image(ImageRightShow, maxWidth, maxHeight, quality);
+            string compressedBase64 = Convert.ToBase64String(compressedImage);
+            ImageRightShow = compressedBase64;
+            UploadPathRight = compressedImage;
+
+            string newFileImageName = await GenerateUniqueFileName(fileImageRight.Name, pathPictureRightFolder);
+            Stock.InventoryStockPictureRight = newFileImageName;
+
+            //using MemoryStream memoryStream = new MemoryStream();
+            //await fileImageRight.OpenReadStream(sizefile).CopyToAsync(memoryStream);
+            //var buffer = memoryStream.GetBuffer();
+            //var imageRightDataUrl = $"data:{imageType};base64,{Convert.ToBase64String(buffer)}";
+            //ImageRightShow = imageRightDataUrl;
+            //string newFileImageName = await GenerateUniqueFileName(fileImageRight.Name, pathPictureRightFolder);
+            //Stock.InventoryStockPictureRight = newFileImageName;
+            Load.Hide();
+        }
+    }
+
+
+    /// <summary>
+    /// Image Right
+    /// </summary>
+    private async Task ImageRightFile()
+    {
+
+        if (fileImageRight != null)
+        {
+            try
+            {
+                var imageType = fileImageRight.ContentType;
+                var sizefile = fileImageRight.Size;
+                if (sizefile > 5542880)
+                {
+                    //ToastService.ShowError("The file size cannot exceed 5MB.");
+                    Stock.InventoryStockPictureRight = "";
+                }
+                else if (imageType != "image/png" && imageType != "image/jpeg")
+                {
+                    ///ToastService.ShowError("File Type Image Incorrect !");
+                    Stock.InventoryStockPictureRight = "";
+                }
+                else
+                {
+                    string newFileImageName = await GenerateUniqueFileName(fileImageRight.Name, pathPictureRightFolder);
+                    string path = Path.Combine(config.GetValue<string>("FileStorage")!, "Inventory", "Edit", "Picture", pathPictureRightFolder, newFileImageName);
+                    Directory.CreateDirectory(Path.Combine(config.GetValue<string>("FileStorage")!, "Inventory", "Edit", "Picture", pathPictureRightFolder)); // Ensure the directory exists
+
+                    await File.WriteAllBytesAsync(path, UploadPathRight);
+                    //string newFileImageName = await GenerateUniqueFileName(fileImageRight.Name, pathPictureRightFolder);
+                    ////string prefixedNewFileName = $"Update_{showinstrument.InstrumentNumber}_" + newFileImageName;
+                    //string path = Path.Combine(config.GetValue<string>("FileStorage")!, "Inventory", "Edit", "Picture", pathPictureRightFolder, newFileImageName);
+
+                    //Directory.CreateDirectory(Path.Combine(config.GetValue<string>("FileStorage")!, "Inventory", "Edit", "Picture", pathPictureRightFolder));
+
+                    //await using FileStream fs = new(path, FileMode.Create);
+                    //await fileImageRight.OpenReadStream(sizefile).CopyToAsync(fs);
+
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowError($"File: {fileImageRight.Name} Error: {ex.Message}");
+            }
+        }
+
+    }
+
+
+    /// <summary>
+    /// GenerateUniqueFileDocument
+    /// </summary>
+    private async Task<string> GenerateUniqueFileName(string originalFileName, string folderName)
+    {
+        string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(originalFileName);
+        string fileExtension = Path.GetExtension(originalFileName);
+        string newFileName = fileNameWithoutExtension + fileExtension;
+
+        int counter = 1;
+        string path = Path.Combine(config.GetValue<string>("FileStorage")!, "Inventory", "Edit", "Picture", folderName, newFileName);
+
+        while (File.Exists(path))
+        {
+            newFileName = $"{fileNameWithoutExtension}({counter}){fileExtension}";
+            path = Path.Combine(config.GetValue<string>("FileStorage")!, "Inventory", "Edit", "Picture", folderName, newFileName);
+            counter++;
+        }
+
+
+
+        return newFileName;
+    }
+
+    
+
+    /// <summary>
+    /// PrintBarcode
+    /// </summary>
+    string barcode { get; set; } = "";
+
+    public async void BarcodeQRGeneratre()
+    {
+        Load.Show();
+        await Task.Run(Loading);
+        Barcode sticker = new Barcode();
+        var pdf = await sticker.GenerateBarcodeAsync(Stock.InventoryStockNumber, Stock.inventory.InventoryENName,
+            inventoryLocations.Find(i => i.InventoryLocationID == Stock.InventoryStockLocationID) != null ? inventoryLocations.Find(i => i.InventoryLocationID == Stock.InventoryStockLocationID).InventoryLocationName : "-", BarcodeType.QRCode);
+        barcode = Convert.ToBase64String(pdf);
+        await PrintingService.Print(new PrintOptions(barcode) { Base64 = true });
+        Load.Hide();
+
+    }
+
+    // public async void BarcodeQRGeneratre()
+    // {
+    //     Load.Show();
+    //     await Task.Run(Loading);
+    //     Barcode sticker = new Barcode();
+    //     var inventoryLocation = inventoryLocations.Find(i => i.InventoryLocationID == Stock.InventoryStockLocationID);
+    //     var inventoryLocationName = inventoryLocation != null ? inventoryLocation.InventoryLocationName : "-";
+    //     var pdf = await sticker.GenerateBarcodeAsync(Stock.InventoryStockNumber, Stock.inventory.InventoryENName, inventoryLocationName, BarcodeType.QRCode);
+    //     barcode = Convert.ToBase64String(pdf);
+    //     await PrintingService.Print(new PrintOptions(barcode) { Base64 = true });
+    //     Load.Hide();
+    // }
+
+
+    
+
+
+    /// <summary>
+    /// Modal
+    /// </summary>
+    BSModal InventoryAddStock { get; set; }
+    BSModal AddStockType { get; set; }
+    BSModal AddBrand { get; set; }
+    BSModal AddLocation { get; set; }
+    BSModal AddAgency { get; set; }
+    BSModal Load { get; set; }
+
+    /// <summary>
+    /// clearURL
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("clearURL");
+            await jsRuntime.InvokeAsync<object>("showFileName");
+        }
+    }
+
+
+    private void Loading()
+    {
+        System.Threading.Thread.Sleep(300);
+        // Retrieve data from the server and initialize
+        // Employees property which the View will bind
+    }
+
+}

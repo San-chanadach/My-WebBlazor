@@ -1,0 +1,143 @@
+﻿@inherits ConsumableNeedDashboardBase
+<div class="col-lg-4 col-md-6 mt-4 mb-4">
+    <div class="card-dashbord z-index-2 ">
+        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+            <a href="@($"Inventoris/MinStockPage")" style="text-decoration:none">
+                <div class="card-header text-white txt-size-paper-two" style="background-color:#70DAD5">
+                    <b>
+                        @AppData.LangResource[AppData.LanguageID, 536]  @AppData.mins.Count() @AppData.LangResource[AppData.LanguageID, 537]
+                    </b>
+                </div>
+            </a>
+            <div class="card-body bg-light">
+                <div class="scrollBar fixTableHead table-responsive scroll-inner height-size-paper-two">
+                    @if (AppData.mins.Count != 0)
+                    {
+                        <table id="dataTable" class="table table-striped text-wrap txt-size-paper-two-content">
+                            <thead class="fixedthead">
+                                <tr>
+
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 431]</th>
+                                    <th class="alternateRow text-right">Quantity</th>
+                                </tr>
+                            </thead>
+                            <tbody class="scrollContent">
+                                @foreach (var item in AppData.mins)
+                                {
+
+                                    <tr>
+                                        <td style="cursor:default;">@item.THName</td>
+                                        <td style="cursor:default;" class="text-right">@item.Quantity</td>
+
+                                    </tr>
+
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <BSAlert Color="Color.Primary" IsDismissible="true">
+                            @AppData.LangResource[AppData.LanguageID, 434]
+                        </BSAlert>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!--ModalInventoryEdit---->
+<EditForm Model="@editInventory" OnValidSubmit="SaveEditInventory">
+    <BSModal @ref="ModalInventoryEdit">
+        <BSModalHeader OnClick="@(() => ModalInventoryEdit.Hide())" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID, 498]</BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 430]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="editInventory.InventoryNumber" disabled placeholder="@AppData.LangResource[AppData.LanguageID,430]" class="form-control" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 64]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="editInventory.InventoryTHName" disabled placeholder="@AppData.LangResource[AppData.LanguageID,64]" class="form-control" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 65]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="editInventory.InventoryENName" disabled placeholder="@AppData.LangResource[AppData.LanguageID,65]" class="form-control" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 71]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputSelect disabled class="form-control" @bind-Value="editInventory.InventoryBrandID">
+                            <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                            @foreach (var item in inventoryBrands)
+                            {
+                                <option value="@item.InventoryBrandID">@item.InventoryBrandName</option>
+                            }
+                        </InputSelect>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <label for="agency" class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 76]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputSelect disabled class="form-control" @bind-Value="editInventory.InventoryAgencyID">
+                            <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                            @foreach (var item in inventoryAgencys)
+                            {
+                                <option value="@item.InventoryAgencyID">@item.InventoryAgencyName</option>
+                            }
+                        </InputSelect>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <label for="agency" class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID,488]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-3">
+                    <div class="input-group input-box-bottom">
+                        <InputNumber disabled @bind-Value="editInventory.minStock" placeholder="@AppData.LangResource[AppData.LanguageID,488]" class="form-control" />
+                    </div>
+                </div>
+                <div class="col-12 col-md-8 col-lg-2">
+                    <div class="input-group input-box-bottom">
+                        <span style="margin-top: 5px;">
+                            <input @bind="editInventory.IsNotif" class="form-check-input " type="checkbox" name="isall" id="isall" />
+                            <label for="">@AppData.LangResource[AppData.LanguageID,489]</label>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </BSModalBody>
+        <BSModalFooter>
+            <button type="submit" class="btn btn-warning">@AppData.LangResource[AppData.LanguageID, 44]</button>
+            <button type="reset" class="btn btn-warning" @onclick="@(() => ModalInventoryEdit.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+        </BSModalFooter>
+    </BSModal>
+</EditForm>
+

@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121.
+-->
+<Project>
+  <PropertyGroup>
+    <_PublishTargetUrl>E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\IIS</_PublishTargetUrl>
+    <History>True|2023-11-14T15:23:26.6733514Z;True|2023-11-13T10:44:29.9711402+07:00;True|2023-11-07T19:56:26.1328253+07:00;True|2023-11-05T22:52:52.3647798+07:00;True|2023-11-05T14:45:14.2304477+07:00;False|2023-11-05T14:43:01.4725578+07:00;True|2023-11-04T03:34:13.2463072+07:00;True|2023-11-03T08:50:21.0318479+07:00;True|2023-10-23T14:06:15.6167498+07:00;True|2023-10-18T11:16:59.8694939+07:00;True|2023-10-16T00:24:43.8703542+07:00;True|2023-10-16T00:22:55.1498778+07:00;True|2023-10-09T16:45:56.4297176+07:00;True|2023-07-26T13:30:40.2808755+07:00;</History>
+  </PropertyGroup>
+</Project>

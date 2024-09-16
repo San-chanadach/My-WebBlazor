@@ -1,0 +1,166 @@
+﻿@inherits PopularConsumableCheckOutDashboardBase
+
+<div class="col-lg-6 col-md-6 mt-4 mb-4 height-size-popular-comsumable">
+    <div class="card-dashbord z-index-2 ">
+        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+            <div class="card-header text-white txt-size-paper-two" style="background-color:#70DAD5">
+                <b>@AppData.LangResource[AppData.LanguageID,550]</b>
+            </div>
+            <div class="scrollBar fixTableHead table-responsive scroll-inner height-size-popular">
+                <table id="dataTable" class="table table-striped text-wrap txt-size-paper-two-content-popular">
+                    <thead class="fixedthead">
+                        <tr>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,423]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,101]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,583]</th>
+                            <th class="alternateRow" style="text-align:right">@AppData.LangResource[AppData.LanguageID, 230]</th>
+
+                        </tr>
+                    </thead>
+                    <tbody class="scrollContent">
+                        @{
+                            //var currentYear = DateTime.Now.Year;
+                            //var lastYear = currentYear - 1;
+
+                            //var inventoryStock = inventoryStockCheckOuts
+                            //.Where(checkout => checkout.InventoryStockCheckOutDate.Value.Year >= lastYear && checkout.InventoryStockCheckOutDate.Value.Year <= currentYear)
+                            //.GroupBy(checkout => new { checkout.InventoryStockNumber, checkout.InventoryStockCheckOutGiveTo })
+                            //.Select(group => new
+                            //{
+                            //    group.Key.InventoryStockNumber,
+                            //    group.Key.InventoryStockCheckOutGiveTo,
+                            //    Count = group.Count(),
+                            //    LastCheckOutDate = group.Max(checkout => checkout.InventoryStockCheckOutDate.Value.Date)
+                            //})
+                            //.OrderByDescending(item => item.Count)
+                            //.ToList();
+
+
+                           
+                            //-----ของเก่าที่ดึงจากตาราง InventoryStockCheckOut
+                            // var inventoryStock = inventoryStockCheckOuts
+                            // .Where(checkout => checkout.InventoryStockCheckOutDate.HasValue &&
+                            // checkout.InventoryStockCheckOutDate.Value >= DateTime.Now.AddMonths(-12)) // แก้ไขตรงนี้
+                            // .GroupBy(checkout => new { checkout.InventoryStockNumber, checkout.InventoryStockCheckOutGiveTo })
+                            // .Select(group => new
+                            // {
+                            //     group.Key.InventoryStockNumber,
+                            //     group.Key.InventoryStockCheckOutGiveTo,
+                            //     Count = group.Count(),
+                            //     LastCheckOutDate = group.Max(checkout => checkout.InventoryStockCheckOutDate.Value.Date)
+                            // })
+                            // .OrderByDescending(item => item.Count)
+                            // .ToList();
+                        }
+
+                        @foreach (var item in inventoryStockCheckOutItemLastYears)
+                        {
+
+                            <tr>
+                                <td data-label="" style="cursor:default">@(item.InventoryStockNumber != null ? item.InventoryStockNumber: "-")</td>
+                                <td data-label="" style="cursor:default;">
+                                    @(accounts.Find(i => i.UserID == item.InventoryStockCheckOutGiveTo) != null ? accounts.Find(i => i.UserID == item.InventoryStockCheckOutGiveTo).FirstName: "-")
+                                    @(accounts.Find(i => i.UserID == item.InventoryStockCheckOutGiveTo) != null ? accounts.Find(i => i.UserID == item.InventoryStockCheckOutGiveTo).LastName: "-")
+
+                                </td>
+                                <td class="text-center" style="cursor:default">
+                                    @item.Count
+                                </td>
+                                <td class="text-right" style="cursor:default">@(item.LastCheckOutDate.HasValue ? item.LastCheckOutDate.Value.ToString("dd/MM/yyyy"):"-")</td>
+                            </tr>
+                        }
+
+
+                        @*@{
+
+                        var currentYear = DateTime.Now.Year;
+                            var lastYear = currentYear - 1;
+
+                            var inventoryStock = inventoryStockCheckOuts
+                            .Where(checkout => checkout.InventoryStockCheckOutDate.Value.Year >= lastYear && checkout.InventoryStockCheckOutDate.Value.Year <= currentYear)
+                            .GroupBy(checkout => new { checkout.InventoryStockNumber, checkout.InventoryStockCheckOutGiveTo })
+                            .Select(group => new
+                            {
+                                group.Key.InventoryStockNumber,
+                                group.Key.InventoryStockCheckOutGiveTo,
+                                Count = group.Count(),
+                                LastCheckOutDate = group.Max(checkout => checkout.InventoryStockCheckOutDate.Value.Date)
+                            })
+                            .OrderByDescending(item => item.Count)
+                            .ToList();
+
+
+                        var orderedInventoryStockCheckOuts = inventoryStockCheckOuts
+                        .OrderByDescending(item =>
+                        {
+                        var today = DateTime.Now;
+                        var monthsAndTotals = Enumerable.Range(0, 12)
+                        .Select(i =>
+                        {
+                        var currentMonth = today.AddMonths(-i);
+                        var resultTotal = inventoryStockCheckOuts
+                        .Count(x => x.InventoryStockCheckOutDate.HasValue &&
+                        x.InventoryStockCheckOutDate.Value.Year == currentMonth.Year &&
+                        x.InventoryStockCheckOutDate.Value.Month == currentMonth.Month);
+                        return new { Month = currentMonth.ToString("MMM"), Total = resultTotal, SortKey = currentMonth };
+                        });
+
+                        return monthsAndTotals
+                        .Where(x => x.SortKey.Year == item.InventoryStockCheckOutDate.Value.Year &&
+                        x.SortKey.Month == item.InventoryStockCheckOutDate.Value.Month)
+                        .Select(x => x.Total)
+                        .FirstOrDefault();
+                        });
+                        }
+
+                        @foreach (var item in orderedInventoryStockCheckOuts)
+                        {
+                        var today = DateTime.Now;
+                        var monthsAndTotals = Enumerable.Range(0, 12)
+                        .Select(i =>
+                        {
+                        var currentMonth = today.AddMonths(-i);
+                        var resultTotal = inventoryStockCheckOuts
+                        .Count(x => x.InventoryStockCheckOutDate.HasValue &&
+                        x.InventoryStockCheckOutDate.Value.Year == currentMonth.Year &&
+                        x.InventoryStockCheckOutDate.Value.Month == currentMonth.Month);
+                        return new { Month = currentMonth.ToString("MMM"), Total = resultTotal, SortKey = currentMonth };
+                        });
+
+                        <tr>
+                        <td data-label="">@(item.InventoryStockNumber != null ? item.InventoryStockNumber: "-")</td>
+                        <td data-label="">@(accounts.Find(i => i.UserID == item.InventoryStockCheckOutGiveTo) != null ? accounts.Find(i => i.UserID == item.InventoryStockCheckOutGiveTo).FirstName: "-")</td>
+                        <td class="text-center">
+                        @(monthsAndTotals
+                        .Where(x => x.SortKey.Year == item.InventoryStockCheckOutDate.Value.Year &&
+                        x.SortKey.Month == item.InventoryStockCheckOutDate.Value.Month)
+                        .Select(x => x.Total)
+                        .FirstOrDefault()) @AppData.LangResource[AppData.LanguageID, 537]
+                        </td>
+                        <td class="text-right">@(item.InventoryStockCheckOutDate != null ? item.InventoryStockCheckOutDate.Value.Date.ToString("dd/MM/yyyy"):"-")</td>
+                        </tr>
+                        }*@
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@*@{
+    var currentYear = DateTime.Now.Year;
+
+    var inventoryStock = inventoryStockCheckOuts
+    .Where(checkout => checkout.InventoryStockCheckOutDate.Value.Year == currentYear)
+    .GroupBy(checkout => new { checkout.InventoryStockNumber, checkout.InventoryStockCheckOutGiveTo })
+    .Select(group => new
+    {
+        group.Key.InventoryStockNumber,
+        group.Key.InventoryStockCheckOutGiveTo,
+        Count = group.Count(),
+        LastCheckOutDate = group.Max(checkout => checkout.InventoryStockCheckOutDate.Value.Date)
+    })
+    .OrderByDescending(item => item.Count)
+    .ToList();
+}*@

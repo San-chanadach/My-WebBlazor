@@ -1,0 +1,768 @@
+﻿@page "/Security/TeamSchedule"
+@inject IJSRuntime IJSRuntime
+@inject HttpClient Http
+@inject AppData AppData
+@inject IToastService ToastService
+@inject IConfiguration Config
+@inject IJSRuntime jsRuntime
+
+<PageTitle>Team Schedule Page</PageTitle>
+
+<BSTabGroup style="margin-top: 1rem;">
+
+    <BSTabList IsPills="true" IsList="true">
+        <BSTab>
+            <BSTabLabel>@AppData.LangResource[AppData.LanguageID, 294]</BSTabLabel>
+            <BSTabContent>
+                <EditForm Model="@addUserSheduler" OnValidSubmit="@PostScheduler">
+                    <!----DataAnnotationsValidator /-->
+                    <div class="row margin-row-card" style="margin-top: 0.5rem;">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">@AppData.LangResource[AppData.LanguageID, 282]</div>
+                                <div class="card-body">
+                                    <div class="row margin-row-schedule">
+                                        <div class="col-lg-3 col-sm-12 margin-col-lg-3">
+                                            <label class="col-form-label margin-label-startdate">
+                                                <span>@AppData.LangResource[AppData.LanguageID, 32]:</span>
+                                            </label>
+                                            <div class="col input-group input-box-bottom" style="margin-left: -1.5rem;">
+                                                <InputDate @bind-Value="addUserSheduler.ScheduleStartDate " class="form-control" />
+                                            </div>
+                                            <ValidationMessage For="@(() => addUserSheduler.ScheduleStartDate)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                                        </div>
+                                        <div class="col-lg-3 col-sm-12 margin-col-lg-3-enddate-type-user">
+                                            <label class="col-form-label margin-label-enddate-type-user">
+                                                <span>@AppData.LangResource[AppData.LanguageID, 33]:</span>
+                                            </label>
+                                            <div class="input-group input-box-bottom" style="margin-left: -2.5rem;">
+                                                <InputDate @bind-Value="addUserSheduler.ScheduleEndDate " class="form-control" />
+                                            </div>
+                                            <ValidationMessage For="@(() => addUserSheduler.ScheduleEndDate)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                                        </div>
+                                        <div class="col-lg-3 col-sm-12 margin-col-lg-3-enddate-type-user">
+                                            <label class="col-form-label margin-label-enddate-type-user">
+                                                <span>@AppData.LangResource[AppData.LanguageID, 283]</span>
+                                            </label>
+                                            <div class="input-group input-box-bottom" style="margin-left: -2.5rem;">
+                                                <InputSelect class="form-control" @bind-Value="addUserSheduler.ScheduleTypeID">
+                                                    <option selected value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                                    @foreach (var item in scheduleTypes)
+                                                    {
+                                                        @if (item.ScheduleTypeID > 1)
+                                                        {
+                                                            <option value="@item.ScheduleTypeID">@item.ScheduleTypeName</option>
+                                                        }
+
+                                                    }
+                                                </InputSelect>
+                                            </div>
+                                            <ValidationMessage For="@(() => addUserSheduler.ScheduleTypeID)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                                        </div>
+
+                                        <div class="col-lg-3 col-sm-12 margin-col-lg-3-enddate-type-user">
+                                            <label class="col-form-label margin-label-enddate-type-user">
+                                                <span>@AppData.LangResource[AppData.LanguageID, 284]</span>
+                                            </label>
+                                            <div class="input-group input-box-bottom" style="margin-left: -2.5rem;">
+                                                <InputSelect class="form-control" @bind-Value="addUserSheduler.UserID">
+                                                    <option selected value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                                    @foreach (var item in accounts)
+                                                    {
+                                                        if (item.IsActive)
+                                                        {
+                                                            <option value="@item.UserID">@item.FirstName</option>
+                                                        }
+
+                                                    }
+                                                </InputSelect>
+                                            </div>
+                                            <ValidationMessage For="@(() => addUserSheduler.UserID)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+
+                                        </div>
+                                        <div class=" col btn-save-addschedule">
+                                            @if (addUserSheduler.ScheduleTypeID != 0 && addUserSheduler.UserID != null && AppData.CurrentPermission.Find(i => i.permissionID == 19).permissionC)
+                                            {
+                                                <button type="submit" class="btn" style="background-color:#4CBB17; color:#fff">@AppData.LangResource[AppData.LanguageID, 44]</button>
+                                            }
+                                            else
+                                            {
+                                                <button type="submit" disabled class="btn" style="background-color:#4CBB17; color:#fff">@AppData.LangResource[AppData.LanguageID, 44]</button>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </EditForm>
+
+                <div class="row margin-row-card" style="margin-top: 0.5rem;">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header"><i class="fas fa-table" style="margin-right:0.5rem;"></i>@AppData.LangResource[AppData.LanguageID, 285]</div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                                        <span>@AppData.LangResource[AppData.LanguageID, 32] :</span>
+                                    </label>
+                                    <div class="col-12 col-md-8 col-lg-3 margin-textbox-schedule-table">
+                                        <div class="input-group input-box-bottom">
+                                            <input type="date" @bind-value="startTable" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <label class="col-12 col-md-4 col-lg-2 col-form-label margin-span-toenddate">
+                                        <span>@AppData.LangResource[AppData.LanguageID, 251] :</span>
+                                    </label>
+                                    <div class="col-12 col-md-8 col-lg-3 margin-textbox-toendDate">
+                                        <div class="input-group input-box-bottom">
+                                            <input type="date" @bind-value="endTable" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="margin-btn-showschedule">
+                                        <button type="button" class="btn btn-warning" @onclick="SearchScheduler">@AppData.LangResource[AppData.LanguageID, 291]</button>
+                                    </div>
+                                </div>
+                                <div class="row" style="margin-right: 0.3rem; margin-left: 0.3rem; margin-top: 0.5rem; margin-bottom: 0.5rem;">
+                                    <div class="table-responsive">
+                                        <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height:550px;">
+                                            <table class="table table-bordered table-striped text-center" width="100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th>@AppData.LangResource[AppData.LanguageID, 284]</th>
+                                                        <th>@AppData.LangResource[AppData.LanguageID, 283]</th>
+                                                        <th>@AppData.LangResource[AppData.LanguageID, 32]</th>
+                                                        <th>@AppData.LangResource[AppData.LanguageID, 33]</th>
+                                                        <th>@AppData.LangResource[AppData.LanguageID, 146]</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var item in schedulerlist)
+                                                    {
+                                                        <tr>
+                                                            <td>@item.User.FirstName    @item.User.LastName</td>
+                                                            <td>@item.Scheduletype.ScheduleTypeName</td>
+                                                            <td>@String.Format("{0:dd/MM/yyyy}", item.ScheduleStartDate)</td>
+                                                            <td>@String.Format("{0:dd/MM/yyyy}", item.ScheduleEndDate)</td>
+                                                            <td>
+                                                                @if (AppData.CurrentPermission.Find(i => i.permissionID == 19).permissionD)
+                                                                {
+                                                                    <i class="far fa-trash-alt" @onclick="() => OnDeleteSchedulyUser(item.ScheduleID)"></i>
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </BSTabContent>
+        </BSTab>
+        <BSTab>
+            <BSTabLabel>@AppData.LangResource[AppData.LanguageID, 287]</BSTabLabel>
+            <BSTabContent>
+                <EditForm Model="@addHoliday" OnValidSubmit="@PostHoliday">
+                    <DataAnnotationsValidator />
+                    <div class="row margin-row-card" style="margin-top: 0.5rem;">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">@AppData.LangResource[AppData.LanguageID, 288]</div>
+                                <div class="card-body">
+                                    <div class="row" style="margin-left: 0.5rem; margin-right: 0.5rem;">
+                                        <div class="col-lg-3 col-sm-12" style="margin-left: -1rem;">
+                                            <label class="col-form-label" style="margin-left: -0.5rem;">
+                                                <span>@AppData.LangResource[AppData.LanguageID, 32]:</span>
+                                            </label>
+                                            <div class="col input-group input-box-bottom" style="margin-left: -1.5rem;">
+                                                <InputDate @bind-Value="addHoliday.ScheduleStartDate " class="form-control" />
+                                            </div>
+                                            <ValidationMessage For="@(() => addHoliday.ScheduleStartDate)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                                        </div>
+                                        <div class="col-lg-3 col-sm-12 margin-col-lg-3-holiday">
+                                            <label class="col-form-label " style="margin-left: -2.5rem;">
+                                                <span>@AppData.LangResource[AppData.LanguageID, 33]:</span>
+                                            </label>
+                                            <div class="input-group input-box-bottom margin-textbox-holiday">
+                                                <InputDate @bind-Value="addHoliday.ScheduleEndDate " class="form-control" />
+                                            </div>
+                                            <ValidationMessage For="@(() => addHoliday.ScheduleEndDate)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                                        </div>
+                                        <div class="col-lg-3 col-sm-12 margin-col-lg-3-holiday">
+                                            <label class="col-form-label" style="margin-left: -2.5rem;">
+                                                <span>@AppData.LangResource[AppData.LanguageID, 117]:</span>
+                                            </label>
+                                            <div class="input-group input-box-bottom margin-textbox-holiday">
+                                                <InputText @bind-Value="addHoliday.ScheduleName" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID, 117]" />
+                                            </div>
+                                            <ValidationMessage For="@(() => addHoliday.ScheduleName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                                        </div>
+                                        <div class="col btn-save-addschedule">
+                                            @if (AppData.CurrentPermission.Find(i => i.permissionID == 19).permissionC)
+                                            {
+                                                <button type="submit" class="btn" style="background-color:#4CBB17; color:#fff">@AppData.LangResource[AppData.LanguageID, 44]</button>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </EditForm>
+
+                <div class="row margin-row-card" style="margin-top: 0.5rem;">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header"><i class="fas fa-table" style="margin-right:0.5rem;"></i>@AppData.LangResource[AppData.LanguageID, 289]</div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                                        <span>@AppData.LangResource[AppData.LanguageID, 290] :</span>
+                                    </label>
+                                    <div class="col-12 col-md-8 col-lg-3 margin-textbox-schedule-table">
+                                        <div class="input-group input-box-bottom">
+                                            <input @bind-value="HolidayofYear" class="form-control" />
+                                        </div>
+                                    </div>
+
+                                    <div class="margin-btn-showschedule">
+                                        <button type="button" class="btn btn-warning" @onclick="SearchHoliday">@AppData.LangResource[AppData.LanguageID, 291]</button>
+                                    </div>
+                                </div>
+                                <div class="row" style="margin-right: 0.3rem; margin-left: 0.3rem; margin-top: 0.5rem; margin-bottom: 0.5rem;">
+                                    <div class="table-responsive">
+                                        <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height:550px;">
+                                            <table class="table table-bordered table-striped text-center" width="100%">
+                                                <thead>
+                                                    <tr>
+
+                                                        <th>@AppData.LangResource[AppData.LanguageID, 32]</th>
+                                                        <th>@AppData.LangResource[AppData.LanguageID, 33]</th>
+                                                        <th>@AppData.LangResource[AppData.LanguageID, 292]</th>
+                                                        <th>@AppData.LangResource[AppData.LanguageID, 146]</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var item in publicHoliday)
+                                                    {
+                                                        <tr>
+                                                            <td>@String.Format("{0:dd/MM/yyyy}",item.ScheduleStartDate)</td>
+                                                            <td>@String.Format("{0:dd/MM/yyyy}",item.ScheduleEndDate)</td>
+                                                            <td>@item.ScheduleName</td>
+                                                            <td>
+                                                                @if (AppData.CurrentPermission.Find(i => i.permissionID == 19).permissionD)
+                                                                {
+                                                                    <i class="far fa-trash-alt" @onclick="() => OnDeleteHolidayUser(item.ScheduleID)"></i>
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </BSTabContent>
+        </BSTab>
+        <BSTab Class="h-25" style="height: 800px;">
+            <BSTabLabel>@AppData.LangResource[AppData.LanguageID, 286]</BSTabLabel>
+            <BSTabContent Class="h-25">
+
+                <div class="w-100 h-25 d-inline-block" style="margin-top:5px; margin-left:0.5rem;">
+                    <div class="card">
+
+                        <div class="card-body" style="display: grid; flex-wrap: wrap; height: 635px;">
+                            <div class="control">
+                                <div class="square-container">
+                                    <div class="square-emergency"></div>
+                                    <div class="text">Emergency</div>
+
+                                </div>
+                                <div class="square-container">
+                                    <div class="square-training"></div>
+                                    <div class="text">Training</div>
+
+                                </div>
+                                <div class="square-container">
+                                    <div class="square-preparation"></div>
+                                    <div class="text">Preparation</div>
+
+                                </div>
+                                <div class="square-container">
+                                    <div class="square-operation"></div>
+                                    <div class="text">Operation</div>
+
+                                </div>
+                                <div class="square-container">
+                                    <div class="square-reception"></div>
+                                    <div class="text">Reception</div>
+
+                                </div>
+                                <div class="square-container">
+                                    <div class="square-oncall"></div>
+                                    <div class="text">On Call</div>
+
+                                </div>
+                                <div class="square-container">
+                                    <div class="square-holiday"></div>
+                                    <div class="text">Holiday</div>
+
+                                </div>
+                            </div>
+                            <FullCalendar @ref="calendar" style="margin-top: 1rem; margin-bottom: 1rem; overflow: auto" settings="@calendarSettings" OnEventClick="OnClickHandler" />
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+
+            </BSTabContent>
+        </BSTab>
+    </BSTabList>
+    <BSTabSelectedContent />
+</BSTabGroup>
+
+<EditForm Model="@addHoliday" OnValidSubmit="@PostHoliday">
+    <DataAnnotationsValidator />
+    <BSModal @ref="AddHoliday">
+        <BSModalHeader Class="btn-header-color" OnClick="@(() => AddHoliday.Hide())">@AppData.LangResource[AppData.LanguageID, 288]</BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-3 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 32]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputDate @bind-Value="addHoliday.ScheduleStartDate" data-date-format="mm/dd/yy" class="form-control" @bind-Value:format="dd-MM-yyyy" />
+                    </div>
+                    <ValidationMessage For="@(() => addHoliday.ScheduleStartDate)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-3 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 33]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputDate @bind-Value="addHoliday.ScheduleEndDate" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => addHoliday.ScheduleEndDate)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-3 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 117]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="addHoliday.ScheduleName" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID, 117]" />
+                    </div>
+                    <ValidationMessage For="@(() => addHoliday.ScheduleName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+        </BSModalBody>
+        <BSModalFooter>
+            <button type="submit" class="btn btn-warning">@AppData.LangResource[AppData.LanguageID, 44]</button>
+            <button type="reset" class="btn btn-warning" @onclick="@(() => AddHoliday.Hide())">@AppData.LangResource[AppData.LanguageID, 293]</button>
+        </BSModalFooter>
+    </BSModal>
+</EditForm>
+
+<!--ConfirmDeleteSchedule-->
+<BSModal @ref="ConfirmDeleteSchedule">
+    <BSModalHeader OnClick="@(() => ConfirmDeleteSchedule.Hide())">@AppData.LangResource[AppData.LanguageID, 613]</BSModalHeader>
+        <BSModalBody>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert-modal-delete">
+                        @{
+                        string Name = "";
+                        var resultAcc = accounts.Find(x => x.UserID == schedulerDelete.UserID);
+                        if(resultAcc != null)
+                        {
+                            Name = resultAcc.FirstName + ' ' + resultAcc.LastName;
+                        }
+                        }
+                        @AppData.LangResource[AppData.LanguageID, 614] :<br>@Name?
+                </div>
+            </div>
+        </div>
+
+    </BSModalBody>
+    <BSModalFooter>
+        @if (AppData.CurrentPermission.Find(i => i.permissionID == 24).permissionD)
+        {
+            <button type="submit" @onclick="OnputScheduleExpire" class="btn btn-danger">@AppData.LangResource[AppData.LanguageID, 610]</button>
+        }
+        else
+        {
+            <button type="button" disabled class="btn btn-danger">@AppData.LangResource[AppData.LanguageID, 610]</button>
+        }
+        <button type="button" class="btn btn-info" @onclick="@(() => ConfirmDeleteSchedule.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+
+<!--ConfirmDeleteHoliday-->
+<BSModal @ref="ConfirmDeleteHoliday">
+    <BSModalHeader OnClick="@(() => ConfirmDeleteHoliday.Hide())">@AppData.LangResource[AppData.LanguageID, 616]</BSModalHeader>
+        <BSModalBody>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert-modal-delete">
+                        @{
+                        string Name = "";
+                        var resultHoli = publicHoliday.Find(x => x.ScheduleName == holidayDelete.ScheduleName);
+                        if (resultHoli != null)
+                        {
+                            Name = resultHoli.ScheduleName;
+                        }
+                    }
+                    @AppData.LangResource[AppData.LanguageID, 615] :<br>@Name?
+                </div>
+            </div>
+        </div>
+
+    </BSModalBody>
+    <BSModalFooter>
+        @if (AppData.CurrentPermission.Find(i => i.permissionID == 24).permissionD)
+        {
+            <button type="submit" @onclick="OnputHolidayExpire" class="btn btn-danger">@AppData.LangResource[AppData.LanguageID, 610]</button>
+        }
+        else
+        {
+            <button type="button" disabled class="btn btn-danger">@AppData.LangResource[AppData.LanguageID, 610]</button>
+        }
+        <button type="button" class="btn btn-info" @onclick="@(() => ConfirmDeleteHoliday.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+@code {
+
+    FullCalendar calendar = new FullCalendar();
+    string textcolor;
+    /// <summary>
+    /// Global Use
+    /// </summary>
+    private List<Account> accounts = new List<Account>();
+    private List<ScheduleType> scheduleTypes = new List<ScheduleType>();
+
+    /// <summary>
+    /// Calendar
+    /// </summary>
+    public CalendarSettings calendarSettings { get; set; }
+    private List<CalendarDateItem> CalendarItem;
+    public CalendarDateItem calendarDateItem = new CalendarDateItem();
+    public CalendarEventChangeResponse calendarEventChangeResponse = new CalendarEventChangeResponse();
+    public CalendarSourceFeed ProjectsSourceFeed { get; set; }
+    public CalendarSourceFeed HolidaySourceFeed { get; set; }
+
+    /// <summary>
+    /// Tab Scheduler
+    /// </summary>
+    Scheduler addUserSheduler = new Scheduler()
+        {
+
+            ScheduleStartDate = DateTime.Today,
+            ScheduleEndDate = DateTime.Today.AddDays(7)
+        };
+    List<Scheduler> schedulerlist = new List<Scheduler>();
+    Scheduler schedulerDelete = new Scheduler();
+
+    /// <summary>
+    /// วันที่ 1-31 ของเดือน/ปีปัจจุบัน
+    /// </summary>
+    DateTime startTable = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+    DateTime endTable = new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.DaysInMonth(DateTime.Today.Year, DateTime.Today.Month));
+
+    /// <summary>
+    /// Tab Holiday
+    /// </summary>
+    Holiday addHoliday = new Holiday()
+        {
+            ScheduleStartDate = DateTime.Today,
+            ScheduleEndDate = DateTime.Today
+        };
+    Holiday holidayDelete = new Holiday();
+
+    private List<Holiday> publicHoliday = new List<Holiday>();
+    int HolidayofYear = DateTime.Today.Year;
+
+    private void OnClickHandler(CalendarEventChangeResponse response)
+    {
+        IJSRuntime.InvokeVoidAsync("alert", $"Event: {response.Title}");
+    }
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            /// <summary>
+            /// GetLookup
+            /// </summary>
+            accounts = await Http.GetFromJsonAsync<List<Account>>($"{Config["aurl"]}/api/GetAccount");
+            scheduleTypes = await Http.GetFromJsonAsync<List<ScheduleType>>($"{Config["aurl"]}/api/GetScheduleType");
+            schedulerlist = await Http.GetFromJsonAsync<List<Scheduler>>($"{Config["aurl"]}/api/GetSchedule/{startTable.ToString("u")}/{endTable.ToString("u")}");
+            foreach (var i in schedulerlist)
+            {
+                i.GetLookup(accounts, scheduleTypes);
+            }
+            publicHoliday = await Http.GetFromJsonAsync<List<Holiday>>($"{Config["aurl"]}/api/GetHoliday/{HolidayofYear}-01-01/{HolidayofYear}-12-31");
+            /// <summary>
+            /// MaptoCalendar
+            /// </summary>
+            //textcolor = schedulerlist.Find(i => i.ScheduleName == calendarDateItem.title).ScheduleName;
+            //calendarEventChangeResponse.TextColor = textcolor;
+
+            if (AppData.LanguageID == 0)
+            {
+                calendarSettings = new CalendarSettings()
+                {
+                    Plugins = new[] { "dayGrid", "interaction" },
+                    InitialView = "dayGridMonth",
+                    HeaderToolbar = new CalendarHeader()
+                    {
+                        Left = "prev,next today",
+                        Center = "title",
+                        Right = ""
+
+                    },
+                    EventStartEditable = true,
+                    EventResizableFromStart = true,
+                    EventDurationEditable = true,
+                    FirstDay = 1,
+                    Locale = "us"
+
+
+
+                };
+            }
+            else
+            {
+                calendarSettings = new CalendarSettings()
+                {
+                    Plugins = new[] { "dayGrid", "interaction" },
+                    InitialView = "dayGridMonth",
+                    HeaderToolbar = new CalendarHeader()
+                    {
+                        Left = "prev,next today",
+                        Center = "title",
+                        Right = ""
+                    },
+                    EventStartEditable = true,
+                    EventResizableFromStart = true,
+                    EventDurationEditable = true,
+                    FirstDay = 1,
+                    Locale = "th",
+
+                };
+            }
+            await Onsetting();
+            //await IJSRuntime.InvokeAsync<object>("DataTables", "#dataTable");
+
+            if (AppData.LanguageID == 0)
+            {
+                var resultScheduleTypes = scheduleTypes.OrderBy(s => s.ScheduleTypeName).ToList();
+                scheduleTypes = resultScheduleTypes;
+                var resultAccount = accounts.OrderBy(a => a.FirstName).ToList();
+                accounts = resultAccount;
+            }
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError($"Error:{e.Message}");
+        }
+
+
+    }
+
+    public async Task Onsetting()
+    {
+        CalendarItem = new List<CalendarDateItem>();
+        CalendarItem = addHoliday.MaptoCalendar(publicHoliday);
+        CalendarItem.AddRange(addUserSheduler.MaptoCalendar(schedulerlist).AsEnumerable());
+
+        calendarSettings.Events = CalendarItem.ToArray();
+        ////await calendar.CalendarRefetchEvents();
+        await InvokeAsync(() => { StateHasChanged(); });
+
+
+    }
+
+    public async Task PostScheduler()
+    {
+        /// <summary>
+        /// AddSchedule
+        /// </summary>
+        try
+        {
+            this.addUserSheduler.GetLookup(accounts, scheduleTypes);
+            this.addUserSheduler.ScheduleName = addUserSheduler.User.FirstName + "  " + addUserSheduler.User.LastName;
+            addUserSheduler.ScheduleEndDate = addUserSheduler.ScheduleEndDate.AddHours(23).AddMinutes(59);
+
+            var result = await Http.PostAsJsonAsync($"{Config["aurl"]}/api/RegisterSchedule", addUserSheduler);
+
+            ///ไม่ต้อง Clear
+            ///addUserSheduler.ScheduleStartDate = null;
+            /// addUserSheduler.ScheduleEndDate = null;
+            /// addUserSheduler.ScheduleTypeID = null;
+            /// addUserSheduler.UserID = null;
+
+            if (result.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                ToastService.ShowSuccess(" Scheduler Save Successfully");
+            }
+
+            /// UpdateTable
+
+            /// <summary>
+            /// เรียก Function SearchSchedule มาใช้งาน
+            /// </summary>
+            await SearchScheduler();
+            await Onsetting();
+
+
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError($"Error:{e.Message}");
+        }
+
+    }
+
+    public async Task PostHoliday()
+    {
+        /// <summary>
+        /// AddHoliday
+        /// </summary>
+        addHoliday.ScheduleTypeID = 1;
+        var response = await Http.PostAsJsonAsync($"{Config["aurl"]}/api/RegisterHoliday", addHoliday);
+        ToastService.ShowSuccess(" PublicHoliday Save Successfully");
+        //Console.WriteLine("Create Holiday");
+
+        /// <summary>
+        /// MaptoCalendar
+        /// </summary>
+
+        /// <summary>
+        /// เรียก Function SearchHoliday มาใช้งาน
+        /// </summary>
+        await SearchHoliday();
+        // await OnInitializedAsync();
+        await Onsetting();
+
+        /// <summary>
+        /// หลังจากกด Save ปิด Modal
+        /// </summary>
+        AddHoliday.Hide();
+    }
+
+    public async Task SearchScheduler()
+    {
+        /// <summary>
+        /// เรียก Function OnInitializedAsync มาใช้งาน
+        /// </summary>
+        //await OnInitializedAsync();
+        schedulerlist = await Http.GetFromJsonAsync<List<Scheduler>>($"{Config["aurl"]}/api/GetSchedule/{startTable.ToString("u")}/{endTable.ToString("u")}");
+        foreach (var i in schedulerlist)
+        {
+            i.GetLookup(accounts, scheduleTypes);
+        }
+        //await IJSRuntime.InvokeAsync<object>("DataTables", "#dataTable");
+        await Onsetting();
+    }
+
+    public async Task SearchHoliday()
+    {
+        // await OnInitializedAsync();
+        publicHoliday = await Http.GetFromJsonAsync<List<Holiday>>($"{Config["aurl"]}/api/GetHoliday/{HolidayofYear}-01-01/{HolidayofYear}-12-31");
+        // await IJSRuntime.InvokeAsync<object>("DataTables", "#dataTable");
+        await Onsetting();
+    }
+    /// <summary>
+    /// Modal AddSchedule AddHoliday
+    /// </summary>
+    BSModal AddSchedule { get; set; }
+    BSModal AddHoliday { get; set; }
+    BSModal ConfirmDeleteSchedule { get; set; }
+    BSModal ConfirmDeleteHoliday { get; set; }
+
+    public async Task OnDeleteSchedulyUser(int id)
+    {
+        var resultDelete = schedulerlist.Find(x => x.ScheduleID == id);
+        if(resultDelete != null)
+        {
+            schedulerDelete = resultDelete;
+            ConfirmDeleteSchedule.Show();
+        }
+
+
+    }
+
+    public async Task OnDeleteHolidayUser(int id)
+    {
+        var resultDelete = publicHoliday.Find(x => x.ScheduleID == id);
+        if (resultDelete != null)
+        {
+            holidayDelete = resultDelete;
+            ConfirmDeleteHoliday.Show();
+        }
+
+    }
+
+    public async Task OnputScheduleExpire()
+    {
+        var response = await Http.PutAsync($"{Config["aurl"]}/api/ExpireSchedule/id?id={schedulerDelete.ScheduleID}", null);
+        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            ToastService.ShowSuccess("Deleted Success");
+            await SearchHoliday();
+            await SearchScheduler();
+            ConfirmDeleteSchedule.Hide();
+        }
+        
+
+    }
+
+    public async Task OnputHolidayExpire()
+    {
+        var response = await Http.PutAsync($"{Config["aurl"]}/api/ExpireSchedule/id?id={holidayDelete.ScheduleID}", null);
+        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            ToastService.ShowSuccess("Deleted Success");
+            await SearchHoliday();
+            await SearchScheduler();
+            ConfirmDeleteHoliday.Hide();
+        }
+
+
+    }
+
+    /// <summary>
+    /// clearURL
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("clearURL");
+        }
+    }
+
+
+}

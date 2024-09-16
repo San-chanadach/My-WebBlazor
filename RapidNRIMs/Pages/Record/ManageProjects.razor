@@ -1,0 +1,1762 @@
+﻿@page "/Record/ManageProject/{id}"
+@inherits ManageProjectBase
+@inject IToastService ToastService
+@inject AppData AppData
+@inject IMasterDataPhase2 _masterDataPhase2
+@inject IConfiguration Config
+@inject HttpClient Http
+@inject IJSRuntime jsRuntime
+<!--EditForm--->
+
+<PageTitle>Manage Project Page</PageTitle>
+
+<BSTabGroup>
+    <BSTabList>
+        <!--Tab Container-->
+        <BSTab>
+            <!--content planning-->
+            <BSTabLabel>@AppData.LangResource[AppData.LanguageID, 247]</BSTabLabel>
+                <BSTabContent>
+                    <div class="row margin-row-card" style="margin-top: 0.4rem;">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">@AppData.LangResource[AppData.LanguageID, 540]: @recordProject.ProjectNumber</div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <label for="projectName" class="col-12 col-md-4 col-lg-2 col-form-label">
+                                        <span>@AppData.LangResource[AppData.LanguageID, 553]</span>
+                                    </label>
+                                    <div class="col-12 col-md-8 col-lg-3">
+                                        <div class="input-group input-box-bottom">
+                                            <input type="text" @bind-value="recordProject.ProjectName" placeholder="@AppData.LangResource[AppData.LanguageID,553]" class="form-control" />
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <label for="provinceRegional" class="col-12 col-md-4 col-lg-2 col-form-label">
+                                        <span>@AppData.LangResource[AppData.LanguageID, 554]</span>
+                                    </label>
+                                    <div class="col-12 col-md-8 col-lg-3">
+                                        <div class="input-group input-box-bottom">
+                                            @if (recordEvents.Count > 0)
+                                            {
+                                                <select class="form-control" @bind="recordProject.ProjectRegional" disabled>
+                                                    <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                                    @foreach (var item in AppData.recordRegionals)
+                                                    {
+                                                        @if (AppData.LanguageID == 0)
+                                                        {
+                                                            <option value="@item.RegionalNumber">@item.RegionalENName</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@item.RegionalNumber">@item.RegionalTHName</option>
+                                                        }
+                                                    }
+
+                                                </select>
+                                            }
+                                            else
+                                            {
+                                                <select class="form-control" @bind="recordProject.ProjectRegional">
+                                                    <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                                    @foreach (var item in AppData.recordRegionals)
+                                                    {
+                                                        @if (AppData.LanguageID == 0)
+                                                        {
+                                                            <option value="@item.RegionalNumber">@item.RegionalENName</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@item.RegionalNumber">@item.RegionalTHName</option>
+                                                        }
+                                                    }
+
+                                                </select>
+                                            }
+
+                                        </div>
+                                    </div>
+                                    <label for="projectType" class="col-12 col-md-4 col-lg-2 col-form-label">
+                                        <span>@AppData.LangResource[AppData.LanguageID, 555]</span>
+                                    </label>
+                                    <div class="col-12 col-md-8 col-lg-3">
+                                        <div class="input-group input-box-bottom">
+                                            @if (recordEvents.Count > 0)
+                                            {
+                                                <select class="form-control" @bind="recordProject.ProjectType" disabled>
+                                                    <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                                    @foreach (var item in recordProjectTypes)
+                                                    {
+                                                        if (item.IsActive == true && item.IsActive != null)
+                                                        {
+                                                            @if (AppData.LanguageID == 0)
+                                                            {
+                                                                <option value="@item.ProjectTypeID">@item.ProjectTypeENName</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@item.ProjectTypeID">@item.ProjectTypeTHName</option>
+                                                            }
+                                                        }
+                                                    }
+                                                </select>
+                                            }
+                                            else
+                                            {
+                                                <select class="form-control" @bind="recordProject.ProjectType">
+                                                    <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                                    @foreach (var item in recordProjectTypes)
+                                                    {
+                                                        if (item.IsActive == true && item.IsActive != null)
+                                                        {
+                                                            @if (AppData.LanguageID == 0)
+                                                            {
+                                                                <option value="@item.ProjectTypeID">@item.ProjectTypeENName</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@item.ProjectTypeID">@item.ProjectTypeTHName</option>
+                                                            }
+                                                        }
+                                                    }
+                                                </select>
+                                            }
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label for="startDate" class="col-12 col-md-4 col-lg-2 col-form-label">
+                                        <span>@AppData.LangResource[AppData.LanguageID, 32]</span>
+                                    </label>
+                                    <div class="col-12 col-md-8 col-lg-3">
+                                        <div class="input-group input-box-bottom">
+                                            <input type="date" @bind="recordProject.ProjectStartDate" placeholder="@AppData.LangResource[AppData.LanguageID,32]" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <label for="endDate" class="col-12 col-md-4 col-lg-2 col-form-label">
+                                        <span>@AppData.LangResource[AppData.LanguageID, 33]</span>
+                                    </label>
+                                    <div class="col-12 col-md-8 col-lg-3">
+                                        <div class="input-group input-box-bottom">
+                                            <input type="date" @bind-value="recordProject.ProjectEndDate" placeholder="@AppData.LangResource[AppData.LanguageID,33]" class="form-control" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label for="registertBy" class="col-12 col-md-4 col-lg-2 col-form-label">
+                                        <span>@AppData.LangResource[AppData.LanguageID, 556]</span>
+                                    </label>
+                                    <div class="col-12 col-md-8 col-lg-3">
+                                        <div class="input-group input-box-bottom">
+                                            <select class="form-control" @bind="recordProject.ProjectRegisteredBy">
+                                                <option selected value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                                @foreach (var item in accounts)
+                                                {
+                                                    if (item.IsActive)
+                                                    {
+                                                        <option value="@item.UserID">@item.FirstName</option>
+                                                    }
+                                                }
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                    <label for="informerName" class="col-12 col-md-4 col-lg-2 col-form-label">
+                                        <span>@AppData.LangResource[AppData.LanguageID, 235]</span>
+                                    </label>
+                                    <div class="col-12 col-md-8 col-lg-3">
+                                        <div class="input-group input-box-bottom">
+                                            <input type="text" @bind-value="recordProject.ProjectInformerName" placeholder="@AppData.LangResource[AppData.LanguageID,235]" class="form-control" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                                        <span>@AppData.LangResource[AppData.LanguageID, 37]</span>
+                                    </label>
+                                    <div class="col-12 col-md-12 col-lg-8 input-box-bottom">
+                                        <textarea rows="2" @bind="recordProject.ProjectRecommend" placeholder="@AppData.LangResource[AppData.LanguageID,37]" class="form-control"></textarea>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <div class="text-center" style="margin-top: -1.5rem; margin-bottom: 0.5rem">
+                                @if (recordProject.ProjectName != "" && recordProject.ProjectRegional != 0 && recordProject.ProjectRegional != null && recordProject.ProjectType != 0 && recordProject.ProjectType != null)
+                                {
+                                    <button type="submit" @onclick="SaveEditProjectRecord"  class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID, 308]</button>
+                                }
+                                else
+                                {
+                                    <button type="submit" disabled class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID, 308]</button>
+                                }
+                                
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row margin-row-card">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">@AppData.LangResource[AppData.LanguageID, 252]</div>
+                            <div class="card-body">
+                                <BSTabGroup>
+                                    <BSTabList>
+                                        <!--Tab Event-->
+                                        <BSTab>
+                                            <BSTabLabel>@AppData.LangResource[AppData.LanguageID, 562]</BSTabLabel>
+                                                <BSTabContent>
+                                                    <div class="row mt-4">
+                                                        <span class=" col-12 col-md-8 col-lg-4 mb-2" style="">
+
+                                                        @if (recordProject.ProjectRegional == updateProject.ProjectRegional)
+                                                        {
+                                                            <button type="submit" class="btn btn-success" @onclick="OnCreateRecordEvent">
+                                                                @AppData.LangResource[AppData.LanguageID, 563]
+                                                            </button>
+                                                        }
+                                                        else
+                                                        {
+                                                            <button type="submit" class="btn btn-success" disabled>
+                                                                @AppData.LangResource[AppData.LanguageID, 563]
+                                                            </button>
+                                                        }
+                                                    </span>
+
+                                                </div>
+                                                <!--/EditForm--->
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="card">
+                                                            <div class="card-header">@AppData.LangResource[AppData.LanguageID, 564]</div>
+                                                            <div class="card-body">
+                                                                <div class="scrollBar fixTableHead table-responsive scroll-inner" style="margin-top: 0.5rem; height:335px;">
+                                                                    <table class="table table-bordered table-striped text-center" style="width: 100%; margin-bottom: 0.5rem;">
+                                                                        <thead class="fixedthead">
+                                                                            <tr>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 244]</th>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 28]</th>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 29]</th>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 31]</th>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 231]</th>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 41]</th>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 145]</th>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 146]</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody class="scrollContent">
+                                                                            @foreach (var item in recordEvents)
+                                                                            {
+                                                                                <tr @onclick="() => TrClickedAtIndex(item.EventNumber)">
+                                                                                    <td>@(recordEvents.IndexOf(item) + 1)</td>
+                                                                                    <td>@item.EventNumber</td>
+                                                                                    <td class="cell-content">@item.EventName</td>
+                                                                                    @if (AppData.LanguageID == 0)
+                                                                                    {
+                                                                                        <td>
+                                                                                            @(AppData.recordEventTypes.Find(x => x.EventTypeID == item.EventType) != null ? AppData.recordEventTypes.Find(x => x.EventTypeID == item.EventType).EventTypeENName : "-")
+                                                                                        </td>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        <td>
+                                                                                            @(AppData.recordEventTypes.Find(x => x.EventTypeID == item.EventType) != null ? AppData.recordEventTypes.Find(x => x.EventTypeID == item.EventType).EventTypeTHName : "-")
+                                                                                        </td>
+                                                                                    }
+
+                                                                                    <td>@item.EventRegisterDate.Value.Date.ToString("dd/MM/yyyy")</td>
+                                                                                    @if (AppData.LanguageID == 0)
+                                                                                    {
+                                                                                        <td>
+                                                                                            @(AppData.Provinces.Find(x => x.ProvinceID == item.ProvinceID) != null ? AppData.Provinces.Find(x => x.ProvinceID == item.ProvinceID).ProvinceENName : "-")
+                                                                                        </td>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        <td>
+                                                                                            @(AppData.Provinces.Find(x => x.ProvinceID == item.ProvinceID) != null ? AppData.Provinces.Find(x => x.ProvinceID == item.ProvinceID).ProvinceTHName : "-")
+                                                                                        </td>
+                                                                                    }
+                                                                                    <td>
+                                                                                        <a href="@($"Record/EventRegister/{item.EventNumber}")" class="btn btn-warning" name="ShowInstrument" id="ShowInstrument"><i class="far fa-edit"></i></a>
+                                                                                    </td>
+                                                                                    <td>
+
+                                                                                        <i class="far fa-trash-alt" @onclick="()=>ConfirmDeleteEvent(item.EventNumber)"></i>
+
+                                                                                    </td>
+
+                                                                                </tr>
+
+                                                                            }
+
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="text-center mt-2" style="justify-content: center">
+                                                            <a type="button" class="btn btn-primary" href="@Config["rurl"]/api/Project?ID=@id" download="" target="_blank">
+                                                                @AppData.LangResource[AppData.LanguageID, 561]
+                                                            </a>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </BSTabContent>
+                                        </BSTab>
+                                        <!---TabBBB--->
+                                    </BSTabList>
+                                    <BSTabSelectedContent />
+                                </BSTabGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </BSTabContent>
+        </BSTab>
+
+        <!---Tab Planning---->
+        <BSTab>
+            <BSTabLabel>@AppData.LangResource[AppData.LanguageID, 588]</BSTabLabel>
+            <BSTabContent>
+                <div class="row margin-row-card">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">@AppData.LangResource[AppData.LanguageID, 252]</div>
+                            <div class="card-body">
+                                <BSTabGroup>
+                                    <BSTabList>
+                                        <!--Tab Team-->
+                                        <BSTab>
+                                            <BSTabLabel>@AppData.LangResource[AppData.LanguageID, 253]</BSTabLabel>
+                                                <BSTabContent>
+                                                    <div class="form-row mt-3 ml-2">
+                                                        <div class="form-group row col-md-4">
+                                                            <label class="col-sm-4 col-form-label">@AppData.LangResource[AppData.LanguageID, 253]:</label>
+                                                        <div class="col-sm-8">
+                                                            <div class="input-group">
+                                                                <select class="form-control" @bind="addTeam.UserID">
+                                                                    <option value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                                                    @foreach (var item in accounts)
+                                                                    {
+                                                                        if (item.IsActive)
+                                                                        {
+                                                                            <option value="@item.UserID">@item.FirstName</option>
+                                                                        }
+                                                                    }
+                                                                </select>
+
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <div class="input-group">
+                                                            <span>
+                                                                @if (AppData.CurrentPermission.Find(i => i.permissionID == 2).permissionC)
+                                                                {
+                                                                    <button type="submit" @onclick="OnAddProjectTeam" class="btn btn-warning ml-3">
+                                                                        @AppData.LangResource[AppData.LanguageID, 254]
+                                                                    </button>
+
+                                                                }
+                                                            </span>
+
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="card">
+                                                            <div class="card-header">@AppData.LangResource[AppData.LanguageID, 255]</div>
+                                                            <div class="card-body">
+                                                                <div class="scrollBar fixTableHead table-responsive scroll-inner" style="margin-top: 0.5rem; height:335px;">
+                                                                    <table class="table table-bordered table-striped text-center" style="width: 100%; margin-bottom: 0.5rem;">
+                                                                        <thead class="fixedthead">
+                                                                            <tr>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 244]</th>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 117]</th>
+                                                                                @* <th width="150">Personal Dose</th> *@
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 146]</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody class="scrollContent">
+                                                                            @foreach (var i in teams)
+                                                                            {
+                                                                                <tr>
+                                                                                    <td>@(teams.IndexOf(i) + 1)</td>
+                                                                                    <td>@accounts.Find(j => j.UserID == @i.UserID).FirstName  @accounts.Find(j => j.UserID == @i.UserID).LastName</td>
+                                                                                    @* <td><input type="number" @bind-value="i.PersonalDose" class="form-control" placeholder="Personal Dose" /></td> *@
+                                                                                    <td>
+                                                                                        @if (AppData.CurrentPermission.Find(i => i.permissionID == 2).permissionD)
+                                                                                        {
+                                                                                            <i class="far fa-trash-alt" @onclick="() => OnDeleteProjectTeam(i.ProjectTeamID)"></i>
+                                                                                        }
+                                                                                    </td>
+                                                                                </tr>
+                                                                            }
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                                @* <div class="text-right">
+                                                                    <span>
+
+                                                                        <button type="submit" @onclick="UpdateProjectTeam" class="btn btn-warning">
+                                                                            Save Personal Dose
+                                                                        </button>
+
+
+                                                                    </span>
+
+
+                                                                </div> *@
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </BSTabContent>
+                                        </BSTab>
+                                        <!--Tab SubportTeam-->
+                                        <BSTab>
+                                            <BSTabLabel>@AppData.LangResource[AppData.LanguageID, 437]</BSTabLabel>
+                                                <BSTabContent>
+
+                                                <div class="form-row mt-3 ml-2">
+                                                    <div class="form-group row col-md-4">
+                                                            <label class="col-sm-4 col-form-label">@AppData.LangResource[AppData.LanguageID, 438]:</label>
+                                                        <div class="col-sm-8">
+                                                            <div class="input-group">
+                                                                <input type="text" class="form-control" @bind-value="addSupportTeam.Name" />
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-row ml-2">
+                                                    <div class="form-group row col-md-4">
+                                                        <label class="col-sm-4 col-form-label">@AppData.LangResource[AppData.LanguageID, 439]:</label>
+                                                        <div class="col-sm-8">
+                                                            <div class="input-group">
+                                                                <input type="text" class="form-control" @bind-value="addSupportTeam.Position" />
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row col-md-4">
+                                                        <label class="col-sm-4 col-form-label">@AppData.LangResource[AppData.LanguageID, 402]:</label>
+                                                        <div class="col-sm-8">
+                                                            <div class="input-group">
+                                                                <input type="text" class="form-control" @bind-value="addSupportTeam.Department" />
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-row ml-2">
+                                                    <div class="form-group row col-md-4">
+                                                        <label class="col-sm-4 col-form-label">@AppData.LangResource[AppData.LanguageID, 403]:</label>
+                                                        <div class="col-sm-8">
+                                                            <div class="input-group">
+                                                                <input type="text" class="form-control" @bind-value="addSupportTeam.PhoneNumber" />
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row col-md-4">
+                                                        <label class="col-sm-4 col-form-label">@AppData.LangResource[AppData.LanguageID, 404]:</label>
+                                                        <div class="col-sm-8">
+                                                            <div class="input-group">
+                                                                <input type="text" class="form-control" @bind-value="addSupportTeam.Email" />
+
+                                                            </div>
+
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <div class="input-group">
+                                                            <span>
+                                                                @if (AppData.CurrentPermission.Find(i => i.permissionID == 2).permissionC)
+                                                                {
+                                                                    <button type="submit" @onclick="OnAddProjectSupportTeam" class="btn btn-warning ml-3">
+                                                                        Add to Support Team
+                                                                    </button>
+                                                                }
+                                                            </span>
+
+
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+                                                <!---Table SubportTeam----->
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="card">
+                                                            <div class="card-header">@AppData.LangResource[AppData.LanguageID, 440]</div>
+                                                            <div class="card-body">
+                                                                <div class="scrollBar fixTableHead table-responsive scroll-inner" style="margin-top: 0.5rem; height:335px;">
+                                                                    <table class="table table-bordered table-striped text-center" style="width: 100%; margin-bottom: 0.5rem;">
+                                                                        <thead class="fixedthead">
+                                                                            <tr>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 244]</th>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 438]</th>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 439]</th>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 402]</th>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 403]</th>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 404]</th>
+                                                                               @*  <th width="100">Personal Dose</th>*@
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 421]</th> 
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody class="scrollContent">
+                                                                            @{int id = 1;}
+                                                                            @foreach (var i in SupportTeam)
+                                                                            {
+                                                                                if (i.OrderProject == 1)
+                                                                                {
+                                                                                    <tr>
+                                                                                        <td>@id</td>
+                                                                                        <td>@i.Name</td>
+                                                                                        <td>@i.Position</td>
+                                                                                        <td>@i.Department</td>
+                                                                                        <td>@i.PhoneNumber</td>
+                                                                                        <td>@i.Email</td>
+                                                                                        @* <td><input type="number" @bind-value="i.PersonalDose" class="form-control" placeholder="Personal Dose" /></td> *@
+                                                                                        <td>
+                                                                                            @if (AppData.CurrentPermission.Find(i => i.permissionID == 2).permissionD)
+                                                                                            {
+                                                                                                <i class="far fa-trash-alt" @onclick="() => OnDeletProjectSupport(i.ProjectSupportTeamID)"></i>
+                                                                                            }
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                    id++;
+                                                                                }
+                                                                            }
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                               @*  <div class="text-right">
+                                                                    <span>
+
+                                                                        <button type="submit" @onclick="UpdateProjectSupportTeam" class="btn btn-warning">
+                                                                            Save Personal Dose
+                                                                        </button>
+
+
+                                                                    </span>
+
+
+                                                                </div> *@
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </BSTabContent>
+                                        </BSTab>
+                                       @*  <!--Tab Personal Dose-->
+                                        <BSTab>
+                                            <BSTabLabel>Personal Dose</BSTabLabel>
+                                            <BSTabContent>
+                                                <div class="form-row mt-3 ml-2">
+                                                    <div class="form-group row col-md-4">
+                                                        <label class="col-sm-4 col-form-label">@AppData.LangResource[AppData.LanguageID, 253]:</label>
+                                                        <div class="col-sm-8">
+                                                            <div class="input-group">
+                                                                @if (addProjectPersonalDose.SupportTeamID != null && addProjectPersonalDose.SupportTeamID != 0)
+                                                                {
+                                                                    <select class="form-control" @bind="addProjectPersonalDose.UserID" disabled>
+                                                                        <option value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                                                        @foreach (var item in teams)
+                                                                        {
+
+                                                                            <option value="@item.UserID">@(accounts.Find(x => x.UserID == item.UserID).FirstName)</option>
+
+                                                                        }
+                                                                    </select>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <select class="form-control" @bind="addProjectPersonalDose.UserID">
+                                                                        <option value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                                                        @foreach (var item in teams)
+                                                                        {
+
+                                                                            <option value="@item.UserID">@(accounts.Find(x => x.UserID == item.UserID).FirstName)</option>
+
+                                                                        }
+                                                                    </select>
+                                                                }
+                                                               
+
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row col-md-4">
+                                                        <label class="col-sm-4 col-form-label">Support Team:</label>
+                                                        <div class="col-sm-8">
+                                                            <div class="input-group">
+                                                                @if (addProjectPersonalDose.UserID != null)
+                                                                {
+                                                                    <select class="form-control" @bind="addProjectPersonalDose.SupportTeamID" disabled>
+                                                                        <option value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                                                        @foreach (var item in SupportTeam)
+                                                                        {
+
+                                                                            <option value="@item.ProjectSupportTeamID">@item.Name</option>
+
+                                                                        }
+                                                                    </select>
+
+                                                                }
+                                                                else
+                                                                {
+                                                                    <select class="form-control" @bind="addProjectPersonalDose.SupportTeamID">
+                                                                        <option value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                                                        @foreach (var item in SupportTeam)
+                                                                        {
+
+                                                                            <option value="@item.ProjectSupportTeamID">@item.Name</option>
+
+                                                                        }
+                                                                    </select>
+                                                                }
+
+                                                               
+
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <div class="input-group">
+                                                            <span>
+                                                                @if (AppData.CurrentPermission.Find(i => i.permissionID == 2).permissionC)
+                                                                {
+                                                                    <button type="submit" @onclick="OnAddProjectPersonalDose" class="btn btn-warning">
+                                                                       Add Personal Dose
+                                                                    </button>
+
+                                                                }
+                                                            </span>
+
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="card">
+                                                            <div class="card-header">Table Personal Dose</div>
+                                                            <div class="card-body">
+                                                                <div class="scrollBar fixTableHead table-responsive scroll-inner" style="margin-top: 0.5rem; height:335px;">
+                                                                    <table class="table table-bordered table-striped text-center" style="width: 100%; margin-bottom: 0.5rem;">
+                                                                        <thead class="fixedthead">
+                                                                            <tr>
+                                                                                <th width="24">@AppData.LangResource[AppData.LanguageID, 244]</th>
+                                                                                <th >@AppData.LangResource[AppData.LanguageID, 117]</th>
+                                                                                <th width="300">Instrument Name</th>
+                                                                                <th width="150">Personal Dose</th>
+                                                                                <th >@AppData.LangResource[AppData.LanguageID, 146]</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody class="scrollContent">
+                                                                            @foreach (var i in projectPersonalDoses)
+                                                                            {
+                                                                                <tr>
+                                                                                    <td>@(projectPersonalDoses.IndexOf(i) + 1)</td>
+                                                                                    @if(i.UserID != new Guid("00000000-0000-0000-0000-000000000000"))
+                                                                                    {
+                                                                                        <td>
+                                                                                            @accounts.Find(j => j.UserID == @i.UserID).FirstName  @accounts.Find(j => j.UserID == @i.UserID).LastName
+                                                                                        </td>
+                                                                                    }
+                                                                                    else if (i.SupportTeamID != 0)
+                                                                                    {
+                                                                                        <td>@(SupportTeam.Find(x => x.ProjectSupportTeamID == i.SupportTeamID) != null ? SupportTeam.Find(x => x.ProjectSupportTeamID == i.SupportTeamID).Name:"-")</td>
+                                                                                    }
+                                                                                   
+                                                                                    <td>
+                                                                                        <select class="form-control" @bind="i.PersonalDoseInstrumentName">
+                                                                                            <option value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                                                                            @foreach (var item in instrumentPersonalDoseList)
+                                                                                            {
+
+                                                                                                <option value="@item.InstrumentENName">@item.InstrumentENName</option>
+
+                                                                                            }
+                                                                                        </select>
+
+                                                                                    </td>
+                                                                                    <td><input type="number" @bind-value="i.PersonalDose" class="form-control" placeholder="Personal Dose" /></td>
+                                                                                    <td>
+                                                                                        @if (AppData.CurrentPermission.Find(i => i.permissionID == 2).permissionD)
+                                                                                        {
+                                                                                            <i class="far fa-trash-alt" @onclick="() => OnDeleteProjectPersonalDose(i.ProjectPersonalDoseID)"></i>
+                                                                                        }
+                                                                                    </td>
+                                                                                </tr>
+                                                                            }
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+
+                                                                <div class="text-right">
+                                                                    <span>
+                                                                       
+                                                                        <button type="submit" @onclick="UpdateProjectPersonalDoseTeamAndSupportTeam" class="btn btn-warning">
+                                                                            Save Personal Dose
+                                                                        </button>
+
+                                                                        
+                                                                    </span>
+
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </BSTabContent>
+                                        </BSTab> *@
+                                        <!--Tab Instrument-->
+                                        <BSTab>
+                                            <BSTabLabel>@AppData.LangResource[AppData.LanguageID, 10]</BSTabLabel>
+                                                <BSTabContent>
+                                                    <div class="form-row mt-3 ml-2">
+                                                        <div class="form-group row col-md-4">
+                                                            <label class="col-sm-4 col-form-label">@AppData.LangResource[AppData.LanguageID, 10]:</label>
+                                                        <div class="col-sm-8">
+                                                            <div class="input-group">
+                                                                <input type="text" id="instrumentnumber-project" @bind-value:event="oninput" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID, 10]" @bind-value="projectInstrument.InstrumentNumber" />
+
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <div class="input-group">
+                                                            @if (AppData.CurrentPermission.Find(i => i.permissionID == 2).permissionC)
+                                                            {
+                                                                <button type="button" @onclick="OnAddProjectInstrument" id="addinstrument-project" class="btn btn-warning ml-3">
+                                                                        @AppData.LangResource[AppData.LanguageID, 256]
+                                                                    </button>
+                                                            }
+
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="card">
+                                                            <div class="card-header">@AppData.LangResource[AppData.LanguageID, 257]</div>
+                                                            <div class="card-body">
+                                                                <div class="scrollBar fixTableHead table-responsive scroll-inner" style="margin-top: 0.5rem; height:335px;">
+                                                                    <table class="table table-bordered table-striped text-center" style="width: 100%;">
+                                                                        <thead class="fixedthead">
+                                                                            <tr>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 244]</th>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 93]</th>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 61]</th>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 258]</th>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 71]</th>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 70]</th>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 246]</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody class="scrollContent">
+
+                                                                           
+                                                                            @foreach (var i in listInstrument)
+                                                                            {
+                                                                                    
+                                                                                    int? statusID = 0;
+                                                                                    var resultProjectStatus = recordProjectRecords.Find(x => x.ProjectID == recordProject.ProjectID);
+                                                                                    if (resultProjectStatus != null)
+                                                                                    {
+                                                                                        statusID = resultProjectStatus.ProjectInsStatusID;
+                                                                                    }
+                                                                                    
+
+                                                                                <tr>
+
+                                                                                    <td>@(listInstrument.IndexOf(i) + 1)</td>
+                                                                                    
+                                                                                    <td>
+                                                                                       
+
+                                                                                        @if(statusID == 3)
+                                                                                        {
+                                                                                            <span class="badge badge-pill badge-success">
+                                                                                                Normal
+                                                                                            </span>
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            <span class="@i.Status.ColorTag">
+                                                                                                @i.Status.InstrumentStatusENName
+                                                                                            </span>
+                                                                                        }
+
+                                                                                       
+                                                                                    </td>
+                                                                                    <td>@i.InstrumentNumber</td>
+                                                                                    <td>@i.InstrumentENName</td>
+                                                                                    <td>@(listInstrumentBrands.Find(c => c.InstrumentBrandID == i.InstrumentBrandID) != null ? listInstrumentBrands.Find(c => c.InstrumentBrandID == i.InstrumentBrandID).InstrumentBrandName : "-")</td>
+                                                                                    <td>@(listInstrumentModels.Find(c => c.InstrumentModelID == i.InstrumentModelID) != null ? listInstrumentModels.Find(c => c.InstrumentModelID == i.InstrumentModelID).InstrumentModelName : "-")</td>
+                                                                                    <td>
+                                                                                        @if (AppData.CurrentPermission.Find(i => i.permissionID == 2).permissionD)
+
+                                                                                        {
+                                                                                            <i class="far fa-trash-alt" @onclick="@(() => OnDeleteProjectInstrument(i.InstrumentNumber))"></i>
+                                                                                        }
+                                                                                    </td>
+
+                                                                                </tr>
+                                                                            }
+
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                                <div class="">
+                                                                    
+                                                                    <button type="button" @onclick="ConfirmInsturmentCheckOutAll" class="btn margin-btn  " style="background-color:#2E2BFF; color:#fff">
+                                                                        @AppData.LangResource[AppData.LanguageID, 441]
+                                                                    </button>
+
+                                                                    <button type="button" @onclick="PostInstrumentCheckIn" class="btn margin-btn  " style="background-color:#2E2BFF; color:#fff">
+                                                                        @AppData.LangResource[AppData.LanguageID, 442]
+                                                                    </button>
+                                                                    
+
+                                                                   
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </BSTabContent>
+                                        </BSTab>
+                                        <!---Tab Comsuble--->
+                                        <BSTab>
+                                            <BSTabLabel>@AppData.LangResource[AppData.LanguageID, 272]</BSTabLabel>
+                                                <BSTabContent>
+                                                    <div class="form-row ml-2 mt-3">
+                                                        <div class="form-group row col-md-4">
+                                                            <label class="col-sm-4 col-form-label">@AppData.LangResource[AppData.LanguageID, 259]:</label>
+                                                        <div class="col-sm-8">
+                                                            <div class="input-group">
+                                                                <input type="text" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID, 259]" @bind-value="projectInventoryStock.ProjectStockNumber" />
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row col-md-4">
+                                                        <label class="col-sm-4 col-form-label">@AppData.LangResource[AppData.LanguageID, 260]:</label>
+                                                        <div class="col-sm-8">
+                                                            <div class="input-group">
+                                                                <input type="number" class="form-control" @bind-value="projectInventoryStock.ProjectStockQuantity" />
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group row">
+                                                        <div class="input-group">
+                                                            @if (AppData.CurrentPermission.Find(i => i.permissionID == 2).permissionC)
+                                                            {
+
+                                                                <button type="button" @onclick="OnAddProjectStock" class="btn btn-warning ml-3">
+                                                                    <i class="fas fa-plus"></i>
+                                                                </button>
+                                                            }
+
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="card">
+                                                            <div class="card-header">@AppData.LangResource[AppData.LanguageID, 273]</div>
+                                                            <div class="card-body">
+                                                                <div class="scrollBar fixTableHead table-responsive scroll-inner" style="margin-top: 0.5rem; height:335px;">
+                                                                    <table class="table table-bordered table-striped text-center" style="width: 100%; margin-bottom: 0.5rem;">
+                                                                        <thead class="fixedthead">
+                                                                            <tr>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 244]</th>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 259]</th>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 261]</th>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 260]</th>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 145]</th>
+                                                                                <th>@AppData.LangResource[AppData.LanguageID, 246]</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody class="scrollContent">
+
+                                                                            @foreach (var i in projectInventoryStocks)
+                                                                            {
+                                                                                <tr>
+                                                                                    <td>@(projectInventoryStocks.IndexOf(i) + 1)</td>
+                                                                                    <td>@i.ProjectStockNumber</td>
+
+                                                                                    <td>@(listInventoryStock.Find(j => j.InventoryStockNumber == i.ProjectStockNumber) != null ? listInventoryStock.Find(j => j.InventoryStockNumber == i.ProjectStockNumber).inventory.InventoryENName : "-")</td>
+                                                                                    <td>@i.RemainQuantity/@i.ProjectStockQuantity</td>
+
+                                                                                    <td>
+                                                                                        @if (AppData.CurrentPermission.Find(i => i.permissionID == 2).permissionU)
+                                                                                        {
+                                                                                            <i class="fas fa-edit fa-sm" @onclick="() => GetProjectInventoryById(i.ProjectInventoryID)"></i>
+                                                                                        }
+                                                                                    </td>
+
+                                                                                    <td>
+                                                                                        @if (AppData.CurrentPermission.Find(i => i.permissionID == 2).permissionD)
+                                                                                        {
+                                                                                            <i class="far fa-trash-alt" @onclick="() => OnDeleteProjectInventoryStock(i.ProjectInventoryID)"></i>
+                                                                                        }
+                                                                                    </td>
+                                                                                </tr>
+                                                                            }
+
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                                <div class="">
+                                                                    <button type="button" @onclick="ConfirmInventoryStockCheckOut" class="btn  " style="background-color:#2E2BFF; color:#fff">
+                                                                        @AppData.LangResource[AppData.LanguageID, 16]
+                                                                    </button>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </BSTabContent>
+                                        </BSTab>
+                                        <!--Tab Personal Dose-->
+                                        <BSTab>
+                                            <BSTabLabel>@AppData.LangResource[AppData.LanguageID, 589]</BSTabLabel>
+                                            <BSTabContent>
+                                                
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="card">
+                                                            <div class="card-header">@AppData.LangResource[AppData.LanguageID, 590]</div>
+                                                            <div class="card-body">
+                                                                <div class="scrollBar fixTableHead table-responsive scroll-inner" style="margin-top: 0.5rem; height:335px;">
+                                                                    <table class="table table-bordered table-striped text-center" style="width: 100%; margin-bottom: 0.5rem;">
+                                                                        <thead class="fixedthead">
+                                                                            <tr>
+                                                                                <th width="24">@AppData.LangResource[AppData.LanguageID, 244]</th>
+                                                                                <th >@AppData.LangResource[AppData.LanguageID, 117]</th>
+                                                                                <th width="300">@AppData.LangResource[AppData.LanguageID, 157]</th>
+                                                                                <th width="150">@AppData.LangResource[AppData.LanguageID, 589]</th>
+                                                                                
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody class="scrollContent">
+                                                                            @* @{
+                                                                                var initialGroup = eventPersonalDoses
+                                                                                .GroupBy(i => new { i.EventPDUserName, i.EventPDSupportId, i.EventPDAccumulationUnit })
+                                                                                .Select(g => new
+                                                                                {
+                                                                                    g.Key.EventPDUserName,
+                                                                                    g.Key.EventPDSupportId,
+                                                                                    g.Key.EventPDAccumulationUnit,
+                                                                                    EventPDAccumulation = g.Sum(i => (double)i.EventPDAccumulation)  // Ensure conversion to double
+                                                                                    
+                                                                                }).ToList();
+
+                                                                                
+                                                                            } *@
+
+                                                                            @* @foreach (var group in initialGroup)
+                                                                            {
+                                                                                <tr>
+                                                                                    <td>@(initialGroup.IndexOf(group) + 1)</td>
+                                                                                    @if (group.EventPDUserName != new Guid("00000000-0000-0000-0000-000000000000"))
+                                                                                    {
+                                                                                        var user = accounts.Find(j => j.UserID == group.EventPDUserName);
+                                                                                        <td>@user?.FirstName @user?.LastName</td>
+                                                                                    }
+                                                                                    else if (group.EventPDSupportId != 0)
+                                                                                    {
+                                                                                        var support = SupportTeam.Find(x => x.ProjectSupportTeamID == group.EventPDSupportId);
+                                                                                        <td>@support?.Name</td>
+                                                                                    }
+                                                                                    @{
+                                                                                        string positionUser = "";
+                                                                                        var resultPosition = accounts.Find(x => x.UserID == group.EventPDUserName);
+                                                                                        if (resultPosition != null)
+                                                                                        {
+                                                                                            var result = positionList.Find(x => x.PositionId == resultPosition.PositionID);
+                                                                                            if (result != null)
+                                                                                            {
+                                                                                                positionUser = result.PositionName;
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                    @if (group.EventPDUserName != new Guid("00000000-0000-0000-0000-000000000000"))
+                                                                                    {
+                                                                                        <td>@positionUser</td>
+                                                                                    }
+                                                                                    else if (group.EventPDSupportId != 0)
+                                                                                    {
+                                                                                        var supportPosition = SupportTeam.Find(x => x.ProjectSupportTeamID == group.EventPDSupportId)?.Position ?? "-";
+                                                                                        <td>@supportPosition</td>
+                                                                                    }
+
+                                                                                    <td>@group.EventPDAccumulation.ToString("F4") @(AppData.recordEventUnits.Find(x => x.RecordEventUnitID == group.EventPDAccumulationUnit)?.RecordEventUnitName ?? "-")</td>
+                                                                                
+                                                                                </tr>
+                                                                            } *@
+
+                                                                            @if (eventSumPersonalDoses.Count() != 1)
+                                                                            {
+                                                                                @foreach (var item in eventSumPersonalDoses)
+                                                                                {
+
+                                                                                    var result = accounts.Find(x => x.FirstName + ' ' + x.LastName == item.TeamOrSupportName);
+                                                                                    <tr>
+                                                                                        <td style="cursor:default">@(eventSumPersonalDoses.IndexOf(item) + 1)</td>
+                                                                                        <td style="cursor:default"> @item.TeamOrSupportName</td>
+                                                                                        <td data-label="" style="cursor:default">@item.PositionName</td>
+                                                                                        <td data-label="" style="cursor:default">@(item.TotalEventPDAccumulation.HasValue != null ? item.TotalEventPDAccumulation.Value.ToString("F4") : 0.0000) @item.RecordEventUnitName</td>
+                                                                                    </tr>
+                                                                                }
+                                                                            }
+                                                                           
+
+                                                                            
+                                                                            
+
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+
+                                                              
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </BSTabContent>
+                                        </BSTab> 
+
+                                    </BSTabList>
+                                    <BSTabSelectedContent />
+                                </BSTabGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                
+            </BSTabContent>
+        </BSTab>
+    </BSTabList>
+    <BSTabSelectedContent />
+
+    <a href="@($"Record/ProjectSearch")" @onclick="initialBack" class="btn margin-btn" name="back" style="background-color:#7F7F7F; color:#fff" id="back">@AppData.LangResource[AppData.LanguageID, 49]</a>
+</BSTabGroup>
+
+<!--Loading-->
+<BSModal class="row style-justify mt-5" @ref="Load" IsCentered="true" Size="Size.Small" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+    <BSModalBody>
+        <div class="text-center mt-3">
+            <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+                  style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+        </div>
+        <div class="text-center pt-3" style=" font-size: 16pt">
+            @AppData.LangResource[AppData.LanguageID, 325]
+        </div>
+    </BSModalBody>
+</BSModal>
+<!--ModalResponseError-->
+<BSModal Class="text-center" @ref="ModalResponseError" IsCentered="true" Size="Size.Large">
+    <BSModalBody>
+
+        <div class="row">
+            <div class="col-md-12 alert-modal-logo">
+                <img src="assets/images/img-common/delete_symbol.png" width="100" height="100" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <p class="alert-modal">@RequertMessage</p>
+            </div>
+        </div>
+        <button type="button" @onclick="@(() => ModalResponseError.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+    </BSModalBody>
+</BSModal>
+
+
+<!--ModalRespondSuccess-->
+<BSModal Class="text-center alert-modal-body" @ref="ModalRespondSuccess" IsCentered="true" Size="Size.Large">
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12 alert-modal-logo">
+                <img src="assets/images/img-common/tick_symbol.png" width="100" height="100" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="alert-modal">@RequertMessage</h4>
+            </div>
+        </div>
+        <button type="button" @onclick="@(() => ModalRespondSuccess.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+    </BSModalBody>
+</BSModal>
+
+<!--ModalCreateRecordEvent-->
+<EditForm Model="@recordEvent" OnValidSubmit="OnSaveCreateRecordEvent">
+    <BSModal @ref="CreateRecordEvent" Size="Size.Large">
+        <BSModalHeader Class="btn-header-color" OnClick="@(() => CreateRecordEvent.Hide())">@AppData.LangResource[AppData.LanguageID, 8]</BSModalHeader>
+            <BSModalBody>
+                <!--div class="row">
+                    <label for="eventnumber" class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 28]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <InputText id="eventnumber" disabled @bind-Value="EventNumber" placeholder="@AppData.LangResource[AppData.LanguageID, 28]" class="form-control" />
+                        </div>
+                        <ValidationMessage For="@(() => EventNumber)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                    </div>
+                </!div--->
+                <div class="row">
+                    <label for="eventname" class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 29]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-8">
+                    <div class="input-group input-box-bottom">
+                        <InputText id="eventname" @bind-Value="recordEvent.EventName" placeholder="@AppData.LangResource[AppData.LanguageID,29]" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => recordEvent.EventName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label for="eventdate" class="col-12 col-md-4 col-lg-2 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 231]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-3">
+                    <div class="input-group input-box-bottom" style="display: flex; align-items: center;">
+                        <input type="date" id="eventdate" value="@recordProject.ProjectStartDate.ToString("yyyy-MM-dd")" @oninput="OnDateChanged" placeholder="@AppData.LangResource[AppData.LanguageID, 231]" class="form-control" />
+                       @*  <span style="color: red; margin-left: 10px;">
+                            Project Start: @recordProject.ProjectStartDate.Date.ToString("dd/MM/yyyy")
+                        </span> *@
+                    </div>
+                    <ValidationMessage For="@(() => recordEvent.EventRegisterDate)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" />
+                </div>
+            </div>
+
+            <div class="row">
+                <label for="eventType" class="col-12 col-md-4 col-lg-2 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 31]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-3">
+                    <div class="input-group input-box-bottom">
+                        @* <InputSelect class="form-control" @bind-Value="recordProject.ProjectType" id="eventType">
+                            <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                            @foreach (var item in recordEventTypes)
+                            {
+                                if (item.IsActive == true && item.IsActive != null)
+                                {
+                                    @if (AppData.LanguageID == 0)
+                                    {
+                                        <option value="@item.EventTypeID">@item.EventTypeENName</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item.EventTypeID">@item.EventTypeTHName</option>
+                                    }
+                                }
+
+
+                            }
+                        </InputSelect> *@
+                        @{
+                            string ProjectTypeName = "";
+                            var resultType = recordProjectTypes.Find(x => x.ProjectTypeID == recordProject.ProjectType);
+                            if(resultType != null)
+                            {
+                                ProjectTypeName = resultType.ProjectTypeENName;
+                            }
+                        }
+
+                        <input type="text" @bind-value="ProjectTypeName" disabled class="form-control" />
+                        
+                    </div>
+                    <ValidationMessage For="@(() => recordEvent.EventType)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" />
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 199]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-8">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="recordEvent.EventLocationName" placeholder="@AppData.LangResource[AppData.LanguageID, 199]" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => recordEvent.EventLocationName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label for="eventProvince" class="col-12 col-md-4 col-lg-2 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 41]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-3">
+                    <div class="input-group input-box-bottom">
+                        <select class="form-control" @bind="recordEvent.ProvinceID" id="eventProvince" @oninput="OnProvinceSelected">
+                            <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                            @foreach (var item in recordEventProvinces)
+                            {
+                                @if (AppData.LanguageID == 0)
+                                {
+                                    <option value="@item.ProvinceID">@item.ProvinceENName</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.ProvinceID">@item.ProvinceTHName</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <ValidationMessage For="@(() => recordEvent.ProvinceID)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" />
+                </div>
+                <label for="district" class="col-12 col-md-4 col-lg-2 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 233]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-3">
+                    <div class="input-group input-box-bottom">
+                        <select class="form-control" @bind="recordEvent.DistrictID" id="district" @oninput="OnDistrictSelected">
+                            <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                            @foreach (var item in recordEventDistricts)
+                            {
+                                @if (AppData.LanguageID == 0)
+                                {
+                                    <option value="@item.DistrictID">@item.DistrictENName</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.DistrictID">@item.DistrictTHName</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <ValidationMessage For="@(() => recordEvent.DistrictID)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" />
+                </div>
+            </div>
+            <div class="row">
+                <label for="subdistrict" class="col-12 col-md-4 col-lg-2 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 234]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-3">
+                    <div class="input-group input-box-bottom">
+                        <select class="form-control" @bind="recordEvent.SubDistrictID" id="subdistrict" @oninput="OnSubDistrictSelected">
+                            <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                            @foreach (var item in subDistricts)
+                            {
+                                zipCode = item.subDistrictCode;
+
+                                @if (AppData.LanguageID == 0)
+                                {
+                                    <option value="@item.subDistrictID">@item.subDistrictENName</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.subDistrictID">@item.subDistrictTHName</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <ValidationMessage For="@(() => recordEvent.SubDistrictID)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" />
+                </div>
+                <label for="eventZipCode" class="col-12 col-md-4 col-lg-2 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 43]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-3">
+                    <div class="input-group input-box-bottom">
+                        <InputNumber disabled @bind-Value="recordEvent.zipCode" placeholder="@AppData.LangResource[AppData.LanguageID, 43]" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => recordEvent.zipCode)" style="margin-top: -0.8rem; font-size:12px;" />
+                </div>
+            </div>
+            <div class="row">
+                <label for="informer" class="col-12 col-md-4 col-lg-2 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 235]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-8">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="recordProject.ProjectInformerName" disabled class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,235]" />
+                    </div>
+                    <ValidationMessage For="@(() => recordEvent.EventInformerName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" />
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 236]</span>
+                </label>
+                <div class="col-12 col-md-12 col-lg-8 input-box-bottom">
+                    <InputTextArea @bind-Value="recordEvent.EventInformation" rows="2" placeholder="@AppData.LangResource[AppData.LanguageID, 236]" class="form-control"></InputTextArea>
+                </div>
+                <ValidationMessage For="@(() => recordEvent.EventInformation)" id="validationTextArea" />
+            </div>
+        </BSModalBody>
+        <BSModalFooter>
+            @if (recordEvent.ProvinceID != null && recordEvent.ProvinceID != 0 &&
+            recordEvent.DistrictID != null && recordEvent.DistrictID != 0 &&
+            recordEvent.SubDistrictID != null && recordEvent.SubDistrictID != 0)
+            {
+                <button type="submit" class="btn btn-warning">@AppData.LangResource[AppData.LanguageID, 44]</button>
+            }
+            else
+            {
+                <button type="submit" disabled class="btn btn-warning">@AppData.LangResource[AppData.LanguageID, 44]</button>
+            }
+
+            <BSButton Color="Color.Warning" OnClick="@(() => CreateRecordEvent.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</BSButton>
+            </BSModalFooter>
+        </BSModal>
+    </EditForm>
+
+    <!----ModalUpdateInventory--------->
+    <BSModal @ref="UpdateProjectInventory">
+        <BSModalHeader OnClick="@(() => UpdateProjectInventory.Hide())">@AppData.LangResource[AppData.LanguageID, 591]</BSModalHeader>
+        <BSModalBody>
+
+        <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 259]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-5">
+                <div class="input-group input-box-bottom">
+                    <input type="text" disabled class="form-control" @bind-value="editProjectInventoryStock.ProjectStockNumber" />
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 260]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-5">
+                <div class="input-group input-box-bottom">
+                    <input type="number" class="form-control" @bind-value="editProjectInventoryStock.ProjectStockQuantity" />
+                </div>
+
+            </div>
+        </div>
+
+    </BSModalBody>
+    <BSModalFooter>
+        @if (AppData.CurrentPermission.Find(i => i.permissionID == 2).permissionU)
+        {
+            <button type="submit" @onclick="OnUpdateProjectInventoryStock" class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+        else
+        {
+            <button type="button" disabled class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+        <button type="reset" class="btn btn-danger" @onclick="@(() => UpdateProjectInventory.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalResponseConfirmDeleteTeam-->
+<BSModal @ref="ModalResponseConfirmDeleteTeam">
+
+    <BSModalHeader OnClick="@(() => ModalResponseConfirmDeleteTeam.Hide())">@AppData.LangResource[AppData.LanguageID, 592]</BSModalHeader>
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert-modal-delete">
+                    @{
+                        var result = teams.Find(x => x.ProjectTeamID == deleteTeamID);
+                        string firstName = "-";
+                        string lastName = "-";
+                        if (result != null)
+                        {
+                            var account = accounts.Find(x => x.UserID == result.UserID);
+                            if (account != null)
+                            {
+                                firstName = account.FirstName;
+                                lastName = account.LastName;
+                            }
+                        }
+                    }
+                    @AppData.LangResource[AppData.LanguageID, 593] <br/>@firstName @lastName?
+                    
+                </div>
+            </div>
+        </div>
+    </BSModalBody>
+    <BSModalFooter>
+
+        <button type="submit" class="btn btn-danger" @onclick="SaveDeleteProjectTeam">@AppData.LangResource[AppData.LanguageID, 610]</button>
+        <button type="reset" class="btn btn-info" @onclick="@(() => ModalResponseConfirmDeleteTeam.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+
+<!--ModalResponseConfirmDeleteSupportTeam-->
+<BSModal @ref="ModalResponseConfirmDeleteSupportTeam">
+
+    <BSModalHeader OnClick="@(() => ModalResponseConfirmDeleteSupportTeam.Hide())">@AppData.LangResource[AppData.LanguageID, 594]</BSModalHeader>
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert-modal-delete">
+                    @{
+                        var result = SupportTeam.Find(x => x.ProjectSupportTeamID == deleteSupportTeamID);
+                        string firstName = "-";
+                        if (result != null)
+                        {
+                           
+                           firstName = result.Name;
+                                
+                            
+                        }
+                    }
+                    @AppData.LangResource[AppData.LanguageID, 595]<br />@firstName?
+                    
+                </div>
+            </div>
+        </div>
+    </BSModalBody>
+    <BSModalFooter>
+
+        <button type="submit" class="btn btn-danger" @onclick="SaveDeleteProjectSupportTeam">@AppData.LangResource[AppData.LanguageID, 610]</button>
+
+
+        <button type="reset" class="btn btn-info" @onclick="@(() => ModalResponseConfirmDeleteSupportTeam.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalResponseConfirmDeletePersonalDoseTeam-->
+<BSModal @ref="ModalResponseConfirmDeletePersonalDoseTeam">
+
+    <BSModalHeader OnClick="@(() => ModalResponseConfirmDeletePersonalDoseTeam.Hide())">@AppData.LangResource[AppData.LanguageID, 596]</BSModalHeader>
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert-modal-delete">
+                    @{
+                        var result = projectPersonalDoses.Find(x => x.ProjectPersonalDoseID == deletePersonalDoseTeamID);
+                        string firstName = "-";
+                        string lastName = "-";
+                        string supportName = "-";
+                        if (result != null)
+                        {
+                            var account = accounts.Find(x => x.UserID == result.UserID);
+                            var supportTeam = SupportTeam.Find(x => x.ProjectSupportTeamID == result.SupportTeamID);
+                            if (account != null)
+                            {
+                                firstName = account.FirstName;
+                                lastName = account.LastName;
+                            }
+
+                            if (supportTeam != null)
+                            {
+                                supportName = supportTeam.Name;
+                            }
+                        }
+                    }
+                    @if(result != null)
+                    {
+                        @if (result.UserID != new Guid("00000000-0000-0000-0000-000000000000"))
+                        {
+
+                            <h3> @AppData.LangResource[AppData.LanguageID, 593]<br/> @firstName @lastName?</h3>
+                        }
+                        else if (result.SupportTeamID != 0)
+                        {
+                            <h3> @AppData.LangResource[AppData.LanguageID, 595]<br /> @supportName?</h3>
+
+                        }
+                    }
+                   
+                    
+
+                </div>
+            </div>
+        </div>
+    </BSModalBody>
+    <BSModalFooter>
+
+        <button type="submit" class="btn btn-danger" @onclick="SavaDeleteProjectPersonalDoseTeam">@AppData.LangResource[AppData.LanguageID, 610]</button>
+
+
+        <button type="reset" class="btn btn-info" @onclick="@(() => ModalResponseConfirmDeletePersonalDoseTeam.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalResponseConfirmDeleteInstrument-->
+<BSModal @ref="ModalResponseConfirmDeleteInstrument">
+
+    <BSModalHeader OnClick="@(() => ModalResponseConfirmDeleteInstrument.Hide())">@AppData.LangResource[AppData.LanguageID, 597]</BSModalHeader>
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert-modal-delete">
+                    @AppData.LangResource[AppData.LanguageID, 598] <br/>
+                    @(projectInstruments.Find(x => x.ProjectInstrumentID == deleteInstrumentID) != null ? projectInstruments.Find(x => x.ProjectInstrumentID == deleteInstrumentID).InstrumentNumber.ToUpper():"-")?
+                </div>
+            </div>
+        </div>
+    </BSModalBody>
+    <BSModalFooter>
+
+        <button type="submit" class="btn btn-danger" @onclick="SaveDeleteProjectInstrument">@AppData.LangResource[AppData.LanguageID, 610]</button>
+
+
+        <button type="reset" class="btn btn-info" @onclick="@(() => ModalResponseConfirmDeleteInstrument.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalResponseConfirmDeleteInventory-->
+<BSModal @ref="ModalResponseConfirmDeleteInventory">
+
+    <BSModalHeader OnClick="@(() => ModalResponseConfirmDeleteInventory.Hide())">@AppData.LangResource[AppData.LanguageID, 599]</BSModalHeader>
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert-modal-delete">
+                    @AppData.LangResource[AppData.LanguageID, 600] <br />
+                    @(projectInventoryStocks.Find(x => x.ProjectInventoryID == deleteInventoryStockID) != null ? projectInventoryStocks.Find(x => x.ProjectInventoryID == deleteInventoryStockID).ProjectStockNumber.ToUpper():"-")?
+                </div>
+            </div>
+        </div>
+    </BSModalBody>
+    <BSModalFooter>
+
+        <button type="submit" class="btn btn-danger" @onclick="SaveDeleteProjectInventoryStock">@AppData.LangResource[AppData.LanguageID, 610]</button>
+
+
+        <button type="reset" class="btn btn-info" @onclick="@(() => ModalResponseConfirmDeleteInventory.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalResponseConfirmCheckOut-->
+<BSModal @ref="ModalResponseConfirmCheckOutInstrument">
+    <BSModalHeader OnClick="@(() => ModalResponseConfirmCheckOutInstrument.Hide())">@AppData.LangResource[AppData.LanguageID, 601]</BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert-modal-delete">
+                        @AppData.LangResource[AppData.LanguageID, 602]
+                    </div>
+            </div>
+        </div>
+    </BSModalBody>
+    <BSModalFooter>
+        
+        <button type="submit" @onclick="PostInstrumentCheckOut" class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 161]</button>
+        
+        
+        <button type="reset" class="btn btn-danger" @onclick="@(() => ModalResponseConfirmCheckOutInstrument.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+
+<!--ModalResponseConfirmCheckIn-->
+<BSModal @ref="ModalResponseConfirmCheckInInstrument">
+    <BSModalHeader OnClick="@(() => ModalResponseConfirmCheckInInstrument.Hide())">@AppData.LangResource[AppData.LanguageID, 603]</BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert-modal-delete">
+                        @AppData.LangResource[AppData.LanguageID, 604]
+                    </div>
+            </div>
+        </div>
+    </BSModalBody>
+    <BSModalFooter>
+        
+        <button type="submit" @onclick="PostInstrumentCheckInAll" class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 161]</button>
+        
+        
+        <button type="reset" class="btn btn-danger" @onclick="@(() => ModalResponseConfirmCheckInInstrument.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalResponseConfirmCheckInInstrumentNotEvent-->
+<BSModal @ref="ModalResponseConfirmCheckInInstrumentNotEvent">
+    <BSModalHeader OnClick="@(() => ModalResponseConfirmCheckInInstrumentNotEvent.Hide())">@AppData.LangResource[AppData.LanguageID, 603]</BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert-modal-delete">
+                        @AppData.LangResource[AppData.LanguageID, 645]
+                    </div>
+            </div>
+        </div>
+    </BSModalBody>
+    <BSModalFooter>
+        
+        <button type="submit" @onclick="PostInstrumentCheckInAll" class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 161]</button>
+        
+        
+        <button type="reset" class="btn btn-danger" @onclick="@(() => ModalResponseConfirmCheckInInstrumentNotEvent.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+
+<!--ModalResponseConfirmCheckOutInventory-->
+<BSModal @ref="ModalResponseConfirmCheckOutInventory">
+    <BSModalHeader OnClick="@(() => ModalResponseConfirmCheckOutInventory.Hide())">@AppData.LangResource[AppData.LanguageID, 605]</BSModalHeader>
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert-modal-delete">
+                    @AppData.LangResource[AppData.LanguageID, 606]
+                </div>
+            </div>
+        </div>
+    </BSModalBody>
+    <BSModalFooter>
+
+        <button type="submit" @onclick="PostInventoryStockCheckOut" class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 161]</button>
+
+
+        <button type="reset" class="btn btn-danger" @onclick="@(() => ModalResponseConfirmCheckOutInventory.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalResponseConfirmDeleteEvent-->
+<BSModal @ref="ModalResponseConfirmDeleteEvent">
+
+    <BSModalHeader OnClick="@(() => ModalResponseConfirmDeleteEvent.Hide())">@AppData.LangResource[AppData.LanguageID, 607]</BSModalHeader>
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert-modal-delete">
+                    @AppData.LangResource[AppData.LanguageID, 608] @deleteEventNumer @AppData.LangResource[AppData.LanguageID, 609]
+                </div>
+            </div>
+        </div>
+    </BSModalBody>
+    <BSModalFooter>
+
+        <button type="submit" class="btn btn-danger" @onclick="OnPutEventRecord">@AppData.LangResource[AppData.LanguageID, 610]</button>
+
+
+        <button type="reset" class="btn btn-info" @onclick="@(() => ModalResponseConfirmDeleteEvent.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalResponseUsedInEvent-->
+@* <BSModal Class="text-center" @ref="ModalResponseUsedInEvent" IsCentered="true" Size="Size.Medium">
+    <BSModalBody>
+       <div class="row text-center">
+            <div class="col-md-12 d-flex justify-content-center mb-3">
+                <div class="alert-modal-delete">
+                    <img class="justify-content-center" src="assets/images/img-common/delete_symbol.png" width="100" height="100" />
+                </div>
+            </div>
+        </div>
+        <hr/>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert-modal-delete"> 
+                    Unable to delete data because it is used in an event:<br /> @UsedEvent
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="mt-3">
+            <button type="button" @onclick="@(() => ModalResponseUsedInEvent.Hide())" class="btn btn-danger">@AppData.LangResource[AppData.LanguageID, 330]</button>
+        </div>
+        
+    </BSModalBody>
+</BSModal> *@
+
+
+
+@* @{
+    var initialGroup = eventPersonalDoses
+    .GroupBy(i => new { i.EventPDUserName, i.EventPDSupportId, InstrumentName = string.IsNullOrWhiteSpace(i.EventPDInstumentName) ? "" : i.EventPDInstumentName, i.EventPDAccumulationUnit })
+    .Select(g => new
+    {
+        g.Key.EventPDUserName,
+        g.Key.EventPDSupportId,
+        g.Key.InstrumentName,
+        g.Key.EventPDAccumulationUnit,
+        EventPDAccumulation = g.Sum(i => i.EventPDAccumulation)
+
+    }).ToList();
+
+    var groupedData = initialGroup
+    .GroupBy(i => new { i.EventPDUserName, i.EventPDSupportId })
+    .SelectMany(g => g.Select(i => new
+    {
+        i.EventPDUserName,
+        i.EventPDSupportId,
+        i.InstrumentName,
+        i.EventPDAccumulation,
+        i.EventPDAccumulationUnit
+    }))
+    .ToList();
+}
+
+@foreach (var group in groupedData)
+{
+    <tr>
+        <td>@(groupedData.IndexOf(group) + 1)</td>
+        @if (group.EventPDUserName != new Guid("00000000-0000-0000-0000-000000000000"))
+        {
+            var user = accounts.Find(j => j.UserID == group.EventPDUserName);
+            <td>@user?.FirstName @user?.LastName</td>
+        }
+        else if (group.EventPDSupportId != 0)
+        {
+            var support = SupportTeam.Find(x => x.ProjectSupportTeamID == group.EventPDSupportId);
+            <td>@support?.Name</td>
+        }
+        @{
+            string positionUser = "";
+            var resultPosition = accounts.Find(x => x.UserID == group.EventPDUserName);
+            if (resultPosition != null)
+            {
+                var result = positionList.Find(x => x.PositionId == resultPosition.PositionID);
+                if (result != null)
+                {
+                    positionUser = result.PositionName;
+                }
+            }
+        }
+        @if (group.EventPDUserName != new Guid("00000000-0000-0000-0000-000000000000"))
+        {
+            <td>@positionUser</td>
+        }
+        else if (group.EventPDSupportId != 0)
+        {
+            var supportPosition = SupportTeam.Find(x => x.ProjectSupportTeamID == group.EventPDSupportId)?.Position ?? "-";
+            <td>@supportPosition</td>
+        }
+        <td>@group.InstrumentName</td>
+        <td>@group.EventPDAccumulation @(AppData.recordEventUnits.Find(x => x.RecordEventUnitID == group.EventPDAccumulationUnit)?.RecordEventUnitName ?? "-")</td>
+
+    </tr>
+}
+ *@
+

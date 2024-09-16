@@ -1,0 +1,437 @@
+﻿@page "/RadiationSources/SourcesSearch"
+@inject IJSRuntime jsRuntime
+@inject NavigationManager NavigationManager
+@inject AppData AppData
+@inject IRadiationSourceService RadiationSourceService
+@inject IRadiationSourceTypeService RadiationSourceTypeService
+@inject IToastService ToastService
+@inject HttpClient http
+@inject IConfiguration Config
+@inject ILocalStorageService _localStorageService
+@using System.Threading
+@inject IMasterData _masterData
+
+<PageTitle>Source Search Page</PageTitle>
+
+<div class="row margin-row-card">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">@AppData.LangResource[AppData.LanguageID, 22]</div>
+            <div class="card-body">
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 122]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <input type="text" @bind-value="radiationSource.RadiationSourceNumber" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,122]" />
+                        </div>
+                    </div>
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 123]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <input type="text" @bind-value="radiationSource.RadiationSourceNuclide" name="Nuclide" id="Nuclide" placeholder="@AppData.LangResource[AppData.LanguageID,123]" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 125]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <select class="form-control" @bind="radiationSource.RadiationSourceTypeID" name="SourceType" id="SourceType">
+                                <option selected value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                @foreach (var item in radiationSourceTypes)
+                                {
+                                    if (item.IsActive == true && item.IsActive != null)
+                                    {
+                                        <option value="@item.RadiationSourceTypeID">@item.RadiationSourceTypeName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 63]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <input type="text" class="form-control" @bind-value="radiationSource.RadiationSourceSerial" name="SerialNumber" id="SerialNumber" placeholder="@AppData.LangResource[AppData.LanguageID,63]" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center" style="margin-top:0.5rem;">
+                    <button type="submit" @onclick="Onsearch" class="btn" style="background-color:#2E2BFF; color:#fff" name="SearchSources" id="OnsearchDoseUserAll">@AppData.LangResource[AppData.LanguageID, 48]</button>
+                    <button type="reset" @onclick="OnClear" class="btn" id="OnsearchDoseUserAll" style="background-color:#B90F1B; color:#fff">
+                        @AppData.LangResource[AppData.LanguageID, 45]
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row margin-row-card">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">@AppData.LangResource[AppData.LanguageID, 129]</div>
+            <div class="card-body scrollBar fixTableHead table-responsive scroll-inner" style="height:575px;">
+                <table id="dataTable" class="table table-striped text-center table-bordered table-respon">
+                    <thead class="fixedthead">
+                        <tr>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 93]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 130]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 123]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 128]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 528]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 529]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 125]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 92]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 131]</th>
+
+                        </tr>
+                    </thead>
+                    <tbody class="scrollContent">
+                        @if (FilteredToDos != null)
+                        {
+                            @foreach (var item in FilteredToDos)
+                            {
+                               
+                                    <tr @onclick="() => TrClickedAtIndex(item.RadiationSourceID)">
+                                        @*(ของเก่า)@if (item.RadiationSourceStatusID == 1)
+                                        {
+                                        <td style="text-align: center;"><i class="fa fa-check"></i></td>
+                                        }
+                                        els
+                                        {
+                                        <td style="text-align: center;"><i class="fas fa-times"></i></td>
+                                        }*@
+                                        @if (AppData.LanguageID == 0)
+                                        {
+                                            <td>
+                                                <span class="@(item.sourceStatus != null ? item.sourceStatus.ColorTag:"-")">
+                                                    @(item.sourceStatus != null ? item.sourceStatus.RadiationSourceStatusENName : "-")
+                                                </span>
+
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td>
+                                                <span class="@(item.sourceStatus != null ? item.sourceStatus.ColorTag:"-")">
+                                                    @(item.sourceStatus != null ? item.sourceStatus.RadiationSourceStatusTHName : "-")
+                                                </span>
+                                            </td>
+                                        }
+
+                                        <td>@item.RadiationSourceNumber</td>
+                                        <td>@item.RadiationSourceNuclide</td>
+                                        @*<td>ของเก่า@item.RadiationSourceActivityDetail  @(AppData.radiationSourceUnits.Find(i => i.RadiationSourceUnitID == item.RadioActivityUnitID) != null ? AppData.radiationSourceUnits.Find(i => i.RadiationSourceUnitID == item.RadioActivityUnitID).RadiationSourceUnitName:"-")</td>*@
+                                        <td>@(String.Format("{0:0.0000}", item.Halflife) != null ? String.Format("{0:0.0000}", item.Halflife) : "-")</td>
+                                        <td>@(String.Format("{0:0.0000}", item.InitialActivity) != null ? String.Format("{0:0.0000}", item.InitialActivity) : "-") @(item.sourceUnit != null ? item.sourceUnit.RadiationSourceUnitName : "-")</td>
+                                        <td>@(String.Format("{0:0.0000}", item.CurrentActivity) != null ? String.Format("{0:0.0000}", item.CurrentActivity) : "-")</td>
+                                        <td>@(item.sourceTypes != null ? item.sourceTypes.RadiationSourceTypeName : "-")</td>
+                                        <td>@item.RadiationSourceSerial</td>
+                                        <td>@String.Format("{0:dd/MM/yyyy}", item.RadiationSourceManufacturedDate)</td>
+
+                                    </tr>
+                                
+
+                               
+                            }
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+        @if (AppData.CurrentPermission.Find(i => i.permissionID == 14).permissionE || AppData.CurrentPermission.Find(i => i.permissionID == 14).permissionU)
+        {
+            <div class="text-center">
+                @if (ID == null)
+                {
+                    <button style="cursor: pointer;" disabled class="btn btn-warning margin-btn" name="ShowSources" id="ShowSources">@AppData.LangResource[AppData.LanguageID, 132]</button>
+                    <button type="button" disabled class="btn margin-btn" style="background-color:#404040; color:#fff">@AppData.LangResource[AppData.LanguageID, 95]</button>
+                   
+                }
+                else
+                {
+                    <a href="@($"RadiationSources/ShowSources/{ID}")" class="btn btn-warning margin-btn" name="ShowSources" id="ShowSources">@AppData.LangResource[AppData.LanguageID, 132]</a>
+                    if (discardRadiationSource.IsActive == true)
+                    {
+                        <button type="submit" class="btn margin-btn" style="background-color:#404040; color:#fff" @onclick="@(() => RadiationDiscard.Show())" name="Discard" id="Discard">@AppData.LangResource[AppData.LanguageID, 95]</button>
+                    }
+                    else
+                    {
+                        <button type="submit" class="btn margin-btn" style="background-color:#404040; color:#fff" disabled name="Discard" id="Discard">@AppData.LangResource[AppData.LanguageID, 95]</button>
+                    }
+                   
+                }
+                <button @onclick="ShowDiscard" class="btn margin-btn" id="OnsearchDoseUserAll" style="background-color:#404040; color:#fff">@AppData.LangResource[AppData.LanguageID, 482]</button>
+
+            </div>
+        }
+    </div>
+</div>
+
+<EditForm Model="@discardRadiationSource" OnValidSubmit="UpdateRadiationSourceDiscard">
+    <!----<DataAnnotationsValidator />-->
+    <BSModal @ref="RadiationDiscard">
+        <BSModalHeader OnClick="@(() => RadiationDiscard.Hide())" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID, 612]</BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 120]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputDate @bind-Value="discardRadiationSource.RadiationSourceDiscardDate" placeholder="@AppData.LangResource[AppData.LanguageID,120]" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => discardRadiationSource.RadiationSourceDiscardDate)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 121]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputSelect class="form-control" @bind-Value="discardRadiationSource.RadiationSourceDiscardBy" id="discardBy">
+                            <option value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                            @foreach (var item in accounts)
+                            {
+                                if(item.IsActive)
+                                {
+                                    @if (item.UserID == discardRadiationSource.RadiationSourceDiscardBy)
+                                    {
+                                        <option value="@item.UserID">@item.FirstName</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item.UserID">@item.FirstName</option>
+                                    }
+                                }
+                                
+
+                            }
+                        </InputSelect>
+                    </div>
+                    <ValidationMessage For="@(() => discardRadiationSource.RadiationSourceDiscardBy)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 104]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="discardRadiationSource.RadiationSourceReason" placeholder="@AppData.LangResource[AppData.LanguageID,104]" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => discardRadiationSource.RadiationSourceReason)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+        </BSModalBody>
+        <BSModalFooter>
+            <button type="submit" class="btn btn-danger">@AppData.LangResource[AppData.LanguageID, 95]</button>
+            <button type="button" class="btn btn-info" @onclick="@(() => RadiationDiscard.Hide())" name="Clear" id="Clear">@AppData.LangResource[AppData.LanguageID, 158]</button>
+        </BSModalFooter>
+    </BSModal>
+</EditForm>
+
+<BSModal class="row style-justify mt-5" @ref="Load" IsCentered="true" Size="Size.Small" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+    <BSModalBody>
+        <div class="text-center mt-3">
+            <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+                  style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+        </div>
+        <div class="text-center pt-3" style=" font-size: 16pt">
+            @AppData.LangResource[AppData.LanguageID, 325]
+        </div>
+    </BSModalBody>
+</BSModal>
+
+@code {
+    BSModal Load { get; set; }
+
+    private List<RadiationSourceType> radiationSourceTypes = new List<RadiationSourceType>();
+    private List<RadiationSource> radiationSources = new List<RadiationSource>();
+    private List<RadiationSourceStatus> radiationSourceStatuses = new List<RadiationSourceStatus>();
+    private List<RadiationSourceUnit> radiationSourceUnits = new List<RadiationSourceUnit>();
+
+    private const string SourceType = "sourceType";
+
+    RadiationSource discardRadiationSource = new RadiationSource();
+
+    private List<Account> accounts = new List<Account>();
+    RadiationSource radiationSource = new RadiationSource
+        {
+            RadiationSourceTypeID = null
+
+        };
+
+    /// <summary>
+    /// FilteredradiationSources
+    /// </summary>
+    List<RadiationSource> FilteredToDos => radiationSources.Where(
+    r => r.RadiationSourceNumber.ToLower().Contains(radiationSource.RadiationSourceNumber.ToLower()) &&
+    r.RadiationSourceNuclide.ToLower().Contains(radiationSource.RadiationSourceNuclide.ToLower()) &&
+
+    r.RadiationSourceSerial.ToLower().Contains(radiationSource.RadiationSourceSerial.ToLower()) &&
+    r.RadiationSourceTypeID.ToString().ToLower().Contains(radiationSource.RadiationSourceTypeID.ToString().ToLower())
+    ).ToList();
+
+    /// <summary>
+    ///
+    /// </summary>
+    public int? ID { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+
+        /***caching****/
+        //radiationSourceTypes = await _localStorageService.GetItemAsync<List<RadiationSourceType>>(SourceType);
+        //if (radiationSourceTypes is null)
+        //{
+        //    radiationSourceTypes = await RadiationSourceTypeService.GetRadiationSourceTypes();
+        //    await _localStorageService.SetItemAsync(SourceType, radiationSourceTypes);
+        //}
+        radiationSourceTypes = AppData.radiationSourceTypes;
+        //var activeRadiationSourceTypes = radiationSourceTypes.Find(r => r.IsActive == true).IsActive;
+        //if (activeRadiationSourceTypes == true)
+        //    radiationSourceTypes = await _masterData.GetAllActiveMasterDataAsync<RadiationSourceType>("ActiveRadiationSourceTypes");
+        radiationSourceStatuses = AppData.radiationSourceStatuses;
+
+        radiationSourceUnits = AppData.radiationSourceUnits;
+
+        accounts = await http.GetFromJsonAsync<List<Account>>($"{Config["aurl"]}/api/GetAccount");
+
+        if (AppData.LanguageID == 0)
+        {
+            var resultRadiationSourceTypes = radiationSourceTypes.OrderBy(rt => rt.RadiationSourceTypeName).ToList();
+            radiationSourceTypes = resultRadiationSourceTypes;
+
+        }
+
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    private async Task UpdateRadiationSourceDiscard()
+    {
+        var upresult = await http.PutAsJsonAsync($"{Config["nurl"]}/api/ExpireRadiationSource/{ID}", discardRadiationSource);
+        ToastService.ShowSuccess("Successfully DiscardRadiationSource");
+        radiationSources = await RadiationSourceService.GetRadiationSources();
+        foreach (var item in radiationSources)
+        {
+            item.GetLookup(radiationSourceTypes, radiationSourceStatuses, radiationSourceUnits);
+        }
+
+        StateHasChanged();
+        RadiationDiscard.Hide();
+        //await OnInitializedAsync();
+
+    }
+
+    /// <summary>
+    /// clearURL
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("clearURL");
+            await jsRuntime.InvokeAsync<object>("ResponsiveDataTables");
+        }
+    }
+
+    /// <summary>
+    /// getByID
+    /// </summary>
+    public async Task TrClickedAtIndex(int? id)
+    {
+        ID = id;
+        //radiationSourceByIds = await http.GetFromJsonAsync<List<RadiationSource>>($"api/GetRadiationSource/{ID}");
+        var respond = await http.GetFromJsonAsync<List<RadiationSource>>($"{Config["nurl"]}/api/GetRadiationSource/{ID}");
+        if (respond != null)
+            discardRadiationSource = respond.First();
+
+        discardRadiationSource.RadiationSourceDiscardDate = DateTime.Today;
+        discardRadiationSource.RadiationSourceReason = "";
+        discardRadiationSource.RadiationSourceDiscardBy = null;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    private void ShowRadiationSourceError()
+    {
+        ToastService.ShowError("RadiationSource list is not selected.");
+    }
+
+    /// <summary>
+    /// ModalDiscard
+    /// </summary>
+    BSModal RadiationDiscard { get; set; }
+
+    public async void Onsearch()
+    {
+        Load.Show();
+        await Task.Run(Loading);
+        ID = null;
+        radiationSources = await RadiationSourceService.GetRadiationSources();
+        foreach (var item in radiationSources)
+        {
+            item.GetLookup(radiationSourceTypes, radiationSourceStatuses, radiationSourceUnits);
+        }
+
+        StateHasChanged();
+        Load.Hide();
+    }
+
+    public async void ShowDiscard()
+    {
+        Load.Show();
+        try
+        {
+            ID = null;
+            radiationSources = await http.GetFromJsonAsync<List<RadiationSource>>($"{Config["nurl"]}/api/GetRadiationSourceDiscard");
+            foreach (var item in radiationSources)
+            {
+                item.GetLookup(radiationSourceTypes, radiationSourceStatuses, radiationSourceUnits);
+            }
+            await jsRuntime.InvokeAsync<object>("ResponsiveDataTables");
+           StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError("" + e);
+        }
+      
+        Load.Hide();
+    }
+
+    public void OnClear()
+    {
+        // (() => radiationSource = new RadiationSource {RadiationSourceTypeID = null})
+        radiationSource = new RadiationSource
+            {
+                RadiationSourceTypeID = null
+
+            };
+            ID = null;
+        radiationSources = new List<RadiationSource>();
+    }
+
+    private void Loading()
+    {
+        System.Threading.Thread.Sleep(300);
+        // Retrieve data from the server and initialize
+        // Employees property which the View will bind
+    }
+
+}

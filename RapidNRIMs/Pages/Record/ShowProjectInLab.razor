@@ -1,0 +1,81 @@
+﻿@inherits ProjectSearchBase
+@page "/Record/ShowProjectInLab"
+
+<PageTitle>Project In Lab Page</PageTitle>
+
+<div class="col-md-12">
+    <div class="card-header bg-gradient-secondary">@AppData.LangResource[AppData.LanguageID,557]</div>
+    <div class="card-body bg-light">
+        <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height:720px;">
+
+            <table id="dataTable" class="table table-striped text-center">
+                <thead class="fixedthead">
+                    <tr>
+                        <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,540]</th>
+                        <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,553]</th>
+                        <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,555]</th>
+                        <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,554]</th>
+                        <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,556]</th>
+                        <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,235]</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollContent">
+                    @if (recordProjects != null)
+                    {
+                        @foreach (var item in recordProjects.OrderByDescending(x => x.ProjectNumber))
+                        {
+                            <tr @onclick="() => TrClickedAtIndex(item.ProjectID)">
+                                <td>@item.ProjectNumber</td>
+                                <td class="cell-content">@item.ProjectName</td>
+                                @if (AppData.LanguageID == 0)
+                                {
+                                    <td>@(AppData.recordProjectTypes.Find(x => x.ProjectTypeID == item.ProjectType) != null ? AppData.recordProjectTypes.Find(x => x.ProjectTypeID == item.ProjectType).ProjectTypeENName:"-")</td>
+                                }
+                                else
+                                {
+                                    <td>@(AppData.recordProjectTypes.Find(x => x.ProjectTypeID == item.ProjectType) != null ? AppData.recordProjectTypes.Find(x => x.ProjectTypeID == item.ProjectType).ProjectTypeTHName:"-")</td>
+                                }
+
+                                @if (AppData.LanguageID == 0)
+                                {
+                                    <td>@(AppData.recordRegionals.Find(x => x.RegionalNumber == item.ProjectRegional) != null ? AppData.recordRegionals.Find(x => x.RegionalNumber == item.ProjectRegional).RegionalENName:"-")</td>
+                                }
+                                else
+                                {
+                                    <td>@(AppData.recordRegionals.Find(x => x.RegionalNumber == item.ProjectRegional) != null ? AppData.recordRegionals.Find(x => x.RegionalNumber == item.ProjectRegional).RegionalTHName:"-")</td>
+                                }
+
+                                <td>
+                                    @(accounts.Find(x => x.UserID == item.ProjectRegisteredBy) != null ? accounts.Find(x => x.UserID == item.ProjectRegisteredBy).FirstName:"-")
+                                    @(accounts.Find(x => x.UserID == item.ProjectRegisteredBy) != null ? accounts.Find(x => x.UserID == item.ProjectRegisteredBy).LastName:"-")
+                                </td>
+                                <td class="cell-content">@item.ProjectInformerName</td>
+                            </tr>
+                        }
+                    }
+
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+</div>
+<div class="text-center">
+
+    <NavLink href="index" class="btn margin-btn" Match="NavLinkMatch.All" style="background-color:#7F7F7F; color:#fff">@AppData.LangResource[AppData.LanguageID, 49]</NavLink>
+    @if (ID != null)
+    {
+        <a href="@($"Record/ManageProject/{ID}")" type="button" class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID,560]</a>
+    }
+    else
+    {
+        <button type="button" disabled class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID, 560]</button>
+    }
+
+
+
+</div>
+
+
+

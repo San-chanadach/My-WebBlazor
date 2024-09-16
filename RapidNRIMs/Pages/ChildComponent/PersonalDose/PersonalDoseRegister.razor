@@ -1,0 +1,319 @@
+﻿@page "/ChildComponent/PersonalDose/PersonalDoseRegister"
+@inherits PersonalDoseBase
+
+
+
+<div class="row margin-row-card">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">@AppData.LangResource[AppData.LanguageID, 622]</div>
+
+            <div class="card-body">
+                <div class="form-row ml-3">
+                    <div class="form-group row col-md-6">
+                        <label class="col-sm-4 col-form-label">@AppData.LangResource[AppData.LanguageID, 623]</label>
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                @if (supportTeamId != 0 && inputValueSupportTeam != "" || inputValueSupportTeam != supportName)
+                                {
+                                    <input type="text" id="teaminput" class="form-control" @bind="inputValueTeam" disabled @oninput="ChangeUserTeamAutoComplete" placeholder="@AppData.LangResource[AppData.LanguageID, 2]" />
+                                    <span class="input-icon-search">
+                                        <i class="fas fa-caret-down fa-1x instrumentmumber-search" id="icon-suggestion-team"></i>
+                                    </span>
+                                    
+                                }
+                                else
+                                {
+                                    <input type="text" id="teaminput" class="form-control" @bind="inputValueTeam" @oninput="ChangeUserTeamAutoComplete" placeholder="@AppData.LangResource[AppData.LanguageID, 2]" />
+                                    @if (!string.IsNullOrEmpty(inputValueTeam))
+                                    {
+                                        <span class="input-icon-search" style="display:none;">
+                                            <i class="fas fa-caret-down fa-1x instrumentmumber-search" id="icon-suggestion-team"></i>
+                                        </span>
+
+                                    }
+                                    else
+                                    {
+                                        <span class="input-icon-search" @onclick="OnclickTeamAll">
+                                            <i class="fas fa-caret-down fa-1x instrumentmumber-search" id="icon-suggestion-team"></i>
+                                        </span>
+                                    }
+                                }
+                            </div>
+                            <div class="input-group">
+                                <ul id="teamsuggestions">
+
+                                    @foreach (var team in teamsuggestions)
+                                    {
+                                        <li @onclick="() => SelectItemTeam(team)">@team</li>
+                                    }
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="form-group row col-md-6">
+                        <label class="col-sm-4 col-form-label">@AppData.LangResource[AppData.LanguageID, 624]</label>
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                @if (TeamUserId != null && inputValueTeam != "" || inputValueTeam != Name)
+                                {
+                                    <input type="text" id="supportinput" class="form-control" @bind="inputValueSupportTeam" disabled @oninput="ChangeSupportTeamAutoComplete" placeholder="@AppData.LangResource[AppData.LanguageID, 2]" />
+                                    <span class="input-icon-search">
+                                        <i class="fas fa-caret-down fa-1x instrumentmumber-search" id="icon-suggestion-support"></i>
+                                    </span>
+
+                                }
+                                else
+                                {
+
+                                    <input type="text" id="supportinput" class="form-control" @bind="inputValueSupportTeam" @oninput="ChangeSupportTeamAutoComplete" placeholder="@AppData.LangResource[AppData.LanguageID, 2]" />
+                                    @if (!string.IsNullOrEmpty(inputValueSupportTeam))
+                                    {
+                                        <span class="input-icon-search" style="display:none;">
+                                            <i class="fas fa-caret-down fa-1x instrumentmumber-search" id="icon-suggestion-support"></i>
+                                        </span>
+
+                                    }
+                                    else
+                                    {
+                                        <span class="input-icon-search" @onclick="OnclickSupportAll">
+                                            <i class="fas fa-caret-down fa-1x instrumentmumber-search" id="icon-suggestion-support"></i>
+                                        </span>
+                                    }
+
+                                    
+                                    
+                                }
+                            </div>
+                            <div class="input-group">
+                                <ul id="supportsuggestions">
+                                    @foreach (var support in supporteamsuggestions)
+                                    {
+                                        <li @onclick="() => SelectItemSupportTeam(support)">@support.Name</li>
+                                    }
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row ml-3">
+                    <div class="form-group row col-md-6">
+                        <label class="col-sm-4 col-form-label">@AppData.LangResource[AppData.LanguageID, 32]</label>
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                <input type="text" class="form-control" @ref="startDatePicker" @bind-value="StartDate" id="setStartDatepicker" name="setStartDatepicker" placeholder="dd/mm/yyyy" />
+                                <input type="text" id="timeInput" placeholder="Ex. 1400 or 14:00" name="timeInput" value="@ConvertedStartTime" @onchange="@(e => ConvertTime("timeInput"))" class="form-control ml-2">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row col-md-6">
+                        <label class="col-md-4 col-form-label">@AppData.LangResource[AppData.LanguageID, 33]</label>
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                <input type="text" class="form-control" @ref="endDatePicker" id="setEndDatepicker" @bind-value="EndDate" name="setEndDatepicker" placeholder="dd/mm/yyyy" />
+                                <input type="text" id="timeEndInput" placeholder="Ex. 1400 or 14:00" name="timeEndInput" value="@ConvertedEndTime" @onchange="@(e => ConverTimeEnd("timeEndInput"))" class="form-control ml-2">
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="form-row ml-3">
+                    <div class="form-group row col-md-6">
+                        <label class="col-sm-4 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 30]</span>
+                        </label>
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <select class="form-control" @bind="personalDose.LocationName">
+                                    <option value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                    @foreach (var item in listInstrumentLocation)
+                                    {
+                                        if (item.IsActive == true && item.IsActive != null)
+                                        {
+                                            
+                                            <option value="@item.InstrumentLocationName">@item.InstrumentLocationName</option>
+                                            
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="form-group row col-md-6">
+                        <label class="col-md-4 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 625]</span>
+                        </label>
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <input type="number" min="0" @bind-value="personalDose.DoseAccumulation" class="form-control" step="0.0001" />
+                                <span>
+                                    <select class="form-control" @bind="personalDose.DoseAccumulationUnit">
+                                        <option value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                        @if (AppData.recordEventUnits.Any())
+                                        {
+                                            <option value="@AppData.recordEventUnits.First().RecordEventUnitID" selected>@AppData.recordEventUnits.First().RecordEventUnitName</option>
+                                            @foreach (var item in AppData.recordEventUnits.Skip(1))
+                                            {
+                                                if(item.IsActive != null && item.IsActive == true)
+                                                {
+                                                    <option value="@item.RecordEventUnitID">@item.RecordEventUnitName</option>
+                                                }
+                                                
+                                            }
+                                        }
+                                    </select>
+
+
+                                </span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="form-group row col-md-6">
+                        <label class="col-sm-4 col-form-label">@AppData.LangResource[AppData.LanguageID, 168]</label>
+                        <div class="col-sm-8">
+                            <div class="input-group input-box-bottom">
+                                <input type="text" id="input" class="form-control" @bind="inputValue" @oninput="ChangeAutoComplete" placeholder="Instrument Name" />
+                                @if (!string.IsNullOrEmpty(inputValue))
+                                {
+                                    <span class="input-icon-search" style="display:none;">
+                                        <i class="fas fa-caret-down fa-1x instrumentmumber-search" id="icon-suggestion"></i>
+                                    </span>
+                                    
+                                }
+                                else
+                                {
+                                    <span class="input-icon-search" @onclick="OnclickAll">
+                                        <i class="fas fa-caret-down fa-1x instrumentmumber-search" id="icon-suggestion"></i>
+                                    </span>
+                                }
+
+                            </div>
+                            <div class="input-group">
+                                <ul id="suggestions">
+
+                                    @foreach (var suggestion in suggestions)
+                                    {
+                                        <li @onclick="() => SelectItem(suggestion)">@suggestion</li>
+                                    }
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row mt-2 mb-4" style="justify-content:center;">
+                    <div class="text-center">
+                        @if (inputValueTeam != "" && StartDate != "" && ConvertedStartTime != "" && EndDate != "" && ConvertedEndTime != "" || inputValueSupportTeam != "" && StartDate != "" && ConvertedStartTime != "" && EndDate != "" && ConvertedEndTime != "")
+                        {
+                            <button type="submit" @onclick="SavePersonalDose" disabled="@isSaving" class="btn" style="background-color:#4CBB17; color:#fff; margin-right: 10px;">@AppData.LangResource[AppData.LanguageID, 44]</button>
+                        }
+                        else
+                        {
+                            <button type="button" disabled class="btn" style="background-color:#4CBB17; color:#fff; margin-right: 10px;">@AppData.LangResource[AppData.LanguageID, 44]</button>
+                        }
+
+                        <button type="reset" @onclick="ClearPersonalDose" class="btn" style="background-color:#B90F1B; color:#fff">@AppData.LangResource[AppData.LanguageID, 45]</button>
+                    </div>
+                </div>
+
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="row margin-row-card">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">@AppData.LangResource[AppData.LanguageID, 626]</div>
+            <div class="card-body">
+                <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height:380px;">
+                    <table id="dataTable" class="table table-bordered table-striped text-center">
+                        <thead class="fixedthead">
+                            <tr>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 627]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 628]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 30]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 168]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 629]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 625]</th>
+                            </tr>
+                        </thead>
+                        <tbody class="scrollContent">
+                            @foreach (var item in listPersonalDose)
+                            {
+                                <tr>
+
+                                    <td style="cursor:default;">
+                                        @String.Format("{0:dd/MM/yyyy HH:mm}", item.CreateRegister)
+                                    </td>
+                                    @if (item.UserID != new Guid("00000000-0000-0000-0000-000000000000"))
+                                    {
+                                        <td style="cursor:default;">
+                                            @accounts.Find(j => j.UserID == item.UserID).FirstName  @accounts.Find(j => j.UserID == item.UserID).LastName
+                                        </td>
+                                    }
+                                    else if (item.UserSupportTeamID != 0)
+                                    {
+                                        <td style="cursor:default;">
+                                            @(SupportTeam.Find(x => x.ProjectSupportTeamID == item.UserSupportTeamID) != null ? SupportTeam.Find(x => x.ProjectSupportTeamID == item.UserSupportTeamID).Name : "-")
+                                        </td>
+                                    }
+                                  @*   <td style="cursor:default;">
+                                        @(accounts.Find(x => x.UserID == item.UserID) != null ? accounts.Find(x => x.UserID == item.UserID).FirstName:"-")
+                                        @(accounts.Find(x => x.UserID == item.UserID) != null ? accounts.Find(x => x.UserID == item.UserID).LastName : "-")
+                                    </td> *@
+                                    <td style="cursor:default;">
+                                       @*  @(listInstrumentLocation.Find(x => x.InstrumentLocationID == item.LocationID) != null ? listInstrumentLocation.Find(x => x.InstrumentLocationID == item.LocationID).InstrumentLocationNameENG:"-") *@
+                                       @item.LocationName
+                                    </td>
+                                    <td style="cursor:default;">
+                                       @*  @(AppData.instrumentsList.Find(x => x.InstrumentID == item.InstrumentID) != null ? AppData.instrumentsList.Find(x => x.InstrumentID == item.InstrumentID).InstrumentENName : "-") *@
+                                       @item.InstrumentName
+                                    </td>
+                                    <td>@item.TotalHour</td>
+
+                                    <td style="cursor:default;">
+                                        @(String.Format("{0:0.0000}", item.DoseAccumulation) != null ? String.Format("{0:0.0000}", item.DoseAccumulation) : "-")
+                                       @(AppData.recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit) != null ? AppData.recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit).RecordEventUnitName:"-")
+                                    </td>
+
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+@code {
+    private string query = string.Empty;
+    private List<string> supportTeams = new();
+
+    private async Task SearchTeams(ChangeEventArgs e)
+    {
+        query = e.Value.ToString();
+       
+        supportTeams = await Http.GetFromJsonAsync<List<string>>($"{Config["nurl"]}/api/ProjectSupportTeam/SearchSupportTeam?query={query}");
+        
+        
+    }
+}

@@ -1,0 +1,516 @@
+﻿@page "/MasterData/MasterDataInstrumentAgency"
+@inject AppData AppData
+@inject IToastService ToastService
+@inject IJSRuntime jsRuntime
+@inject IMasterData _masterData
+
+
+@if (listInstrumentAgency == null)
+{
+    <div class="text-center mt-3">
+        <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+              style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+    </div>
+    <div class="text-center pt-3" style=" font-size: 16pt">
+        @AppData.LangResource[AppData.LanguageID, 325]
+    </div>
+}
+else
+{
+    <div class="row margin-row-card">
+        <div class="col-md-12">
+            <div class="float-right" style="margin-bottom:10px; margin-top:10px">
+                <button class="btn btn-warning" @onclick="@(() => ModalInstrumentAgencyCreate.Show())">
+                    @AppData.LangResource[AppData.LanguageID, 331]
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row margin-row-card">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header"><i class="fas fa-table mr-1"></i>@AppData.LangResource[AppData.LanguageID, 332]</div>
+                <div class="card-body">
+                    <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height: 700px;">
+                        <table id="dataTable" class="table table-bordered table-striped text-center" width="100%">
+                            <thead class="fixedthead">
+                                <tr>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 322]</th>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 77]</th>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 39]</th>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 78]</th>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 79]</th>
+                                    <!--th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 194]</th-->
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 145]</th>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 146]</th>
+
+                                </tr>
+                            </thead>
+                            <tbody class="scrollContent">
+                                @{int id = 1;}
+                                @foreach (var item in listInstrumentAgency)
+                                {
+                                    if (item.InstrumentAgencyName != "-" && item.IsActive != null && item.IsActive == true)
+                                    {
+                                        <tr>
+                                            <td>@id</td>
+                                            <td>@item.InstrumentAgencyName</td>
+                                            <td>@item.InstrumentAgencyAddress</td>
+                                            <td>@item.InstrumentAgencyTel</td>
+                                            <td>@item.InstrumentAgencyEmail</td>
+                                            <td>
+                                                <button type="button" class="btn btn-warning" @onclick="@(() =>InstrumentAgencyUpdate(item.InstrumentAgencyID))">
+                                                    <i class="fas fa-edit fa-sm"></i>
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-danger" @onclick="@(() => InstrumentAgencyDelete(item.InstrumentAgencyID))">
+                                                    <i class="fas fa-trash-alt fa-sm"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        id++;
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                 
+                </div>
+            </div>
+
+        </div>
+    </div>
+}
+
+<!--Loading-->
+<BSModal class="row style-justify mt-5" @ref="Load" IsCentered="true" Size="Size.Small" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+    <BSModalBody>
+        <div class="text-center mt-3">
+            <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+                  style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+        </div>
+        <div class="text-center pt-3" style=" font-size: 16pt">
+            @AppData.LangResource[AppData.LanguageID, 325]
+        </div>
+    </BSModalBody>
+</BSModal>
+
+<!--ModalInstrumentAgencyCreate-->
+<BSModal @ref="ModalInstrumentAgencyCreate">
+    <BSModalHeader OnClick="@(() => ModalInstrumentAgencyCreate.Hide())">@AppData.LangResource[AppData.LanguageID, 331]</BSModalHeader>
+    <BSModalBody>
+
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 77]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" @bind-value="addInstrumentAgency.InstrumentAgencyName" placeholder="@AppData.LangResource[AppData.LanguageID,77]" class="form-control" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 39]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <textarea @bind="addInstrumentAgency.InstrumentAgencyAddress" class="form-control" rows="3" placeholder="@AppData.LangResource[AppData.LanguageID,39]" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 78]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="tel" @bind-value="addInstrumentAgency.InstrumentAgencyTel" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,78]" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 79]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" @bind-value="addInstrumentAgency.InstrumentAgencyEmail" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,79]" />
+                </div>
+            </div>
+        </div>
+
+    </BSModalBody>
+    <BSModalFooter>
+        @if (AppData.CurrentPermission.Find(i => i.permissionID == 24).permissionC)
+        {
+            <button type="submit" @onclick="SaveCreateInstrumentAgency" class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+        else
+        {
+            <button type="button" disabled class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+        <button type="reset" class="btn btn-danger" @onclick="@(() => ModalInstrumentAgencyCreate.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalInstrumentAgencyEdit-->
+<BSModal @ref="ModalInstrumentAgencyEdit">
+    <BSModalHeader OnClick="@(() => ModalInstrumentAgencyEdit.Hide())">@AppData.LangResource[AppData.LanguageID, 334]</BSModalHeader>
+    <BSModalBody>
+
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 77]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" @bind-value="editInstrumentAgency.InstrumentAgencyName" placeholder="@AppData.LangResource[AppData.LanguageID,77]" class="form-control" />
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 39]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <textarea type="text" @bind="editInstrumentAgency.InstrumentAgencyAddress" rows="3" placeholder="@AppData.LangResource[AppData.LanguageID,39]" class="form-control" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 78]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="tel" @bind-value="editInstrumentAgency.InstrumentAgencyTel" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,78]" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 79]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" @bind-value="editInstrumentAgency.InstrumentAgencyEmail" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,79]" />
+                </div>
+            </div>
+        </div>
+
+    </BSModalBody>
+    <BSModalFooter>
+        @if (AppData.CurrentPermission.Find(i => i.permissionID == 24).permissionU)
+        {
+            <button type="submit" @onclick="SaveEditInstrumentAgency" class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+        else
+        {
+            <button type="button" disabled class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+        <button type="button" class="btn btn-danger" @onclick="@(() => ModalInstrumentAgencyEdit.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalInstrumentAgencyDelete-->
+<BSModal @ref="ModalInstrumentAgencyDelete">
+    <BSModalHeader OnClick="@(() => ModalInstrumentAgencyDelete.Hide())">@AppData.LangResource[AppData.LanguageID, 335]</BSModalHeader>
+    <BSModalBody>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert-modal-delete">
+                    @AppData.LangResource[AppData.LanguageID, 323] @AppData.LangResource[AppData.LanguageID, 77]:<br>@editInstrumentAgency.InstrumentAgencyName @AppData.LangResource[AppData.LanguageID, 324] ?
+                </div>
+            </div>
+        </div>
+
+    </BSModalBody>
+    <BSModalFooter>
+        @if (AppData.CurrentPermission.Find(i => i.permissionID == 24).permissionD)
+        {
+            <button type="submit" @onclick="SaveDeleteInstrumentAgency" class="btn btn-danger">@AppData.LangResource[AppData.LanguageID, 610]</button>
+        }
+        else
+        {
+            <button type="button" disabled class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+        <button type="button" class="btn btn-info" @onclick="@(() => ModalInstrumentAgencyDelete.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalResponseError-->
+<BSModal Class="text-center" @ref="ModalResponseError" IsCentered="true" Size="Size.Large">
+    <BSModalBody Class="overflow-hidden">
+        <div class="row">
+            <div class="col-md-12 alert-modal-logo">
+                <img src="assets/images/img-common/delete_symbol.png" width="100" height="100" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <p class="alert-modal">@RequertMessage</p>
+            </div>
+        </div>
+        <button type="button" @onclick="@(() => ModalResponseError.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+    </BSModalBody>
+</BSModal>
+
+<!--ModalRespondSuccess-->
+<BSModal Class="text-center alert-modal-body" @ref="ModalRespondSuccess" IsCentered="true" Size="Size.Large">
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12 alert-modal-logo">
+                <img src="assets/images/img-common/tick_symbol.png" width="100" height="100" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="alert-modal">@RequertMessage</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <button @onclick="@(() => ModalRespondSuccess.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+            </div>
+        </div>
+    </BSModalBody>
+</BSModal>
+
+<!--ModalCheckBox-->
+<BSModal Class="text-center alert-modal-body" @ref="ModalCheckBox" IsCentered="true" Size="Size.Large">
+    <BSModalBody>
+       
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="alert-modal">@editInstrumentAgency.InstrumentAgencyName</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <button @onclick="@(() => ModalCheckBox.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+            </div>
+        </div>
+    </BSModalBody>
+</BSModal>
+
+
+@code {
+
+    /// <summary>
+    /// listInstrumentAgency
+    /// </summary>
+    private List<InstrumentAgency> listInstrumentAgency = new List<InstrumentAgency>();
+    private InstrumentAgency addInstrumentAgency = new InstrumentAgency();
+    private InstrumentAgency editInstrumentAgency = new InstrumentAgency();
+
+    /// <summary>
+    /// BSModal
+    /// </summary>
+    BSModal Load { get; set; }
+    BSModal ModalInstrumentAgencyCreate { get; set; }
+    BSModal ModalInstrumentAgencyEdit { get; set; }
+    BSModal ModalInstrumentAgencyDelete { get; set; }
+    BSModal ModalResponseError { get; set; }
+    BSModal ModalRespondSuccess { get; set; }
+
+    BSModal ModalCheckBox { get; set; }
+
+
+    /// <summary>
+    /// Variable
+    /// </summary>
+    private string RequertMessage;
+
+    /// <summary>
+    /// OnInitializedAsync
+    /// </summary>
+    /// <returns></returns>
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            AppData.instrumentAgencies = await _masterData.GetMasterDataAsync<InstrumentAgency>("InstrumentAgency");
+            listInstrumentAgency = AppData.instrumentAgencies;
+            //await jsRuntime.InvokeAsync<object>("ResponsiveDataTables");
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+
+    }
+
+    /// <summary>
+    /// Modal show InstrumentAgencyUpdate
+    /// </summary>
+    /// <param name="id"></param>
+    private async void InstrumentAgencyUpdate(int? id)
+    {
+        try
+        {
+            var respond = await _masterData.GetMasterDataAsyncByID<InstrumentAgency>("InstrumentAgencyByID", id);
+            if (respond != null)
+            {
+                if (string.IsNullOrEmpty(respond.Content))
+                {
+                    editInstrumentAgency = respond;
+                    ModalInstrumentAgencyEdit.Show();
+                }
+                else
+                {
+                    var requertException = respond.Content;
+                    RequertMessage = requertException;
+                    ModalResponseError.Show();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+    }
+
+    /// <summary>
+    /// Modal show InstrumentAgencyDelete
+    /// </summary>
+    /// <param name="id"></param>
+    private async void InstrumentAgencyDelete(int? id)
+    {
+        try
+        {
+            var respond = await _masterData.GetMasterDataAsyncByID<InstrumentAgency>("InstrumentAgencyByID", id);
+            if (string.IsNullOrEmpty(respond.Content))
+            {
+                editInstrumentAgency = respond;
+                ModalInstrumentAgencyDelete.Show();
+            }
+            else
+            {
+                var requertException = respond.Content;
+                RequertMessage = requertException;
+                ModalResponseError.Show();
+            }
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+    }
+
+    /// <summary>
+    /// SaveCreateInstrumentAgency
+    /// </summary>
+    private async Task SaveCreateInstrumentAgency()
+    {
+        try
+        {
+            var respond = await _masterData.PostMasterDataAsync("PostInstrumentAgency", addInstrumentAgency);
+            if (!string.IsNullOrEmpty(respond.ToString()))
+            {
+                var requertException = respond.StatusMessage;
+                RequertMessage = requertException;
+                await OnInitializedAsync();
+                ModalRespondSuccess.Show();                
+            }
+            else
+            {
+                var requertException = respond.Content;
+                RequertMessage = requertException;
+                ModalResponseError.Show();
+            }
+
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+
+        ModalInstrumentAgencyCreate.Hide();
+    }
+
+    /// <summary>
+    /// SaveEditInstrumentAgency
+    /// </summary>
+    private async Task SaveEditInstrumentAgency()
+    {
+        try
+        {
+            var respond = await _masterData.PutMasterDataAsync("PutInstrumentAgency", editInstrumentAgency, editInstrumentAgency.InstrumentAgencyID);
+            if (!string.IsNullOrEmpty(respond.ToString()))
+            {
+                var requertException = respond.StatusMessage;
+                RequertMessage = requertException;
+                await OnInitializedAsync();
+                ModalRespondSuccess.Show();
+            }
+            else
+            {
+                var requertException = respond.Content;
+                RequertMessage = requertException;
+                ModalResponseError.Show();
+            }
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+        ModalInstrumentAgencyEdit.Hide();
+    }
+
+    /// <summary>
+    /// SaveDeleteInstrumentAgency
+    /// </summary>
+    private async Task SaveDeleteInstrumentAgency()
+    {
+        try
+        {
+            var respond = await _masterData.DeleteMasterDataAsync<InstrumentAgency>("DeleteInstrumentAgency", editInstrumentAgency.InstrumentAgencyID);
+            if (!string.IsNullOrEmpty(respond.ToString()))
+            {
+                var requertException = respond.StatusMessage;
+                RequertMessage = requertException;
+                await OnInitializedAsync();
+                ModalRespondSuccess.Show();
+            }
+            else
+            {
+                var requertException = respond.Content;
+                RequertMessage = requertException;
+                ModalResponseError.Show();
+            }
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        };
+        ModalInstrumentAgencyDelete.Hide();
+    }
+
+    /// <summary>
+    /// ClearCreateInstrumentAgency
+    /// </summary>
+    private void ClearCreateInstrumentAgency()
+    {
+        addInstrumentAgency = new InstrumentAgency();
+    }
+
+}

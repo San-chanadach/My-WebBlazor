@@ -1,0 +1,61 @@
+﻿@using System.Net.Http
+@using System.Net.Http.Json
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.WebAssembly.Http
+@using Microsoft.JSInterop
+@using RapidNRIMs
+@using RapidNRIMs.Shared
+@using BlazorStrap
+@using System.IO
+@using System
+@using RapidNRIMs.Model.Cores
+@using RapidNRIMs.Model.Authenications
+@using RapidNRIMs.Services
+@using Microsoft.Extensions.Configuration
+@using Blazored.Toast
+@using Blazored.Toast.Services
+@using RapidNRIMs.Pages.MasterData
+@using RapidNRIMs.Pages.ModalMasterData
+@using Append.Blazor.Printing
+@using RapidNRIMs.Barcode
+@using Blazored.LocalStorage
+@using RapidNRIMs.Model.Instruments
+@using RapidNRIMs.Model.Radiations
+@using RapidNRIMs.Model.Inventories
+@using RapidNRIMs.Model.EventRecord
+@using RapidNRIMs.Model.Securitys
+@using RapidNRIMs.Model.Reports
+@using RapidNRIMs.Pages.ChildComponent.IndexDashboardComponent
+@using RapidNRIMs.Pages.ComponentBased.IndexDashboardBased
+@using RapidNRIMs.Pages.ComponentBased.MasterDataBased
+@using RapidNRIMs.Pages.ComponentBased.RecordBased
+@using RapidNRIMs.Pages.ComponentBased.InstrumentBased
+@using RapidNRIMs.Pages.ComponentBased.ConsumableBased
+@using RapidNRIMs.Pages.ComponentBased.LogoBased
+@using RapidNRIMs.Pages.ComponentBased.PersonalDoseBase
+@using RapidNRIMs.Pages.ChildComponent.Record
+@using RapidNRIMs.Pages.ChildComponent.PersonalDose
+
+@using RapidNRIMs.Model.Logo
+@using RapidNRIMs.Model.Project
+
+
+@using BlazorFullCalendar
+@using BlazorFullCalendar.Data
+
+@using System.Threading;
+
+@using PSC.Blazor.Components.Chartjs
+@using PSC.Blazor.Components.Chartjs.Enums
+@using PSC.Blazor.Components.Chartjs.Models
+@using PSC.Blazor.Components.Chartjs.Models.Common
+@using PSC.Blazor.Components.Chartjs.Models.Bar
+@using PSC.Blazor.Components.Chartjs.Models.Bubble
+@using PSC.Blazor.Components.Chartjs.Models.Doughnut
+@using PSC.Blazor.Components.Chartjs.Models.Line
+@using PSC.Blazor.Components.Chartjs.Models.Pie
+@using PSC.Blazor.Components.Chartjs.Models.Polar
+@using PSC.Blazor.Components.Chartjs.Models.Radar
+@using PSC.Blazor.Components.Chartjs.Models.Scatter

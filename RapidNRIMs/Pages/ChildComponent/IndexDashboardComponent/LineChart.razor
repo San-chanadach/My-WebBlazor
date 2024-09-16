@@ -1,0 +1,43 @@
+﻿@inherits LineChartBase
+<div class="row  margin-top-paper-three">
+    <div class="col-lg-6 col-md-6 mt-4 mb-4">
+        <div class="card-dashbord z-index-2 ">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                <div class="card-header text-white txt-size-paper-two" style="background-color:#3CBBCE">
+                    <b>@AppData.LangResource[AppData.LanguageID, 545]</b>
+                </div>
+                <div class="chart height-line-chart">
+                    <Chart Config="_lineInstrumentCheckOutConfig" Width="100%" Height="300px" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 col-md-6 mt-4 mb-4">
+        <div class="card-dashbord z-index-2 ">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                <div class="card-header text-white txt-size-paper-two" style="background-color:#70DAD5">
+                    <b>@AppData.LangResource[AppData.LanguageID, 546]</b> 
+                </div>
+                <div class="chart height-line-chart">
+                    <Chart Config="_lineInventoryCheckOutConfig" Width="100%" Height="300px" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<BSModal class="row style-justify mt-5" @ref="Load" IsCentered="true" Size="Size.Small" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+    <BSModalBody>
+        <div class="text-center mt-3">
+            <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+                  style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+        </div>
+        <div class="text-center pt-3" style=" font-size: 16pt">
+            Loading...
+        </div>
+    </BSModalBody>
+</BSModal>
+
+@code {
+
+}

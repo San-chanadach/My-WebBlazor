@@ -1,0 +1,291 @@
+﻿@page "/Instruments/CheckList"
+@inject IJSRuntime jsRuntime
+@inject HttpClient Http
+@inject AppData AppData
+@inject IMasterData _masterData
+@inject IConfiguration config
+
+<PageTitle>Check List Page</PageTitle>
+
+<div class="row margin-row-card">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">@AppData.LangResource[AppData.LanguageID, 15] </div>
+            <div class="card-body">
+                <BSTabGroup>
+                    <BSTabList>
+                        @if (ID == null)
+                        {
+                            @foreach (var temp in AppData.instrumentChecklistTypes)
+                            {
+                                @if (temp.IsActive != null && temp.IsActive == true)
+                                {
+                                    <BSTab>
+                                        <BSTabContent>
+                                            <div class="card-body text-center">
+                                                <div class="col-12">
+                                                    <div class="row margin-row-card">
+                                                        <div class="col-md-12">
+                                                            <div class="card">
+                                                                <div class="card-header">@AppData.LangResource[AppData.LanguageID, 12] @temp.InstrumentCheckListTypeName</div>
+                                                                <div class="card-body">
+                                                                    <div class="row">
+                                                                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                                                                            <span>@AppData.LangResource[AppData.LanguageID, 61]</span>
+                                                                        </label>
+                                                                        <div class="col-12 col-md-8 col-lg-3">
+                                                                            <div class="input-group input-box-bottom">
+                                                                                <input type="text" @bind-value="instrument.InstrumentNumber" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,61]">
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                                                                            <span>@AppData.LangResource[AppData.LanguageID, 66]</span>
+                                                                        </label>
+                                                                        <div class="col-12 col-md-8 col-lg-3">
+                                                                            <div class="input-group input-box-bottom">
+                                                                                <select class="form-control" @bind="instrument.InstrumentTypeID">
+                                                                                    <option selected value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                                                                    @foreach (var item in AppData.instrumentTypes)
+                                                                                    {
+                                                                                        if (item.IsActive != null && item.IsActive == true)
+                                                                                        {
+                                                                                            <option value="@item.InstrumentTypeID">@item.InstrumentTypeName</option>
+                                                                                        }
+                                                                                    }
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="text-center" style="margin-top:0.5rem;">
+                                                                        <button type="submit" @onclick="Onsearch" class="btn" style="background-color:#2E2BFF; color:#fff" name="InstrumentSearch" id="InstrumentSearch">@AppData.LangResource[AppData.LanguageID, 48]</button>
+                                                                        <button type="reset" @onclick="Onclear" class="btn btn-warning" style="background-color:#B90F1B; color:#fff">@AppData.LangResource[AppData.LanguageID, 45]</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </BSTabContent>
+                                        <div @onclick="(() => Ontab(temp.InstrumentCheckListTypeID))">
+                                            <BSTabLabel>
+                                                <span>@temp.InstrumentCheckListTypeName</span>
+                                            </BSTabLabel>
+                                        </div>
+
+                                    </BSTab>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <div class="col-md-12">
+                                <BSAlert Color="Color.Warning" IsDismissible="true">
+                                    <div class="text-center">
+                                        Warning: When selecting data in the table, if you wish to go back to choosing tabs as before, please kindly press the clear data button first.
+                                    </div>
+                                </BSAlert>
+                            </div>
+
+                        }
+                    </BSTabList>
+                    <BSTabSelectedContent />
+                </BSTabGroup>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header"><i class="fas fa-table mr-1"></i>@AppData.LangResource[AppData.LanguageID, 15]</div>
+            <div class="card-body">
+                <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height:380px;">
+                    <table id="dataTable" class="table table-bordered table-striped text-center">
+                        <thead class="fixedthead">
+                            <tr>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 93]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 89]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 90]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 91]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 92]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 71]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 70]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 30]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 415]</th>
+                            </tr>
+                        </thead>
+                        <tbody class="scrollContent">
+
+                            @foreach (var item in FilteredInstrumentSearch)
+                            {
+                                <tr @onclick="() => TrClickedAtIndex(item.InstrumentID)">
+                                    <td data-label="@AppData.LangResource[AppData.LanguageID,93]">
+                                        <span class="@item.Status.ColorTag">
+                                            @item.Status.InstrumentStatusENName
+                                        </span>
+                                    </td>
+                                    <td data-label="@AppData.LangResource[AppData.LanguageID,89]">@item.InstrumentNumber</td>
+                                    <td data-label="@AppData.LangResource[AppData.LanguageID,90]">@item.InstrumentENName</td>
+                                    <td data-label="@AppData.LangResource[AppData.LanguageID,91]">@item.InstrumentAssetNumber</td>
+                                    <td data-label="@AppData.LangResource[AppData.LanguageID,92]">@item.InstrumentSerialNumber</td>
+                                    <td data-label="@AppData.LangResource[AppData.LanguageID,71]">@(item.Brand.InstrumentBrandName != null ? item.Brand.InstrumentBrandName:"-")</td>
+                                    <td data-label="@AppData.LangResource[AppData.LanguageID,70]">@(item.Model.InstrumentModelName != null ? item.Model.InstrumentModelName:"-")</td>
+                                    <td data-label="Location">@(item.Location != null? item.Location.InstrumentLocationName:"-")</td>
+
+                                    <td data-label="@AppData.LangResource[AppData.LanguageID,56]">@item.InstrumentRegisterDate.Value.ToString("yyyy")</td>
+                                </tr>
+                            }
+
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        @if (AppData.CurrentPermission.Find(i => i.permissionID == 4).permissionE || AppData.CurrentPermission.Find(i => i.permissionID == 4).permissionU)
+        {
+            <div class="text-center" style="margin-top:-1rem; margin-bottom: 2rem;">
+                @if (FilteredInstrumentSearch.Count == 0 || ID == null)
+                {
+                    <button style="cursor: pointer;" class="btn btn-warning" disabled>@AppData.LangResource[AppData.LanguageID, 455]</button>
+                }
+                else
+                {
+                    <a href="@($"Instruments/CheckListHistory/{typeID}/{FilteredInstrumentSearch.Find(i=>i.InstrumentID==ID).InstrumentNumber}/{FilteredInstrumentSearch.Find(i=>i.InstrumentID==ID).InstrumentModelID}/")" class="btn btn-warning" name="ShowInstrument" id="ShowInstrument">@AppData.LangResource[AppData.LanguageID, 455]</a>
+                }
+            </div>
+        }
+    </div>
+</div>
+<BSModal class="row style-justify mt-5" @ref="Load" IsCentered="true" Size="Size.Small" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+    <BSModalBody>
+        <div class="text-center mt-3">
+            <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+                  style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+        </div>
+        <div class="text-center pt-3" style=" font-size: 16pt">
+            @AppData.LangResource[AppData.LanguageID, 325]
+        </div>
+    </BSModalBody>
+</BSModal>
+
+
+
+@code {
+
+    /// <summary>
+    /// Varliable
+    /// </summary>
+    private List<Instrument> instrumentChecklists = new List<Instrument>();
+    private List<InstrumentChecklistType> instrumentChecklistTypes = new List<InstrumentChecklistType>();
+    public int? typeID = 1;
+    //private List<InstrumentModel> instrumentModels = new List<InstrumentModel>();
+    InstrumentSearchParameter instrument = new InstrumentSearchParameter();
+
+    List<Instrument> FilteredInstrumentSearch => instrumentChecklists.Where(
+        i => i.InstrumentCheckType.Count > 0 && (i.InstrumentCheckType.Find(j => j.InstrumentCheckListTypeID == typeID).IsCheck == true)).ToList();
+    List<InstrumentMapCheckListType> InstrumentCheckType = new List<InstrumentMapCheckListType>();
+
+    BSModal Load { get; set; }
+    /// <summary>
+    /// pass Parameter InstrumentModelID
+    /// </summary>
+    [Parameter]
+    public string modelID { get; set; }
+
+    /// <summary>
+    /// OnInitializedAsync
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        ///instrumentChecklists = await Http.GetFromJsonAsync<List<Instrument>>("api/GetInstrument");
+        // instrumentChecklists = await Http.GetFromJsonAsync<List<InstrumentChecklist>>($"api/GetInstrumentChecklist/id?id={int.Parse(modelID)}");
+
+        /*foreach (var i in instrumentChecklists)
+            {
+            i.GetLookup(instrumentModels);
+        }*/
+        //var activeInstrumentCheckListType =  AppData.instrumentChecklistTypes.Find(i => i.IsActive == true).IsActive;
+        //if (activeInstrumentCheckListType == true)
+        //    AppData.instrumentChecklistTypes = await _masterData.GetAllActiveMasterDataAsync<InstrumentChecklistType>("ActiveInstrumentCheckListType");
+
+        //var activeInstrumentType = AppData.instrumentTypes.Find(i => i.IsActive == true).IsActive;
+        //if(activeInstrumentType == true)
+        //    AppData.instrumentTypes = await _masterData.GetAllActiveMasterDataAsync<InstrumentType>("ActiveInstrumentType");
+
+        if (AppData.LanguageID == 0)
+        {
+            var resultInstrumentType = AppData.instrumentTypes.OrderBy(t => t.InstrumentTypeName).ToList();
+            AppData.instrumentTypes = resultInstrumentType;
+        }
+
+    }
+    public int? ID { get; set; }
+    public void TrClickedAtIndex(int? id)
+    {
+        ID = id;
+        //instrumentById = await Http.GetFromJsonAsync<List<Instrument>>($"api/GetInstrument/{ID}");
+
+    }
+
+    public async Task Onsearch()
+    {
+        Load.Show();
+        await Task.Run(Loading);
+        InstrumentCheckType = await Http.GetFromJsonAsync<List<InstrumentMapCheckListType>>($"{config["nurl"]}/api/InstrumentMapCheckListType");
+
+        var Respond = await Http.PostAsJsonAsync<InstrumentSearchParameter>($"{config["nurl"]}/api/GetInstrumentByParameter", instrument);
+
+        if (Respond.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            instrumentChecklists = await Respond.Content.ReadFromJsonAsync<List<Instrument>>();
+            foreach (var i in instrumentChecklists)
+            {
+                i.GetLookup(AppData.instrumentBrands, AppData.instrumentModels, AppData.instrumentAgencies, AppData.instrumentStatus, AppData.instrumentLocations, InstrumentCheckType);
+            }
+        }
+        StateHasChanged();
+        Load.Hide();
+    }
+
+    void Ontab(int? type)
+    {
+        typeID = type;
+
+        // Load.Show();
+        // instrumentChecklists = await Http.GetFromJsonAsync<List<Instrument>>("api/GetInstrument");
+        StateHasChanged();
+        // Load.Hide();
+
+        ///StateHasChanged();
+    }
+
+    public void Onclear()
+    {
+        instrument = new InstrumentSearchParameter();
+        instrumentChecklists = new List<Instrument>();
+        ID = null;
+    }
+
+    private void Loading()
+    {
+        System.Threading.Thread.Sleep(300);
+        // Retrieve data from the server and initialize
+        // Employees property which the View will bind
+    }
+
+    /// <summary>
+    /// clearURL
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeAsync<object>("ResponsiveDataTables");
+            await jsRuntime.InvokeVoidAsync("clearURL");
+        }
+    }
+}

@@ -1,0 +1,990 @@
+﻿@page "/Instruments/Maintenance/{instrumentnumber}"
+@inject IJSRuntime jsRuntime
+@inject AppData AppData
+@inject IInstrumentService InstrumentService
+@inject IInstrumentBrandService InstrumentBrandService
+@inject IInstrumentModelService InstrumentModelService
+@inject IInstrumentAgencyService InstrumentAgencyService
+@inject IInstrumentMaintenanceService InstrumentMaintenanceService
+@inject IToastService ToastService
+@inject NavigationManager NavigationManager
+@inject IMasterDataInstrument _masterDataInstrument
+@inject HttpClient Http
+@using System.Threading
+@using RapidNRIMs.Model.Instruments
+@inject IConfiguration config
+
+<PageTitle>Maintenance Page</PageTitle>
+
+<div class="row margin-row-card">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">@AppData.LangResource[AppData.LanguageID, 14]</div>
+            <div class="card-body">
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">@AppData.LangResource[AppData.LanguageID, 61]</label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group">
+
+                            <input type="text" @bind-value="instrumentnumber" class="form-control" name="instrumentNumber" id="instrumentNumber" placeholder="@AppData.LangResource[AppData.LanguageID,61]">
+                            <span class="input-icon-search" id='btn_signin' @onclick="OnSearch"><i class="fa fa-search instrumentmumber-search"></i></span>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">@AppData.LangResource[AppData.LanguageID, 173]</div>
+            <div class="scrollBar-x card-body scroll-inner">
+                <table id="dataTable" class="table table-bordered table-striped text-center">
+                    <thead>
+                        <tr>
+                            <th class="cell-content">@AppData.LangResource[AppData.LanguageID, 89]</th>
+                            <th class="cell-content">@AppData.LangResource[AppData.LanguageID, 90]</th>
+                            <th class="cell-content">@AppData.LangResource[AppData.LanguageID, 91]</th>
+                            <th class="cell-content">@AppData.LangResource[AppData.LanguageID, 92]</th>
+                            <th class="cell-content">@AppData.LangResource[AppData.LanguageID, 71]</th>
+                            <th class="cell-content">@AppData.LangResource[AppData.LanguageID, 70]</th>
+                            <th class="cell-content">@AppData.LangResource[AppData.LanguageID, 76]</th>
+                            <th class="cell-content">@AppData.LangResource[AppData.LanguageID, 85]</th>
+                            <th class="cell-content">@AppData.LangResource[AppData.LanguageID, 275]</th>
+                            <th class="cell-content">@AppData.LangResource[AppData.LanguageID, 416]</th>
+                            <th class="cell-content">@AppData.LangResource[AppData.LanguageID, 417]</th>
+                            <th class="cell-content">@AppData.LangResource[AppData.LanguageID, 418]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in instrumentMaintenances)
+                        {
+                            <tr @onclick="() => ShowInstrumentMaintenance(item.InstrumentMaintenanceID)" class="@((ID == item.InstrumentMaintenanceID) ? "selected none-bg" : "")">
+                                <td>@(item.instrument != null ? item.instrument.InstrumentNumber:"-")</td>
+                                <td>@(item.instrument != null ? item.instrument.InstrumentENName:"-")</td>
+                                <td>@(item.instrument != null ? item.instrument.InstrumentAssetNumber:"-")</td>
+                                <td>@(item.instrument != null ? item.instrument.InstrumentSerialNumber:"-")</td>
+                                <td>@(item.instrument != null ? item.instrument.Brand.InstrumentBrandName:"-")</td>
+                                <td>@(item.instrument != null ? item.instrument.Model.InstrumentModelName:"-")</td>
+                                <td>@(item.instrument != null ? item.instrument.Agency.InstrumentAgencyName:"-")</td>
+                                <td>@item.InstrumentMaintenanceDate.Value.Date.ToString("dd/MM/yyyy")</td>
+                                <td>@item.InstrumentMaintenanceNext.Value.Date.ToString("dd/MM/yyyy")</td>
+                                <td>@item.MaintenanceDetail</td>
+                                <td>
+                                    @if (item.InstrumentMaintenanceFile != "")
+                                    {
+                                        <a href="@($"{config["nurl"]}{config["nurlFileInstrument"]}{item.InstrumentMaintenanceFile}")" class="btn btn-warning margin-btn" target="_blank">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" disabled class="btn btn-warning margin-btn">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                    }
+
+                                </td>
+                                <td>
+                                    <div class="input-group input-box-bottom">
+                                        <input type="text" @bind-value="@item.Note" class="form-control" width="100%" />
+                                        <button @onclick="@(() =>OnUpdateNote(item))" class="btn btn-primary">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="text-center">
+            @if (instrumentId != 0)
+            {
+                <a href="@($"Instruments/ShowInstrument/{instrumentId}")" class="btn btn-warning margin-btn" name="ShowInstrument" id="ShowInstrument">@AppData.LangResource[AppData.LanguageID, 94]</a>
+            }
+
+            @if (ID == null)
+            {
+                <button disabled class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID, 478]</button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-warning margin-btn" @onclick="@(() => ModalEditMaintenance.Show())">@AppData.LangResource[AppData.LanguageID, 478]</button>
+            }
+
+            @if (AppData.CurrentPermission.Find(i => i.permissionID == 6).permissionE)
+            {
+                <button type="button" class="btn  margin-btn" style="background-color:#3CBBCE;" @onclick="ShowModalAddMaintenance" name="Maintenance" id="Maintenance">@AppData.LangResource[AppData.LanguageID, 14]</button>
+            }
+            <button type="reset" @onclick="OnClear" class="btn margin-btn" style="background-color:#B90F1B; color:#fff">@AppData.LangResource[AppData.LanguageID, 45]</button>
+        </div>
+    </div>
+</div>
+
+<!--PostInstrumentMaintenance-->
+<EditForm Model="@instrumentMaintenance" OnValidSubmit="PostInstrumentMaintenance">
+    @foreach (var item in FilteredToDos)
+    {
+        <BSModal @ref="InstrumentMaintenance">
+            <BSModalHeader @onclick="ClearModePost" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID, 14]</BSModalHeader>
+            <BSModalBody>
+                
+                <div class="row">
+                    <div class="col-md-12 form-group">
+                        <span class="span-img-calibration">
+                            <!--img class="img-qrcode" src="assets/images/img-qrcode/qr-code.png"-->
+                        </span>
+                    </div>
+                </div>
+
+                <div class="row g-3 align-items-center">
+                    <div class="col-sm-5">
+                         <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 61]</span></label>
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="text" @bind-value="item.InstrumentNumber" disabled placeholder="@item.InstrumentNumber" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row g-3 align-items-center mt-2">
+                    <div class="col-sm-5">
+                        <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 168]</span></label>
+                    </div>
+                    <div class="col-sm-6">
+                        @if (AppData.LanguageID == 0)
+                        {
+                            <input type="text" disabled placeholder="@item.InstrumentENName" class="form-control" />
+                        }
+                        else
+                        {
+                            <input type="text" disabled placeholder="@item.InstrumentTHName" class="form-control" />
+                        }
+                    </div>
+                </div>
+
+                <div class="row g-3 align-items-center mt-2">
+                    <div class="col-sm-5">
+                        <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 174]</span></label>
+                    </div>
+                    <div class="col-sm-6">
+                        @if (item.InstrumentStatusID == 2 || item.InstrumentStatusID == 5 || item.InstrumentStatusID == 6)
+                        {
+                            <span class="span-checkbox-calibration">
+                                <input class="form-check-input" disabled type="radio" bind="@instrumentMaintenance.InstrumentMaintenanceStatus" name="inlineRadioOptions" id="inlineRadioOptions" @onclick="CheckPassFail">
+                                <label class="form-check-label">
+                                    @AppData.LangResource[AppData.LanguageID, 170]
+                                </label>
+                            </span>
+                            <span class="span-checkbox-calibration">
+                                <input class="form-check-input" disabled type="radio" @onchange="ChangFail" bind="@instrumentMaintenance.InstrumentMaintenanceStatus" name="inlineRadioOptions" id="inlineRadioOptions" @onclick="CheckPassFail">
+                                <label class="form-check-label">
+                                    @AppData.LangResource[AppData.LanguageID, 171]
+                                </label>
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="span-checkbox-calibration">
+                                <input class="form-check-input" type="radio" bind="@instrumentMaintenance.InstrumentMaintenanceStatus" name="inlineRadioOptions" id="inlineRadioOptions" @onclick="CheckPassFail">
+                                <label class="form-check-label">
+                                    @AppData.LangResource[AppData.LanguageID, 170]
+                                </label>
+                            </span>
+                            <span class="span-checkbox-calibration">
+                                <input class="form-check-input" type="radio" @onchange="ChangFail" bind="@instrumentMaintenance.InstrumentMaintenanceStatus" name="inlineRadioOptions" id="inlineRadioOptions" @onclick="CheckPassFail">
+                                <label class="form-check-label">
+                                    @AppData.LangResource[AppData.LanguageID, 171]
+                                </label>
+                            </span>
+                        }
+                    </div>
+                </div>
+
+                <div class="row g-3 align-items-center mt-2">
+                    <div class="col-sm-5">
+                        <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 85]</span></label>
+                    </div>
+                    <div class="col-sm-6">
+                        <InputDate @bind-Value="instrumentMaintenance.InstrumentMaintenanceDate" placeholder=" @AppData.LangResource[AppData.LanguageID,85]" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row g-3 align-items-center mt-2">
+                    <div class="col-sm-5">
+                        <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 175]</span></label>
+                    </div>
+                    <div class="col-sm-6">
+                        <InputDate @bind-Value="instrumentMaintenance.InstrumentMaintenanceNext" placeholder="@AppData.LangResource[AppData.LanguageID,175]" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row g-3 align-items-center mt-2">
+                    <div class="col-sm-5">
+                        <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 280]</span></label>
+                    </div>
+                    <div class="col-sm-6" style="margin-left:15px;">
+                        <InputFile OnChange="@OnInputFileDocumentChange" class="custom-file-input file-name-custom" id="documentFile" />
+                        @if (AppData.LanguageID == 0)
+                        {
+                            <label class="custom-file-label mr-4" id="documentFileLabel" for="documentFile" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                        }
+                        else
+                        {
+                            <label class="custom-file-label mr-4" id="documentFileLabel" for="documentFile" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                        }
+                    </div>
+                </div>
+
+                <div class="row g-3 align-items-center mt-2">
+                    <div class="col-sm-5">
+                        <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 481]</span></label>
+                    </div>
+                    <div class="col-sm-6">
+                        <InputTextArea @bind-Value="instrumentMaintenance.MaintenanceDetail" rows="2" placeholder="@AppData.LangResource[AppData.LanguageID, 481]" class="form-control"></InputTextArea>
+                    </div>
+                </div>
+                
+               
+               
+
+            </BSModalBody>
+            <BSModalFooter>
+                @if (item.InstrumentStatusID == 2 || item.InstrumentStatusID == 5 || item.InstrumentStatusID == 6 || instrumentMaintenance.InstrumentMaintenanceDate == null || instrumentMaintenance.InstrumentMaintenanceNext == null)
+                {
+                    <button type="button" disabled class="btn" style="background-color:#4CBB17; color:#fff">@AppData.LangResource[AppData.LanguageID, 44]</button>
+                }
+                else
+                {
+                    <button type="button" class="btn" style="background-color:#4CBB17; color:#fff" @onclick="PostInstrumentMaintenance">@AppData.LangResource[AppData.LanguageID, 44]</button>
+                }
+
+
+                <button type="reset" class="btn" style="background-color:#B90F1B; color:#fff" @onclick="ClearModePost">@AppData.LangResource[AppData.LanguageID, 158]</button>
+            </BSModalFooter>
+
+        </BSModal>
+    }
+</EditForm>
+
+<!--EditInstrumetnMaintenance-->
+<EditForm Model="@editMaintenance" OnValidSubmit="SaveEditInstrumentMaintenance">
+    <BSModal @ref="ModalEditMaintenance">
+        <BSModalHeader @onclick="ModalOnClear" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID, 478]</BSModalHeader>
+        <BSModalBody>
+            @foreach (var item in FilteredToDos)
+            {
+                <div class="row">
+                    <div class="col-md-12 form-group">
+                        <span class="span-img-calibration">
+                            <!--img class="img-qrcode" src="assets/images/img-qrcode/qr-code.png"-->
+                        </span>
+                    </div>
+                </div>
+                <div class="row g-3 align-items-center">
+                    <div class="col-sm-5">
+                        <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 61]</span></label>
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="text" @bind-value="item.InstrumentNumber" disabled placeholder="@item.InstrumentNumber" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row g-3 align-items-center mt-2">
+                    <div class="col-sm-5">
+                        <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 168]</span></label>
+                    </div>
+                    <div class="col-sm-6">
+                        @if (AppData.LanguageID == 0)
+                        {
+                            <input type="text" disabled placeholder="@item.InstrumentENName" class="form-control" />
+                        }
+                        else
+                        {
+                            <input type="text" disabled placeholder="@item.InstrumentTHName" class="form-control" />
+                        }
+                    </div>
+                </div>
+
+                <div class="row g-3 align-items-center mt-2">
+                    <div class="col-sm-5">
+                        <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 174]</span></label>
+                    </div>
+                    <div class="col-sm-6">
+                        <span class="span-checkbox-calibration">
+                            @if (editMaintenance.InstrumentMaintenanceStatus == true)
+                            {
+                                <input class="form-check-input" disabled type="radio" checked bind="@editMaintenance.InstrumentMaintenanceStatus" name="inlineRadioOptions" id="inlineRadioOptions" @onclick="CheckPassFail">
+                            }
+                            else
+                            {
+                                <input class="form-check-input" disabled type="radio" bind="@editMaintenance.InstrumentMaintenanceStatus" name="inlineRadioOptions" id="inlineRadioOptions" @onclick="CheckPassFail">
+                            }
+                            <label class="form-check-label">
+                                @AppData.LangResource[AppData.LanguageID, 170]
+                            </label>
+                        </span>
+                        <span class="span-checkbox-calibration">
+                            @if (editMaintenance.InstrumentMaintenanceStatus == false)
+                            {
+                                <input class="form-check-input" disabled type="radio" @onchange="ChangFail" checked bind="@editMaintenance.InstrumentMaintenanceStatus" name="inlineRadioOptions" id="inlineRadioOptions" @onclick="CheckPassFail">
+                            }
+                            else
+                            {
+                                <input class="form-check-input" disabled type="radio" @onchange="ChangFail" bind="@editMaintenance.InstrumentMaintenanceStatus" name="inlineRadioOptions" id="inlineRadioOptions" @onclick="CheckPassFail">
+                            }
+                            <label class="form-check-label">
+                                @AppData.LangResource[AppData.LanguageID, 171]
+                            </label>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="row g-3 align-items-center mt-2">
+                    <div class="col-sm-5">
+                        <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 85]</span></label>
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="date" disabled @bind-value="editMaintenance.InstrumentMaintenanceDate" placeholder=" @AppData.LangResource[AppData.LanguageID,85]" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row g-3 align-items-center mt-2">
+                    <div class="col-sm-5">
+                        <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 175]</span></label>
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="date" disabled @bind-value="editMaintenance.InstrumentMaintenanceNext" placeholder="@AppData.LangResource[AppData.LanguageID,175]" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row g-3 align-items-center mt-2">
+                    <div class="col-sm-5">
+                        <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 280]</span></label>
+                    </div>
+                    <div class="col-sm-6" style="margin-left:15px;">
+                        <InputFile OnChange="@OnInputFileDocumentChange" class="custom-file-input file-name-custom" id="documentFile" />
+                        @if (AppData.LanguageID == 0)
+                        {
+                            <label class="custom-file-label mr-4" for="documentFile" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                        }
+                        else
+                        {
+                            <label class="custom-file-label mr-4" for="documentFile" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                        }
+                    </div>
+                </div>
+
+                <div class="row g-3 align-items-center mt-2">
+                    <div class="col-sm-5">
+                        <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 481]</span></label>
+                    </div>
+                    <div class="col-sm-6">
+                        <textarea @bind="editMaintenance.MaintenanceDetail" rows="2" placeholder="@AppData.LangResource[AppData.LanguageID, 481]" class="form-control"></textarea>
+                    </div>
+                </div>
+            }
+        </BSModalBody>
+        <BSModalFooter>
+            <button type="submit" class="btn" style="background-color:#4CBB17; color:#fff">@AppData.LangResource[AppData.LanguageID, 44]</button>
+            <button type="reset" class="btn" style="background-color:#B90F1B; color:#fff" @onclick="ModalOnClear">@AppData.LangResource[AppData.LanguageID, 158]</button>
+        </BSModalFooter>
+    </BSModal>
+</EditForm>
+
+<!--ModalResponseError-->
+<BSModal Class="text-center" @ref="ModalResponseError" IsCentered="true" Size="Size.Large">
+    <BSModalBody>
+
+        <div class="row">
+            <div class="col-md-12 alert-modal-logo">
+                <img src="assets/images/img-common/delete_symbol.png" width="100" height="100" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <p class="alert-modal">Update Error</p>
+            </div>
+        </div>
+        <button type="button" @onclick="@(() => ModalResponseError.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+    </BSModalBody>
+</BSModal>
+
+<!--ModalRespondSuccess-->
+<BSModal Class="text-center alert-modal-body" @ref="ModalRespondSuccess" IsCentered="true" Size="Size.Large">
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12 alert-modal-logo">
+                <img src="assets/images/img-common/tick_symbol.png" width="100" height="100" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="alert-modal">Upadate Successfully</h4>
+            </div>
+        </div>
+        <button type="button" @onclick="@(() => ModalRespondSuccess.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+    </BSModalBody>
+</BSModal>
+
+<!--EditForm Modal Loading--->
+<BSModal class="row style-justify mt-5" @ref="Load" IsCentered="true" Size="Size.Small" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+    <BSModalBody>
+        <div class="text-center mt-3">
+            <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+                  style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+        </div>
+        <div class="text-center pt-3" style=" font-size: 16pt">
+            @AppData.LangResource[AppData.LanguageID, 325]
+        </div>
+    </BSModalBody>
+</BSModal>
+
+
+@code {
+    List<Instrument> instruments = new List<Instrument>();
+    private List<InstrumentBrand> instrumentBrands = new List<InstrumentBrand>();
+    private List<InstrumentModel> instrumentModels = new List<InstrumentModel>();
+    private List<InstrumentAgency> instrumentAgencys = new List<InstrumentAgency>();
+    private List<InstrumentStatus> instrumentStatus = new List<InstrumentStatus>();
+    private List<InstrumentMaintenance> instrumentMaintenances = new List<InstrumentMaintenance>();
+
+    private InstrumentMaintenance instrumentMaintenance = new InstrumentMaintenance();
+
+
+    private InstrumentMaintenance editMaintenance = new InstrumentMaintenance();
+    private InstrumentMaintenance editMaintenanceDownloadFile = new InstrumentMaintenance();
+
+    List<Instrument> FilteredToDos => instruments.Where(i => i.InstrumentNumber.ToLower().Contains(instrumentnumber.ToLower())).ToList();
+
+    [Parameter]
+    public string instrumentnumber { get; set; }
+
+    [Parameter]
+    public int? instrumentId { get; set; }
+    public int? ID { get; set; }
+
+    public bool pass { get; set; } = true;
+    public bool fail { get; set; } = false;
+
+    BSModal InstrumentMaintenance { get; set; }
+    BSModal ModalEditMaintenance { get; set; }
+    BSModal ModalResponseError { get; set; }
+    BSModal ModalRespondSuccess { get; set; }
+
+
+    private void ShowModalAddMaintenance()
+    {
+
+        ID = null;
+
+        //instrumentMaintenance.InstrumentMaintenanceDate = DateTime.Today;
+        //instrumentMaintenance.InstrumentMaintenanceNext = DateTime.Today;
+
+
+
+        InstrumentMaintenance.Show();
+
+
+        // เพิ่ม class "none-bg" ให้กับ tr.selected
+        jsRuntime.InvokeVoidAsync("addNoneBgClassToSelectedRows");
+
+
+    }
+
+    private async Task PostInstrumentMaintenance()
+    {
+        await Task.Run(Loading);
+        Load.Show();
+        try
+        {
+            if (instrumentMaintenance.InstrumentMaintenanceNext.HasValue != null && instrumentMaintenance.InstrumentMaintenanceDate.HasValue != null && instrumentMaintenance.InstrumentMaintenanceNext.Value.Date >= instrumentMaintenance.InstrumentMaintenanceDate.Value.Date)
+            {
+                instrumentMaintenance.InstrumentID = instrumentId;
+                await Http.PostAsJsonAsync($"{config["nurl"]}/api/RegisterInstrumentMaintenance", instrumentMaintenance);
+                ToastService.ShowSuccess(" Maintenance Save Successfully");
+                await FileDocument();
+
+
+                AppData.SetNoti(await Http.GetFromJsonAsync<List<InstrumentCalibration>>($"{config["nurl"]}/api/GetDueInstrumentCalibration"),
+                         await Http.GetFromJsonAsync<List<InstrumentMaintenance>>($"{config["nurl"]}/api/GetDueInstrumentMaintenance")
+                         , AppData.instrumentsList);
+                foreach (var i in AppData.instrumentBrands)
+                {
+                    i.Getlookup(AppData.instrumentModels);
+                }
+                foreach (var i in AppData.instrumentsList)
+                {
+                    i.GetLookup(AppData.instrumentBrands, AppData.instrumentModels, AppData.instrumentAgencies, AppData.instrumentStatus);
+                }
+
+                instrumentMaintenance = new InstrumentMaintenance()
+                    {
+                        InstrumentMaintenanceDate = DateTime.Today,
+                        InstrumentMaintenanceNext = DateTime.Today
+                    };
+                await OnInitializedAsync();
+            }
+            else
+            {
+                ToastService.ShowError("Maintenance date Next must be after Maintenance date");
+            }
+
+
+        }
+        catch (Exception e)
+        {
+
+        }
+        InstrumentMaintenance.Hide();
+        Load.Hide();
+
+    }
+
+    public void CheckPassFail()
+    {
+        if (pass == true)
+        {
+
+            instrumentMaintenance.InstrumentMaintenanceStatus = pass;
+
+
+        }
+    }
+
+    private void ChangFail()
+    {
+
+        instrumentMaintenance.InstrumentMaintenanceStatus = fail;
+
+
+    }
+
+    string innum;
+    string fileDoc;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Run(Loading);
+        Load.Show();
+        instrumentBrands = AppData.instrumentBrands;
+        instrumentModels = AppData.instrumentModels;
+        instrumentAgencys = AppData.instrumentAgencies;
+        instrumentStatus = AppData.instrumentStatus;
+        // instrumentMaintenances = await InstrumentMaintenanceService.GetInstrumentMaintenances();
+        instruments = await Http.GetFromJsonAsync<List<Instrument>>($"{config["nurl"]}/api/GetInstrumentByInstrumentNumber/{instrumentnumber}");
+
+        if (instruments.Count >= 1)
+        {
+            instrumentId = instruments.First().InstrumentID;
+            innum = instruments.First().InstrumentNumber;
+            Console.WriteLine(instrumentId);
+
+            instrumentMaintenances = await Http.GetFromJsonAsync<List<InstrumentMaintenance>>($"{config["nurl"]}/api/GetInstrumentMaintenance/{instrumentId}");
+
+            foreach (var j in instruments)
+            {
+                j.GetLookup(instrumentBrands, instrumentModels, instrumentAgencys, instrumentStatus);
+            }
+
+            foreach (var m in instrumentMaintenances)
+            {
+                m.GetLookup(FilteredToDos);
+            }
+
+
+
+        }
+
+        Load.Hide();
+
+    }
+
+
+
+    /*******************************************UploadFile*************************************************************************/
+    private IBrowserFile? fileDocument;
+    private string pathAddDocumentFolder { get; set; } = "AddDocument";
+    private string pathEditDocumentFolder { get; set; } = "EditDocument";
+    /// <summary>
+    /// Document File
+    /// </summary>
+    protected async Task OnInputFileDocumentChange(InputFileChangeEventArgs e)
+    {
+        fileDocument = e.File;
+        //var formatDocumentFile = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        var fileType = fileDocument.ContentType;
+        var sizefile = fileDocument.Size;
+
+        if (sizefile > 2154227)
+        {
+            if (ID == null)
+            {
+                ToastService.ShowError("The file size cannot exceed 30MB.");
+                instrumentMaintenance.InstrumentMaintenanceFile = "";
+            }
+            else
+            {
+                ToastService.ShowError("The file size cannot exceed 30MB.");
+                editMaintenance.InstrumentMaintenanceFile = "";
+            }
+
+        }
+        else if (fileType != "application/pdf")
+        {
+            if (ID == null)
+            {
+                ToastService.ShowError("File Type Document Incorrect !");
+                instrumentMaintenance.InstrumentMaintenanceFile = "";
+            }
+            else
+            {
+                ToastService.ShowError("File Type Document Incorrect !");
+                editMaintenance.InstrumentMaintenanceFile = "";
+            }
+
+        }
+        else
+        {
+            if (ID == null)
+            {
+                Load.Show();
+                await Task.Run(Loading);
+                string newFileName = await GenerateUniqueFileName(fileDocument.Name, pathAddDocumentFolder);
+                instrumentMaintenance.InstrumentMaintenanceFile = newFileName;
+                Load.Hide();
+            }
+            else
+            {
+                Load.Show();
+                await Task.Run(Loading);
+                string newFileName = await GenerateUniqueFileName(fileDocument.Name, pathEditDocumentFolder);
+                editMaintenance.InstrumentMaintenanceFile = newFileName;
+                Load.Hide();
+            }
+
+        }
+
+    }
+
+    /// <summary>
+    /// Document File
+    /// </summary>
+    private async Task FileDocument()
+    {
+        if (fileDocument != null)
+        {
+            try
+            {
+                var fileType = fileDocument.ContentType;
+                var sizefile = fileDocument.Size;
+                if (sizefile <= 2154227 && fileType == "application/pdf")
+                {
+                    if (ID == null)
+                    {
+                        string newFileName = await GenerateUniqueFileName(fileDocument.Name, pathAddDocumentFolder);
+                        string path = Path.Combine(config.GetValue<string>("FileStorage")!, "Instrument", "Maintenance", pathAddDocumentFolder, newFileName);
+
+                        Directory.CreateDirectory(Path.Combine(config.GetValue<string>("FileStorage")!, "Instrument", "Maintenance", pathAddDocumentFolder));
+
+                        await using FileStream fs = new(path, FileMode.Create);
+                        await fileDocument.OpenReadStream(sizefile).CopyToAsync(fs);
+                    }
+                    else
+                    {
+                        string newFileName = await GenerateUniqueFileName(fileDocument.Name, pathEditDocumentFolder);
+                        string path = Path.Combine(config.GetValue<string>("FileStorage")!, "Instrument", "Maintenance", pathEditDocumentFolder, newFileName);
+
+                        Directory.CreateDirectory(Path.Combine(config.GetValue<string>("FileStorage")!, "Instrument", "Maintenance", pathEditDocumentFolder));
+
+                        await using FileStream fs = new(path, FileMode.Create);
+                        await fileDocument.OpenReadStream(sizefile).CopyToAsync(fs);
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowError($"File: {fileDocument.Name} Error: {ex.Message}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// GenerateUniqueFileDocument
+    /// </summary>
+    private async Task<string> GenerateUniqueFileName(string originalFileName, string folderName)
+    {
+        string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(originalFileName);
+        string fileExtension = Path.GetExtension(originalFileName);
+        string newFileName = fileNameWithoutExtension + fileExtension;
+
+        if (ID == null && folderName == "AddDocument")
+        {
+            int counter = 1;
+            string path = Path.Combine(config.GetValue<string>("FileStorage")!, "Instrument", "Maintenance", folderName, newFileName);
+
+            while (File.Exists(path))
+            {
+                newFileName = $"{fileNameWithoutExtension}({counter}){fileExtension}";
+                path = Path.Combine(config.GetValue<string>("FileStorage")!, "Instrument", "Maintenance", folderName, newFileName);
+                counter++;
+            }
+        }
+        else
+        {
+            int counter = 1;
+            string path = Path.Combine(config.GetValue<string>("FileStorage")!, "Instrument", "Maintenance", folderName, newFileName);
+
+            while (File.Exists(path))
+            {
+                newFileName = $"{fileNameWithoutExtension}({counter}){fileExtension}";
+                path = Path.Combine(config.GetValue<string>("FileStorage")!, "Instrument", "Maintenance", folderName, newFileName);
+                counter++;
+            }
+        }
+
+
+
+
+
+        return newFileName;
+    }
+
+
+    /// <summary>
+    /// Document File
+    /// </summary>
+    //private long sizeFile;
+    //private async Task OnInputFileDocumentChange(InputFileChangeEventArgs e)
+    //{
+    //    var formatDocumentFile = e.File.ContentType;
+    //    var sizefile = e.File.Size;
+    //    sizeFile = sizefile;
+    //    var fileName = e.File.Name;
+
+    //    if (sizeFile > 2597152)
+    //    {
+    //        ToastService.ShowError("The file size cannot exceed 2MB.");
+    //        instrumentMaintenance.InstrumentMaintenanceFile = "";
+    //    }
+    //    else if (formatDocumentFile != "application/pdf")
+    //    {
+    //        ToastService.ShowError("File Type Document Incorrect !");
+    //        instrumentMaintenance.InstrumentMaintenanceFile = "";
+    //    }
+    //    else
+    //    {
+    //        await Task.Run(Loading);
+    //        Load.Show();
+    //        using MemoryStream memoryStream = new MemoryStream();
+    //        await e.File.OpenReadStream(sizeFile).CopyToAsync(memoryStream);
+    //        var buffer = memoryStream.GetBuffer();
+    //        var fileDocumentDataUrl = $"data:{formatDocumentFile};base64,{Convert.ToBase64String(buffer)}";
+
+    //        //fileDocumentDataUrls.Add(fileDocumentDataUrl);
+    //        //Console.WriteLine(fileDocumentDataUrl);
+    //        //Console.WriteLine(sizefile);
+    //        instrumentMaintenance.InstrumentMaintenanceFileName = fileName;
+    //        instrumentMaintenance.InstrumentMaintenanceFile = fileDocumentDataUrl;
+    //        Load.Hide();
+    //    }
+    //}
+
+    private void ShowInstrumentError()
+    {
+        ToastService.ShowError("Maintenance list is not selected.");
+    }
+
+    public async Task OnSearch()
+    {
+        try
+        {
+            var instrumentNumber = (await Http.GetFromJsonAsync<List<Instrument>>($"{config["nurl"]}/api/GetInstrumentByInstrumentNumber/{instrumentnumber}"))
+                .Find(i => i.InstrumentNumber == instrumentnumber);
+
+            if (instrumentNumber != null)
+            {
+                instruments = await Http.GetFromJsonAsync<List<Instrument>>($"{config["nurl"]}/api/GetInstrumentByInstrumentNumber/{instrumentnumber}");
+            }
+            else
+            {
+                ToastService.ShowError("Please enter InstrumentNumber");
+            }
+
+            if (instruments.Count >= 1)
+            {
+                instrumentId = instruments.First().InstrumentID;
+                Console.WriteLine(instrumentId);
+
+                instrumentMaintenances = await Http.GetFromJsonAsync<List<InstrumentMaintenance>>($"{config["nurl"]}/api/GetInstrumentMaintenance/{instrumentId}");
+
+                foreach (var j in instruments)
+                {
+                    j.GetLookup(instrumentBrands, instrumentModels, instrumentAgencys, instrumentStatus);
+                }
+
+                foreach (var m in instrumentMaintenances)
+                {
+                    m.GetLookup(FilteredToDos);
+                }
+
+                // await jsRuntime.InvokeAsync<object>("onClickEnter", "#btn_signin");
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError($"Error:{ex.Message}");
+        }
+
+
+
+    }
+
+    public void OnClear()
+    {
+        instrumentMaintenances = new List<InstrumentMaintenance>();
+        instruments = new List<Instrument>();
+        instrumentnumber = "-";
+        instrumentId = 0;
+    }
+
+    public async Task ModalOnClear()
+    {
+        if (ID != null)
+        {
+            ID = null;
+
+            await OnInitializedAsync();
+
+            ModalEditMaintenance.Hide();
+        }
+
+    }
+
+    public async void ClearModePost()
+    {
+
+        instrumentMaintenance.InstrumentMaintenanceDate = null;
+        instrumentMaintenance.InstrumentMaintenanceNext = null;
+        await jsRuntime.InvokeVoidAsync("clearFileInput", "documentFile", "documentFileLabel");
+        InstrumentMaintenance.Hide();
+    }
+
+    /// <summary>
+    /// Update Maintenance Remark
+    /// </summary>
+    /// <param name="i"></param>
+    /// <returns></returns>
+    public async Task OnUpdateNote(InstrumentMaintenance i)
+    {
+        try
+        {
+            var response = await Http.PutAsJsonAsync<InstrumentMaintenance>($"{config["nurl"]}/api/RegisterInstrumentMaintenance", i);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                ToastService.ShowSuccess(" Save Successfully");
+
+            }
+            else
+            {
+                ToastService.ShowError("Error !");
+            }
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError("Err:" + e);
+        }
+        await OnInitializedAsync();
+
+    }
+
+    /// <summary>
+    /// Modal show InstrumentMaintenance Update
+    /// </summary>
+    /// <param name="id"></param>
+    private void ShowInstrumentMaintenance(int? id)
+    {
+        ID = id;
+        editMaintenance = instrumentMaintenances.Find(i => i.InstrumentMaintenanceID == id);
+
+    }
+
+    /// <summary>
+    /// SaveEditInstrumentMaintenance
+    /// </summary>
+    private async Task SaveEditInstrumentMaintenance()
+    {
+        await Task.Run(Loading);
+        Load.Show();
+        var respond = await _masterDataInstrument.PutInstrumentMasterDataAsync("PutInstrumentMaintenance", editMaintenance);
+        if (!string.IsNullOrEmpty(respond.ToString()))
+        {
+            ModalRespondSuccess.Show();
+
+        }
+        else
+        {
+            ModalResponseError.Show();
+        }
+        await FileDocument();
+        await OnInitializedAsync();
+
+        ModalEditMaintenance.Hide();
+        Load.Hide();
+    }
+
+    private async Task DownloadFile(string fileDocument, string fileName)
+    {
+        try
+        {
+            if (fileName != null)
+            {
+                string[] base64String = fileDocument.Split(',');
+                await jsRuntime.InvokeVoidAsync("downloadFile", "application/pdf", base64String[1], fileName);
+            }
+            else
+            {
+                string[] base64String = fileDocument.Split(',');
+                await jsRuntime.InvokeVoidAsync("downloadFile", "application/pdf", base64String[1], Guid.NewGuid());
+            }
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError($"Error:{e.Message}");
+        }
+
+    }
+
+    BSModal Load { get; set; }
+
+    private void Loading()
+    {
+        System.Threading.Thread.Sleep(300);
+        // Retrieve data from the server and initialize
+        // Employees property which the View will bind
+    }
+
+
+    /// <summary>
+    /// clearURL
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeAsync<object>("showFileName");
+            await jsRuntime.InvokeAsync<object>("onClickEnter", "#btn_signin");
+            await jsRuntime.InvokeAsync<object>("ResponsiveDataTables");
+            await jsRuntime.InvokeVoidAsync("clearURL");
+        }
+    }
+
+}
+

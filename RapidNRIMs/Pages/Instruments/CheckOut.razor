@@ -1,0 +1,878 @@
+﻿@page "/Instruments/CheckOut"
+@inject IJSRuntime jsRuntime
+@inject AppData AppData
+@inject IInstrumentCheckOutService InstrumentCheckOutService
+@inject IInstrumentService InstrumentService
+@inject IToastService ToastService
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IConfiguration Config
+@inject IMasterData _masterData
+@inject ImageService _imageService
+@using System.Threading
+
+<PageTitle>ChackOut Page</PageTitle>
+
+<EditForm Model="@instrumentCheckOut">
+    <!--DataAnnotationsValidator /-->
+
+
+    <div class="row margin-row-card">
+        <div class="col-md-12">
+            <div class="card">
+
+                <div class="card-header">
+                    @AppData.LangResource[AppData.LanguageID, 99]:
+                    <!--img class="img-qrcode float-right" src="assets/images/img-qrcode/qr-code.png"@bind=""-->
+                </div>
+
+                <div class="card-body">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-sm-2">
+                            <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 61] <strong class="color-necessary">*</strong></span></label>
+                        </div>
+                        <div class="col-sm-3">
+                           <InputText id="instrumentNumber" @bind-Value="instrumentCheckOut.InstrumentNumber" placeholder="@AppData.LangResource[AppData.LanguageID,61]" class="form-control" />
+                        </div>
+                        
+                    </div>
+
+                    <div class="row g-3 align-items-center mt-2">
+                        <div class="col-sm-2">
+                            <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 100] <strong class="color-necessary">*</strong></span></label>
+                        </div>
+                        <div class="col-sm-3">
+                           <InputSelect class="form-control" @bind-Value="instrumentCheckOut.InstrumentCheckOutAction" id="action">
+                                <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                @foreach (var item in instrumentActions)
+                                {
+                                    if (item.IsActive == true && item.IsActive != null)
+                                    {
+                                        <option value="@item.InstrumentActionID">@item.InstrumentActionName</option>
+                                    }
+                                }
+                            </InputSelect>
+                            <span class="span-btn-action">
+                                @if (AppData.CurrentPermission.Find(i => i.permissionID == 8).permissionE)
+                                {
+                                    <!--button type="button" @onclick="@(() => AddAction.Show())" class="btn btn-warning margin-btn" name="AddTeam" id="AddTeam">
+                                        <i class="fas fa-plus"></i>
+                                    </button-->
+                                }
+                            </span>
+                        </div>
+
+                        <div class="col-sm-1">
+                            <label class="col-form-label">@AppData.LangResource[AppData.LanguageID, 101] <strong class="color-necessary">*</strong></label>
+                        </div>
+                        <div class="col-sm-4 d-flex align-items-center">
+                            <span class="col-auto d-flex align-items-center">
+                                <input @bind="instrumentCheckOut.IsStaff" @onclick="@(()=> instrumentCheckOut.InstrumentCheckOutGiveTo = null)" class="form-check-input" type="checkbox" name="inlineRadioOptions" id="inlineRadioOptions" />@AppData.LangResource[AppData.LanguageID, 475]
+                            </span>
+                            <div class="flex-grow-1">
+                                @if (instrumentCheckOut.IsStaff)
+                                {
+                                    <div style="display: flex; align-items: center;">
+                                        <InputSelect class="form-control" @bind-Value="instrumentCheckOut.InstrumentCheckOutGiveTo">
+                                            <option value="">@AppData.LangResource[AppData.LanguageID, 2]-Staff</option>
+                                            @foreach (var item in accounts)
+                                            {
+                                                if (item.IsActive)
+                                                {
+                                                    <option value="@item.UserID">@item.FirstName</option>
+                                                }
+
+                                            }
+                                        </InputSelect>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div style="display: flex; align-items: center;">
+                                        <InputSelect class="form-control" @bind-Value="instrumentCheckOut.InstrumentCheckOutGiveTo">
+                                            <option value="">@AppData.LangResource[AppData.LanguageID, 2]-OutSide</option>
+                                            @foreach (var item in other)
+                                            {
+                                                <option value="@item.UserID">@item.UserName</option>
+                                            }
+                                        </InputSelect>
+                                        <span class="ml-2">
+                                            <button type="button" @onclick="@(() => AddOtherUser.Show())" class="btn btn-warning ">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        
+                    </div>
+
+                    @if (!instrumentCheckOut.IsStaff && instrumentCheckOut.InstrumentCheckOutGiveTo != null)
+                    {
+                        <div Class="card bg-light mt-2">
+                            <div Class="card-bordy">
+
+                                <div class="row g-3 align-items-center mt-2">
+                                    <div class="col-sm-2">
+                                        <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 401] <strong class="color-necessary">*</strong> </span></label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <InputText disabled @bind-Value="@other.Find(i=>i.UserID == instrumentCheckOut.InstrumentCheckOutGiveTo).UserName" class="form-control" />
+                                    </div>
+
+                                    <div class="col-sm-1">
+                                        <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 402] <strong class="color-necessary">*</strong></span></label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <InputText disabled @bind-Value="@other.Find(i=>i.UserID == instrumentCheckOut.InstrumentCheckOutGiveTo).Department" class="form-control" />
+                                    </div>
+
+                                </div>
+
+                                <div class="row g-3 align-items-center mt-2">
+                                    <div class="col-sm-2">
+                                        <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 403] <strong class="color-necessary">*</strong></span></label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <InputText disabled @bind-Value="@other.Find(i=>i.UserID == instrumentCheckOut.InstrumentCheckOutGiveTo).PhoneNumber" class="form-control" />
+                                    </div>
+
+                                    <div class="col-sm-1">
+                                        <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 404] <strong class="color-necessary">*</strong></span></label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <InputText disabled @bind-Value="@other.Find(i=>i.UserID == instrumentCheckOut.InstrumentCheckOutGiveTo).Email" class="form-control" />
+                                    </div>
+
+                                </div>
+
+
+                               
+                            </div>
+                        </div>
+                    }
+
+                    <div class="row g-3 align-items-center mt-2">
+                        <div class="col-sm-2">
+                            <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 230]</span></label>
+                        </div>
+                        <div class="col-sm-3">
+                            <InputDate id="checkoutDate" @bind-Value:format="dd/MM/yyyy" @bind-Value="instrumentCheckOut.InstrumentCheckOutDate" placeholder="@AppData.LangResource[AppData.LanguageID,102]" class="form-control" />
+                        </div>
+
+                        <div class="col-sm-1">
+                            <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 102]</span></label>
+                        </div>
+                        <div class="col-sm-4">
+                            <InputDate id="retrunDate" @bind-Value:format="dd/MM/yyyy" @bind-Value="instrumentCheckOut.InstrumentCheckOutReturnDate" placeholder="@AppData.LangResource[AppData.LanguageID,102]" class="form-control" />
+                        </div>
+
+                    </div>
+
+                    <div class="row g-3 align-items-center mt-2">
+                        <div class="col-sm-2">
+                            <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 75]</span></label>
+                        </div>
+                        <div class="col-sm-3" style="margin-left:15px;">
+                            <InputFile OnChange="@OnInputFileDefaultChange" class="custom-file-input file-name-custom " id="picture" />
+                            @if (AppData.LanguageID == 0)
+                            {
+                                <label class="custom-file-label mr-4" for="picture" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                            }
+                            else
+                            {
+                                <label class="custom-file-label mr-4" for="picture" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                            }
+                        </div>
+
+                    </div>
+
+                    <div class="row g-3 align-items-center mt-2">
+                        <div class="col-sm-2">
+                            <label class="col-form-label"><span></span></label>
+                        </div>
+                        <div class="col-sm-3">
+                            @if (instrumentCheckOut.InstrumentCheckOutImagedata != "")
+                            {
+                                <div class="card" style="width:30rem;">
+                                    <div class="card-body">
+                                        @if (!string.IsNullOrEmpty(ImageShow))
+                                        {
+                                            <a href="@("data:image/png;base64,"+ImageShow+"")" data-lightbox="gallery" data-title="@AppData.LangResource[AppData.LanguageID, 296]">
+                                                <img class="img-show float-left m-2" src="@("data:image/png;base64,"+ImageShow+"")" />
+                                            </a>
+
+                                        }
+                                        else
+                                        {
+                                            <a href="@($"{Config["nurl"]}{Config["nurlFileInstrument"]}{instrumentCheckOut.InstrumentCheckOutImagedata}")" data-lightbox="gallery" data-title="@AppData.LangResource[AppData.LanguageID, 296]">
+                                                <img class="img-show float-left m-2" src="@($"{Config["nurl"]}{Config["nurlFileInstrument"]}{instrumentCheckOut.InstrumentCheckOutImagedata}")" />
+                                            </a>
+
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <img class="img-show float-left" src="assets/images/no-img/ImageNotFount.png">
+                            }
+                        </div>
+
+                    </div>
+                    
+                    <div class="row g-3 align-items-center mt-2">
+                        <div class="col-sm-2">
+                            <label class="col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 105]</span></label>
+                        </div>
+                        <div class="col-sm-8">
+                            <InputTextArea id="detail" @bind-Value="instrumentCheckOut.InstrumentCheckOutNote" rows="2" placeholder="@AppData.LangResource[AppData.LanguageID,105]" class="form-control" />
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+            <div class="text-center">
+                <!--button type="button" class="btn btn-warning margin-btn" name="Report" id="Report">@AppData.LangResource[AppData.LanguageID,23]</button-->
+                @if (instrumentCheckOut.InstrumentNumber != "" && instrumentCheckOut.InstrumentCheckOutAction != 0 && AppData.CurrentPermission.Find(i => i.permissionID == 8).permissionC)
+                {
+                    <button type="submit" @onclick="PostInstrumentCheckOut" class="btn margin-btn" style="background-color:#2E2BFF; color:#fff">@AppData.LangResource[AppData.LanguageID, 16]</button>
+                }
+                else
+                {
+                    <button type="submit" disabled class="btn margin-btn" style="background-color:#2E2BFF; color:#fff">@AppData.LangResource[AppData.LanguageID, 16]</button>
+                }
+                <button type="reset" @onclick="OnClear" class="btn margin-btn" style="background-color:#B90F1B; color:#fff">@AppData.LangResource[AppData.LanguageID, 45]</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header">
+                <button type="submit" @onclick="Onsearch" class="btn" style="background-color:#2E2BFF; color:#fff"><i class="fas fa-table mr-1"> </i>@AppData.LangResource[AppData.LanguageID, 405]</button>
+                <span class="txt-span-checkAll">
+                    <input @bind="IsAll" class="form-check-input checkAll" type="checkbox" name="isall" id="isall" />
+                    <label for="isall">@AppData.LangResource[AppData.LanguageID, 406]</label>
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height:350px;">
+                    <table id="dataTable" class="table table-bordered table-striped text-center">
+                        <thead class="fixedthead">
+                            <tr>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,407]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,230]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,61]</th>
+
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,168]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,70]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,71]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,100]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,101]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,23]</th>
+                            </tr>
+                        </thead>
+                        <tbody class="scrollContent">
+
+                            @foreach (var item in instrumentCheckOutListFilter)
+                            {
+                                <tr>
+                                    <td data-label="">
+                                        @if (item.InstrumentCheckOutStatus == 0)
+                                        {
+                                            <!--span class="badge badge-secondary">/</!--span-->
+                                            <button type="button" style="border-radius: 15px; cursor: context-menu;" class="btn btn-secondary">Returned</button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" style="border-radius: 15px; cursor: context-menu;" class="btn btn-primary">Non-Returned</button>
+                                        }
+                                    </td>
+                                    <td data-label="">@String.Format("{0:dd/MM/yyyy}", item.InstrumentCheckOutDate) </td>
+                                    <td data-label="">@item.InstrumentNumber</td>
+                                    <td data-label="">@(item.instrument != null ? item.instrument.InstrumentENName:"-")</td>
+
+                                    <td data-label="">@(item.instrument != null && AppData.instrumentModels.Find(x => x.InstrumentModelID == item.instrument.InstrumentModelID) != null ? AppData.instrumentModels.Find(x => x.InstrumentModelID == item.instrument.InstrumentModelID).InstrumentModelName : "-")</td>
+                                    <td data-label="">@(item.instrument != null && AppData.instrumentBrands.Find(x => x.InstrumentBrandID == item.instrument.InstrumentBrandID) != null ? AppData.instrumentBrands.Find(x => x.InstrumentBrandID == item.instrument.InstrumentBrandID).InstrumentBrandName : "-")</td>
+
+                                    <td data-label="">@(instrumentActions.Find(i => i.InstrumentActionID == item.InstrumentCheckOutAction) != null? instrumentActions.Find(i => i.InstrumentActionID == item.InstrumentCheckOutAction).InstrumentActionName:"-")</td>
+                                    <td data-label="">
+                                        @if (item.IsStaff)
+                                        {
+                                            @(accounts.Find(i => i.UserID == @item.InstrumentCheckOutGiveTo) != null? accounts.Find(i => i.UserID == @item.InstrumentCheckOutGiveTo).FirstName:"-")
+                                        }
+                                        else
+                                        {
+                                            @(other.Find(i => i.UserID == @item.InstrumentCheckOutGiveTo) != null? other.Find(i => i.UserID == @item.InstrumentCheckOutGiveTo).UserName:"-")
+                                        }
+                                    </td>
+                                    <td>
+                                        <a type="button" class="btn btn-warning " href="@Config["rurl"]/api/InstrumentCheckOutReport?CheckOutID=@item.InstrumentCheckOutID&USerID=@item.InstrumentCheckOutGiveTo&s=@(item.IsStaff?1:0)&CUserID=@(item.ByUserID )" download="" target="_blank">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<EditForm Model="@instrumentAction" OnValidSubmit="PostInstrumentAction">
+    <BSModal @ref="AddAction">
+        <BSModalHeader OnClick="@(() => AddAction.Hide())" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID, 210]</BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 217]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="instrumentAction.InstrumentActionName" placeholder="@AppData.LangResource[AppData.LanguageID,217]" class="form-control" />
+                    </div>
+
+                    <ValidationMessage For="@(() => instrumentAction.InstrumentActionName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+
+                </div>
+
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 218]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="instrumentAction.InstrumentActionDescription" placeholder="@AppData.LangResource[AppData.LanguageID,218]" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => instrumentAction.InstrumentActionDescription)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+
+        </BSModalBody>
+        <BSModalFooter>
+            <button type="submit" class="btn btn-warning">@AppData.LangResource[AppData.LanguageID, 44]</button>
+            <button type="reset" class="btn btn-warning" @onclick="@(() => AddAction.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+        </BSModalFooter>
+    </BSModal>
+</EditForm>
+<EditForm Model="@newOtherUser" OnValidSubmit="PostOtherUser">
+    <DataAnnotationsValidator />
+    <BSModal @ref="AddOtherUser">
+        <BSModalHeader OnClick="@(() => AddOtherUser.Hide())" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID, 644]</BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <label for="retrunDate" class="col-4  col-form-label">
+                    <span>Name*:</span>
+                </label>
+                <div class="col-8">
+                    <div class="input-group input-box-bottom">
+                        <InputText id="UserName" @bind-Value="newOtherUser.UserName" disable placeholder="UserName" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => newOtherUser.UserName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label for="checkoutDate" class="col-4 col-form-label ">
+                    <span>Department* :</span>
+                </label>
+                <div class="col-8">
+                    <div class="input-group input-box-bottom">
+                        <InputText id="Department" @bind-Value="newOtherUser.Department" placeholder="Department" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => newOtherUser.Department)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+
+            <div class="row">
+                <label for="retrunDate" class="col-4 col-form-label">
+                    <span>PhoneNumber* :</span>
+                </label>
+                <div class=" col-8 ">
+                    <div class="input-group input-box-bottom">
+                        <InputText id="instrumentNumber" @bind-Value="newOtherUser.PhoneNumber" placeholder="PhoneNumber" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => newOtherUser.PhoneNumber)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label for="checkoutDate" class="col-md-4 col-form-label ">
+                    <span>E-mail</span>
+                </label>
+                <div class=" col-8 ">
+                    <div class="input-group input-box-bottom">
+                        <InputText id="instrumentNumber" @bind-Value="newOtherUser.Email" placeholder="email" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+
+        </BSModalBody>
+        <BSModalFooter>
+            <button type="submit" class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+            <button type="reset" class="btn btn-danger" @onclick="@(() => AddOtherUser.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+        </BSModalFooter>
+    </BSModal>
+</EditForm>
+<BSModal class="row style-justify mt-5" @ref="Load" IsCentered="true" Size="Size.Small" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+    <BSModalBody>
+        <div class="text-center mt-3">
+            <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+                  style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+        </div>
+        <div class="text-center pt-3" style=" font-size: 16pt">
+            @AppData.LangResource[AppData.LanguageID, 325]
+        </div>
+    </BSModalBody>
+</BSModal>
+
+
+@code {
+    BSModal Load { get; set; }
+
+    /// <summary>
+    /// Varliable
+    /// </summary>
+    InstrumentCheckOut instrumentCheckOut = new InstrumentCheckOut();
+    Instrument instrument = new Instrument();
+    List<Instrument> listInstrument = new List<Instrument>();
+    InstrumentAction instrumentAction = new InstrumentAction();
+    private List<Instrument> instruments = new List<Instrument>();
+    private List<InstrumentModel> insrumentModels = new List<InstrumentModel>();
+    private List<Account> accounts = new List<Account>();
+    private List<InstrumentAction> instrumentActions = new List<InstrumentAction>();
+    OtherUser newOtherUser = new OtherUser();
+    OtherUser choose = new OtherUser();
+    List<OtherUser> other = new List<OtherUser>();
+    bool IsAll = false;
+    public string URLImageData { get; set; }
+    List<InstrumentCheckOut> instrumentCheckOutList = new List<InstrumentCheckOut>();
+    List<InstrumentCheckOut> instrumentCheckOutListFilter => instrumentCheckOutList.Where(i => (i.InstrumentCheckOutStatus == 1 || i.InstrumentCheckOutStatus == (IsAll ? 0 : 1))).ToList();
+
+    /// <summary>
+    /// PostInstrumentCheckOut CheckOut ซำ้ไม่ได้ จนกว่าจะ CheckIn InstrumentNumber นั้น
+    /// </summary>
+    private async Task PostInstrumentCheckOut()
+    {
+        Load.Show();
+        await Task.Run(Loading);
+        try
+        {
+            if (instrumentCheckOut.InstrumentCheckOutReturnDate.HasValue != null && instrumentCheckOut.InstrumentCheckOutDate.HasValue != null && instrumentCheckOut.InstrumentCheckOutReturnDate.Value.Date >= instrumentCheckOut.InstrumentCheckOutDate.Value.Date)
+            {
+                   if (instrumentCheckOut.InstrumentCheckOutGiveTo == null)
+                   {
+                       instrumentCheckOut.InstrumentCheckOutGiveTo = new Guid("00000000-0000-0000-0000-000000000000");
+                   }
+
+                   var checkInstrumentNumber = (await Http.GetFromJsonAsync<List<Instrument>>($"{Config["nurl"]}/api/GetInstrumentByInstrumentNumber/{instrumentCheckOut.InstrumentNumber}"))
+                .Find(i => i.InstrumentNumber == instrumentCheckOut.InstrumentNumber);
+
+                   //var checkinstrumentnumberFail = (await Http.GetFromJsonAsync<List<Instrument>>($"{Config["nurl"]}/api/GetInstrumentByInstrumentNumber/{instrumentCheckOut.InstrumentNumber}")).Find(i => i.InstrumentNumber == instrumentCheckOut.InstrumentNumber && i.InstrumentStatusID == 6);
+
+                   if (checkInstrumentNumber == null)
+                   {
+                       ToastService.ShowError("There is no Instrument Number.");
+                   }
+                   else if ((checkInstrumentNumber.InstrumentStatusID == 1 && instrumentCheckOut.InstrumentCheckOutAction != 3) ||
+                    (checkInstrumentNumber.InstrumentStatusID == 2 && instrumentCheckOut.InstrumentCheckOutAction == 3))//เพิ่มการเช็คเงื่อนไขตรงจุดนี้
+                   {
+                       this.instrumentCheckOut.InstrumentCheckOutDate = DateTime.Today;
+                       instrumentCheckOut.ByUserID = AppData.UserID;
+                       var respond = await Http.PostAsJsonAsync($"{Config["nurl"]}/api/RegisterInstrumentCheckOut", instrumentCheckOut);
+
+                       if (respond.StatusCode == System.Net.HttpStatusCode.OK)
+                       {
+
+
+                           ToastService.ShowSuccess("CheckOutInstrument Save Successfully");
+                           await ImageDefaultFile();
+                           List<InstrumentCheckOut> checkout = await respond.Content.ReadFromJsonAsync<List<InstrumentCheckOut>>();
+                           instrumentCheckOut = checkout.First();
+
+                           string url = $"{Config["rurl"]}/api/InstrumentCheckOutReport?CheckOutID={instrumentCheckOut.InstrumentCheckOutID}&USerID={instrumentCheckOut.InstrumentCheckOutGiveTo}&s={(instrumentCheckOut.IsStaff ? 1 : 0)}&CUserID={AppData.UserID}";
+                           await jsRuntime.InvokeVoidAsync("OpenURL", url);
+                       }
+                   }
+                   else
+                   {
+                       ToastService.ShowError("Failed to check out. Check Instrument status.");
+                   }
+            }
+            else
+            {
+                ToastService.ShowError("Return date must be after Check Out date");
+            }
+
+         
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError($"Error : {e.Message}");
+        }
+
+
+
+
+
+        Load.Hide();
+
+    }
+
+    /// <summary>
+    /// OnClear
+    /// </summary>
+    public void OnClear()
+    {
+        instrumentCheckOut = new InstrumentCheckOut
+            {
+                InstrumentCheckOutDate = DateTime.Today
+            };
+    }
+
+    /// <summary>
+    /// Post Modal InstrumentAction
+    /// </summary>
+    private async Task PostInstrumentAction()
+    {
+        try
+        {
+            var res = await Http.PostAsJsonAsync($"{Config["nurl"]}/api/RegisterInstrumentAction", instrumentAction);
+
+            ToastService.ShowSuccess("Action Save Successfully");
+            if (res.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+
+                var o = (await res.Content.ReadFromJsonAsync<List<InstrumentAction>>()).First<InstrumentAction>();
+                this.instrumentActions.Add(o);
+                this.instrumentCheckOut.InstrumentCheckOutAction = o.InstrumentActionID; ToastService.ShowSuccess("Action Save Successfully");
+            }
+        }
+
+        catch (Exception)
+        {
+            throw;
+        }
+        AddAction.Hide();
+        StateHasChanged();
+
+    }
+
+    private async Task PostOtherUser()
+    {
+        try
+        {
+            var res = await Http.PostAsJsonAsync($"{Config["nurl"]}/api/OtherUser", newOtherUser);
+            if (res.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+
+                var o = await res.Content.ReadFromJsonAsync<OtherUser>();
+                this.other.Add(o);
+                this.instrumentCheckOut.InstrumentCheckOutGiveTo = o.UserID;
+                ToastService.ShowSuccess("OtherUser Save Successfully");
+            }
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError($"Error:{e.Message}");
+        }
+        AddOtherUser.Hide();
+        StateHasChanged();
+
+    }
+    /// <summary>
+    /// OnInitializedAsync
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        instruments = AppData.instrumentsList;
+        instrumentActions = AppData.instrumentAction;
+
+
+        //var activeInstrumentAction = instrumentActions.Find(i => i.IsActive == true).IsActive;
+        //if (activeInstrumentAction == true)
+        //    instrumentActions = await _masterData.GetAllActiveMasterDataAsync<InstrumentAction>("ActiveInstrumentAction");
+
+        this.instrumentCheckOut.InstrumentCheckOutDate = DateTime.Today;
+        this.instrumentCheckOut.IsStaff = true;
+
+        accounts = await Http.GetFromJsonAsync<List<Account>>($"{Config["aurl"]}/api/GetAccount");
+        other = await Http.GetFromJsonAsync<List<OtherUser>>($"{Config["nurl"]}/api/OtherUser");
+
+        if (AppData.LanguageID == 0)
+        {
+            var resultInstrumentActions = instrumentActions.OrderBy(a => a.InstrumentActionName).ToList();
+            instrumentActions = resultInstrumentActions;
+            var resultAccounts = accounts.OrderBy(a => a.FirstName).ToList();
+            accounts = resultAccounts;
+            var resultOther = other.OrderBy(o => o.UserName).ToList();
+            other = resultOther;
+        }
+        else
+        {
+
+            var resultOther = other.OrderBy(o => o.UserName).ToList();
+            other = resultOther;
+        }
+
+
+
+    }
+
+    private IBrowserFile? fileImageDefault;
+
+    private string? ImageShow { get; set; }
+
+    private string pathPictureDefaultFolder { get; set; } = "PictureDefault";
+
+    private byte[] UploadPathDefault { get; set; }
+
+    //// <summary>
+    //// Image Default
+    //// </summary>
+    private async Task OnInputFileDefaultChange(InputFileChangeEventArgs e)
+    {
+        fileImageDefault = e.File;
+        var imageType = fileImageDefault.ContentType;
+        var sizefile = fileImageDefault.Size;
+
+        if (sizefile > 5542880)
+        {
+            ToastService.ShowError("The file size cannot exceed 5MB.");
+            instrumentCheckOut.InstrumentCheckOutImagedata = "";
+        }
+        else if (imageType != "image/png" && imageType != "image/jpeg")
+        {
+            ToastService.ShowError("File Type Image Incorrect !");
+            instrumentCheckOut.InstrumentCheckOutImagedata = "";
+        }
+        else
+        {
+            Load.Show();
+            await Task.Run(Loading);
+            try
+            {
+                var resizedImage = await fileImageDefault.RequestImageFileAsync(imageType, 550, 550);
+                // อ่านข้อมูลรูปภาพและแปลงเป็น Base64
+                using (var stream = resizedImage.OpenReadStream(resizedImage.Size))
+                {
+                    var memoryStream = new MemoryStream();
+                    await stream.CopyToAsync(memoryStream);
+                    var buffer = memoryStream.ToArray();
+                    ImageShow = Convert.ToBase64String(buffer);
+                }
+                int maxWidth = 640;
+                int maxHeight = 480;
+                int quality = 90;
+
+                byte[] compressedImage = _imageService.CompressBase64Image(ImageShow, maxWidth, maxHeight, quality);
+                string compressedBase64 = Convert.ToBase64String(compressedImage);
+                ImageShow = compressedBase64;
+                UploadPathDefault = compressedImage;
+
+                string newFileImageName = await GenerateUniqueFileName(fileImageDefault.Name, pathPictureDefaultFolder);
+                instrumentCheckOut.InstrumentCheckOutImagedata = newFileImageName;
+                instrumentCheckOut.InstrumentCheckOutFile = compressedBase64;
+
+                //using MemoryStream memoryStream = new MemoryStream();
+                //await fileImageDefault.OpenReadStream(sizefile).CopyToAsync(memoryStream);
+                //var buffer = memoryStream.ToArray();
+                //var imageLeftDataUrl = $"data:{imageType};base64,{Convert.ToBase64String(buffer)}";
+                //ImageShow = imageLeftDataUrl;
+                //string newFileImageName = await GenerateUniqueFileName(fileImageDefault.Name, pathPictureDefaultFolder);
+                //instrumentCheckOut.InstrumentCheckOutImagedata = newFileImageName;
+
+                //string base64Image = Convert.ToBase64String(buffer);
+                //int maxWidth = 800;
+                //int maxHeight = 600;
+                //int quality = 95;
+
+                //byte[] compressedImage = _imageService.CompressBase64Image(base64Image, maxWidth, maxHeight, quality);
+                //string compressedBase64 = Convert.ToBase64String(compressedImage);
+                //instrumentCheckOut.InstrumentCheckOutFile = compressedBase64;
+
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowError($"Erro:{ex.Message}");
+            }
+
+            Load.Hide();
+        }
+
+
+    }
+
+    /// <summary>
+    /// Image Default
+    /// </summary>
+    private async Task ImageDefaultFile()
+    {
+
+        if (fileImageDefault != null)
+        {
+            try
+            {
+                var imageType = fileImageDefault.ContentType;
+                var sizefile = fileImageDefault.Size;
+                if (sizefile > 5542880)
+                {
+                    //ToastService.ShowError("The file size cannot exceed 5MB.");
+                    instrumentCheckOut.InstrumentCheckOutImagedata = "";
+                }
+                else if (imageType != "image/png" && imageType != "image/jpeg")
+                {
+                    ///ToastService.ShowError("File Type Image Incorrect !");
+                    instrumentCheckOut.InstrumentCheckOutImagedata = "";
+                }
+                else
+                {
+                    string newFileImageName = await GenerateUniqueFileName(fileImageDefault.Name, pathPictureDefaultFolder);
+                    string path = Path.Combine(Config.GetValue<string>("FileStorage")!, "Instrument", "CheckOut", "Picture", pathPictureDefaultFolder, newFileImageName);
+                    Directory.CreateDirectory(Path.Combine(Config.GetValue<string>("FileStorage")!, "Instrument", "CheckOut", "Picture", pathPictureDefaultFolder)); // Ensure the directory exists
+
+                    await File.WriteAllBytesAsync(path, UploadPathDefault);
+
+                    //string newFileImageName = await GenerateUniqueFileName(fileImageDefault.Name, pathPictureDefaultFolder);
+                    ////string prefixedNewFileName = $"Update_{showinstrument.InstrumentNumber}_" + newFileImageName;
+                    //string path = Path.Combine(Config.GetValue<string>("FileStorage")!, "Instrument", "CheckOut", "Picture", pathPictureDefaultFolder, newFileImageName);
+
+                    //Directory.CreateDirectory(Path.Combine(Config.GetValue<string>("FileStorage")!, "Instrument", "CheckOut", "Picture", pathPictureDefaultFolder));
+
+                    //await using FileStream fs = new(path, FileMode.Create);
+                    //await fileImageDefault.OpenReadStream(sizefile).CopyToAsync(fs);
+
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowError($"File: {fileImageDefault.Name} Error: {ex.Message}");
+            }
+        }
+
+    }
+
+    /// <summary>
+    /// GenerateUniqueFileDocument
+    /// </summary>
+    private async Task<string> GenerateUniqueFileName(string originalFileName, string folderName)
+    {
+        string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(originalFileName);
+        string fileExtension = Path.GetExtension(originalFileName);
+        string newFileName = fileNameWithoutExtension + fileExtension;
+
+        int counter = 1;
+        string path = Path.Combine(Config.GetValue<string>("FileStorage")!, "Instrument", "CheckOut", "Picture", folderName, newFileName);
+
+        while (File.Exists(path))
+        {
+            newFileName = $"{fileNameWithoutExtension}({counter}){fileExtension}";
+            path = Path.Combine(Config.GetValue<string>("FileStorage")!, "Instrument", "CheckOut", "Picture", folderName, newFileName);
+            counter++;
+        }
+
+        return newFileName;
+    }
+
+
+    /// <summary>
+    /// Image One
+    /// </summary>
+    //private long sizeFileImage;
+    //private string typeFileImage;
+    //private IList<string> imageDataUrls = new List<string>();
+    //private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    //{
+    //    var formatImageDefault = e.File.ContentType;
+    //    var sizefile = e.File.Size;
+    //    typeFileImage = formatImageDefault;
+    //    sizeFileImage = sizefile;
+    //    if (sizeFileImage > 5542880)
+    //    {
+    //        ToastService.ShowError("The file size cannot exceed 5MB.");
+    //        instrumentCheckOut.InstrumentCheckOutFile = "";
+    //    }
+    //    else if (typeFileImage != "image/png" && typeFileImage != "image/jpeg")
+    //    {
+    //        ToastService.ShowError("File Type Image Incorrect !");
+    //        instrumentCheckOut.InstrumentCheckOutFile = "";
+    //    }
+    //    else
+    //    {
+    //        await Task.Run(Loading);
+    //        Load.Show();
+    //        //using MemoryStream memoryStream = new MemoryStream();
+    //        //await e.File.OpenReadStream(5542880).CopyToAsync(memoryStream);
+    //        //var buffer = memoryStream.GetBuffer();
+    //        //var imageDefaultDataUrl = Convert.ToBase64String(buffer);
+    //        var resizedImage = await e.File.RequestImageFileAsync(formatImageDefault, 550, 550);
+    //        var buffer = new byte[resizedImage.Size];
+    //        await resizedImage.OpenReadStream(resizedImage.Size).ReadAsync(buffer);
+    //        var imageDefaultDataUrl = Convert.ToBase64String(buffer);
+    //        instrumentCheckOut.InstrumentCheckOutFile = imageDefaultDataUrl;
+    //        Load.Hide();
+    //    }
+    //}
+
+    /// <summary>
+    /// Modal AddAction
+    /// </summary>
+    BSModal AddAction { get; set; }
+    BSModal AddOtherUser { get; set; }
+
+
+    public async void Onsearch()
+    {
+        await Task.Run(Loading);
+        Load.Show();
+        try
+        {
+
+            instrumentCheckOutList = await Http.GetFromJsonAsync<List<InstrumentCheckOut>>($"{Config["nurl"]}/api/GetInstrumentCheckOut");
+            foreach (var item in instrumentCheckOutList)
+            {
+                item.GetLookUp(AppData.instrumentsList);
+            }
+
+            StateHasChanged();
+
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError($"Error: {e.Message}");
+        }
+        Load.Hide();
+    }
+
+    private void Loading()
+    {
+        System.Threading.Thread.Sleep(300);
+        // Retrieve data from the server and initialize
+        // Employees property which the View will bind
+    }
+
+    /// <summary>
+    /// clearURL
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeAsync<object>("showFileName");
+            await jsRuntime.InvokeVoidAsync("clearURL");
+        }
+    }
+
+}

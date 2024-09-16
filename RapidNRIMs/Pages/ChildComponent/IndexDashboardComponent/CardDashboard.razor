@@ -1,0 +1,122 @@
+﻿@inherits CardDashboardBase
+<div class="row">
+    <div class="col-xl-4 col-sm-6 mb-xl-0 mb-4">
+        <div class="card-dashbord height-footer" style="background-color:#1E97DB">
+            <div class="card-dashbord-header p-3 pt-2 color-card" style="background-color:#1E97DB">
+
+                <div class="icon icon-lg icon-shape shadow-success text-center border-radius-xl mt-n4 position-absolute" style="background-color:#203864">
+                    <i class="fa-solid fa-map-location-dot material-icons opacity-10"></i>
+                </div>
+
+                <div class="text-end pt-0">
+                    <p class="mb-0 text-capitalize txt-size-content" style="color:#fff">
+                        @AppData.LangResource[AppData.LanguageID, 531]
+                    </p>
+                    <h4 class="mb-0 txt-size" style="color:#fff">@AppData.recordProjects.Count()</h4>
+                </div>
+            </div>
+            <hr class="dark horizontal my-0">
+            <div class="card-dashbord-footer p-3 ">
+                <p class="mb-0">
+                    <a href="@($"Record/ShowProjectInLab")" style="text-decoration:none; color:#333">
+                        <h4 class="mb-0 txt-size" style="color:#fff">
+                            <b>@AppData.LangResource[AppData.LanguageID, 532]</b>
+                        </h4>
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-sm-6 mb-xl-0 mb-4">
+        <div class="card-dashbord height-footer-instrument" style="background-color:#3CBBCE">
+            <div class="card-dashbord-header p-3 pt-2" style="background-color:#3CBBCE">
+                <div class="icon icon-lg icon-shape shadow-info text-center border-radius-xl mt-n4 position-absolute" style="background-color:#248390">
+                    <i class="fa-sharp fa-solid fa-toolbox material-icons opacity-10"></i>
+                </div>
+                <div class="text-end pt-1">
+                    <div class="mb-0 txt-size-content" style="color:#fff">
+
+                        @AppData.LangResource[AppData.LanguageID, 16] /
+                        @AppData.LangResource[AppData.LanguageID, 533] /
+                        @AppData.LangResource[AppData.LanguageID, 450]
+
+                    </div>
+                    <div class="row" style="justify-content: right;">
+                        <div class="col-xl-12 col-sm-6">
+                            <div class="mb-0 float-right" style="color:#fff; font-size:16px;">
+                                <p class="mb-0 txt-size text-capitalize">
+                                    <a style="text-decoration:none; color:#fff"> @instrumentCheckOutListNonReturned.Count() /</a>
+                                    <a style="text-decoration:none; color:#fff"> @instrumentListViewsReady.Count() /</a>
+                                    <a style="text-decoration:none; color:#fff"> @instrumentListViews.Count()</a>
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+            <hr class="dark horizontal my-0">
+            <div class="card-dashbord-footer p-3">
+                <p class="mb-0">
+                    <a href="@($"Instruments/ShowInstrumentCheckOutAll")" style="text-decoration:none; color:#333">
+                        <h4 class="mb-0 txt-size" style="color:#fff; ">
+                            <b>@AppData.LangResource[AppData.LanguageID, 534]</b>
+                        </h4>
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-sm-6 mb-xl-0 mb-4">
+        <div class="card-dashbord height-footer" style="background-color:#70DAD5">
+            <div class="card-dashbord-header p-3 pt-2" style="background-color:#70DAD5">
+                <div class="icon icon-lg icon-shape shadow-primary text-center border-radius-xl mt-n4 position-absolute" style="background-color:#238580">
+                    <i class="fa-solid fa-warehouse material-icons opacity-10"></i>
+                </div>
+                <div class="text-end pt-1">
+                    <p class="mb-0 text-capitalize txt-size-content" style="color:#fff">@AppData.LangResource[AppData.LanguageID, 272]</p>
+                    <h4 class="mb-0 txt-size" style="color:#fff">@AppData.inventoryStocks.Count()</h4>
+                </div>
+            </div>
+            <hr class="dark horizontal my-0">
+            <div class="card-dashbord-footer p-3">
+                <p class="mb-0">
+                    <a href="@($"Inventoris/ShowLimitConsumable")" style="text-decoration:none; color:#333">
+                        <h4 class="mb-0 txt-size" style="color:#fff">
+                            <b>@AppData.LangResource[AppData.LanguageID, 535]</b>
+                        </h4>
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+    <!--div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <div class="card-dashbord" style="background-color:#A5643C">
+        <div class="card-dashbord-header p-3 pt-2" style="background-color:#A5643C">
+            <div class="icon icon-lg icon-shape bg-warning shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+            <i class="fa-solid fa-calendar material-icons opacity-10"></i>
+            </div>
+            <div class="text-end pt-1">
+            <p class="text-sm mb-0 text-capitalize" style="color:#fff">sub events</p>
+            <h4 class="mb-0" style="color:#fff">@AppData.eventResults.Count()</h4>
+            </div>
+        </div>
+        <hr class="dark horizontal my-0">
+        <div class="card-dashbord-footer p-3">
+            <p class="mb-0">
+                <a href="@($"Record/Search")" style="text-decoration:none; color:#333">
+                    <h4 class="mb-0" style="color:#fff">Event in Lab</h4>
+                </a>
+            </p>
+        </div>
+        </div>
+    </!--div--->
+</div>
+
+
+
+@code {
+
+}

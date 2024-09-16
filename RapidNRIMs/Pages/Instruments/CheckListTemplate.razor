@@ -1,0 +1,654 @@
+﻿@page "/Instruments/CheckListTemplate/{modelID}/{inID}"
+@inject IJSRuntime jsRuntime
+@inject HttpClient Http
+@inject IToastService ToastService
+@inject AppData AppData
+@inject IConfiguration config
+@inject IMasterData _masterData
+@inject NavigationManager NavigationManager
+
+<PageTitle>Check List Template Page</PageTitle>
+
+<div class="row margin-row-card">
+    <div class="col-md-12">
+        <div class="card">
+
+            <div class="card-header">@AppData.LangResource[AppData.LanguageID, 314] : @ModelName @Number</div>
+
+            <div class="card-body">
+                <BSTabGroup>
+                    <BSTabList>
+
+                        @if (mapCheckListType > 0)
+                        {
+
+                            <BSTab InitialSelection="@(mapCheckListType == 1)">
+                                <div>
+                                    <BSTabLabel @onclick="(() => Ontab(1))">
+                                        <span>@AppData.LangResource[AppData.LanguageID, 398]</span>
+                                    </BSTabLabel>
+                                </div>
+                               
+                                <BSTabContent id="home-tab">
+                                    <button style="margin-top: 0.5rem; margin-bottom: 0.5rem;" type="button" @onclick="@(() => AddCheckList.Show())" class="btn btn-warning float-right">@AppData.LangResource[AppData.LanguageID, 315]</button>
+                                    <div class="table-responsive" style="margin-top: 0.5rem;">
+                                        <table class="table table-bordered table-striped text-center" style="width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 244]</th>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 117]</th>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 245]</th>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 145]</th>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 246]</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+
+                                                @foreach (var item in Daily)
+                                                {
+                                                    if (item.IsActive != null && item.IsActive == true)
+                                                    {
+                                                        <tr>
+                                                            <td>@(Daily.IndexOf(item)+1)</td>
+                                                            <td>@item.InstrumentChecklistName</td>
+                                                            <td>@item.InstrumentChecklistDescription</td>
+                                                            <td>
+                                                                @if (AppData.CurrentPermission.Find(j => j.permissionID == 7).permissionU)
+                                                                {
+                                                                    <a class="btn btn-warning" @onclick="()=>OnUpdate(item)"><i class="far fa-edit"></i></a>
+                                                                }
+                                                            </td>
+                                                            <td>
+                                                                @if (AppData.CurrentPermission.Find(i => i.permissionID == 7).permissionD)
+                                                                {
+                                                                    <i class="far fa-trash-alt" @onclick="() => OnDeleteTemplate(item.InstrumentChecklistID)"></i>
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </BSTabContent>
+                            </BSTab>
+                          
+                            <BSTab InitialSelection="@(mapCheckListType == 2)">
+                                <div @onclick="(() => Ontab(2))">
+                                    <BSTabLabel>
+                                        <span>@AppData.LangResource[AppData.LanguageID, 97]</span>
+                                    </BSTabLabel>
+                                </div>
+                               
+                                <BSTabContent>
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 7).permissionE)
+                                    {
+                                        <button style="margin-top: 0.5rem; margin-bottom: 0.5rem;" type="button" @onclick="@(() => AddCheckList.Show())" class="btn btn-warning float-right">@AppData.LangResource[AppData.LanguageID, 315]</button>
+                                    }
+                                    <div class="table-responsive" style="margin-top: 0.5rem;">
+                                        <table class="table table-bordered table-striped text-center" style="width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 244]</th>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 117]</th>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 245]</th>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 145]</th>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 246]</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+
+                                                @foreach (var item in Weekly)
+                                                {
+                                                    if (item.IsActive != null && item.IsActive == true)
+                                                    {
+                                                        <tr>
+                                                            <td>@(Weekly.IndexOf(item)+1)</td>
+                                                            <td>@item.InstrumentChecklistName</td>
+                                                            <td>@item.InstrumentChecklistDescription</td>
+                                                            <td>
+                                                                @if (AppData.CurrentPermission.Find(j => j.permissionID == 7).permissionU)
+                                                                {
+                                                                    <a class="btn btn-warning" @onclick="()=>OnUpdate(item)"><i class="far fa-edit"></i></a>
+                                                                }
+                                                            </td>
+                                                            <td>
+                                                                @if (AppData.CurrentPermission.Find(i => i.permissionID == 7).permissionD)
+                                                                {
+                                                                    <i class="far fa-trash-alt" @onclick="() => OnDeleteTemplate(item.InstrumentChecklistID)"></i>
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </BSTabContent>
+                            </BSTab>
+
+                            <BSTab InitialSelection="@(mapCheckListType == 3)">
+                                <div @onclick="(() => Ontab(3))">
+                                    <BSTabLabel>
+                                        <span>@AppData.LangResource[AppData.LanguageID, 98]</span>
+                                    </BSTabLabel>
+                                </div>
+                               
+                                <BSTabContent>
+                                    <button style="margin-top: 0.5rem; margin-bottom: 0.5rem;" type="button" @onclick="@(() => AddCheckList.Show())" class="btn btn-warning float-right">@AppData.LangResource[AppData.LanguageID, 315]</button>
+                                    <div class="table-responsive" style="margin-top: 0.5rem;">
+                                        <table class="table table-bordered table-striped text-center" style="width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 244]</th>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 117]</th>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 245]</th>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 145]</th>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 246]</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+
+                                                @foreach (var item in Monthly)
+                                                {
+                                                    if (item.IsActive != null && item.IsActive == true)
+                                                    {
+                                                        <tr>
+                                                            <td>@(Monthly.IndexOf(item)+1)</td>
+                                                            <td>@item.InstrumentChecklistName</td>
+                                                            <td>@item.InstrumentChecklistDescription</td>
+                                                            <td>
+                                                                @if (AppData.CurrentPermission.Find(j => j.permissionID == 7).permissionU)
+                                                                {
+                                                                    <a class="btn btn-warning" @onclick="()=>OnUpdate(item)"><i class="far fa-edit"></i></a>
+                                                                }
+                                                            </td>
+                                                            <td>
+                                                                @if (AppData.CurrentPermission.Find(i => i.permissionID == 7).permissionD)
+                                                                {
+                                                                    <i class="far fa-trash-alt" @onclick="() => OnDeleteTemplate(item.InstrumentChecklistID)"></i>
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </BSTabContent>
+                            </BSTab>
+
+                            <BSTab  InitialSelection="@(mapCheckListType == 4)">
+                                <div @onclick="(() => Ontab(4))">
+                                    <BSTabLabel>
+                                        <span>@AppData.LangResource[AppData.LanguageID, 400]</span>
+                                    </BSTabLabel>
+                                </div>
+                               
+                                <BSTabContent>
+                                    <button style="margin-top: 0.5rem; margin-bottom: 0.5rem;" type="button" @onclick="@(() => AddCheckList.Show())" class="btn btn-warning float-right">@AppData.LangResource[AppData.LanguageID, 315]</button>
+                                    <div class="table-responsive" style="margin-top: 0.5rem;">
+                                        <table class="table table-bordered table-striped text-center" style="width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 244]</th>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 117]</th>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 245]</th>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 145]</th>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 246]</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+
+                                                @foreach (var item in Quarterly)
+                                                {
+                                                    if (item.IsActive != null && item.IsActive == true)
+                                                    {
+                                                        <tr>
+                                                            <td>@(Quarterly.IndexOf(item)+1)</td>
+                                                            <td>@item.InstrumentChecklistName</td>
+                                                            <td>@item.InstrumentChecklistDescription</td>
+                                                            <td>
+                                                                @if (AppData.CurrentPermission.Find(j => j.permissionID == 7).permissionU)
+                                                                {
+                                                                    <a class="btn btn-warning" @onclick="()=>OnUpdate(item)"><i class="far fa-edit"></i></a>
+                                                                }
+                                                            </td>
+                                                            <td>
+                                                                @if (AppData.CurrentPermission.Find(i => i.permissionID == 7).permissionD)
+                                                                {
+                                                                    <i class="far fa-trash-alt" @onclick="() => OnDeleteTemplate(item.InstrumentChecklistID)"></i>
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </BSTabContent>
+                            </BSTab>
+
+                            <BSTab InitialSelection="@(mapCheckListType == 5)">
+                                <div @onclick="(() => Ontab(5))">
+                                    <BSTabLabel>
+                                        <span>@AppData.LangResource[AppData.LanguageID, 399]</span>
+                                    </BSTabLabel>
+                                </div>
+                               
+                                <BSTabContent>
+                                    <button style="margin-top: 0.5rem; margin-bottom: 0.5rem;" type="button" @onclick="@(() => AddCheckList.Show())" class="btn btn-warning float-right">@AppData.LangResource[AppData.LanguageID, 315]</button>
+                                    <div class="table-responsive" style="margin-top: 0.5rem;">
+                                        <table class="table table-bordered table-striped text-center" style="width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 244]</th>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 117]</th>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 245]</th>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 145]</th>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 246]</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+
+                                                @foreach (var item in HaftYear)
+                                                {
+                                                    if (item.IsActive != null && item.IsActive == true)
+                                                    {
+                                                        <tr>
+                                                            <td>@(HaftYear.IndexOf(item)+1)</td>
+                                                            <td>@item.InstrumentChecklistName</td>
+                                                            <td>@item.InstrumentChecklistDescription</td>
+                                                            <td>
+                                                                @if (AppData.CurrentPermission.Find(j => j.permissionID == 7).permissionU)
+                                                                {
+                                                                    <a class="btn btn-warning" @onclick="()=>OnUpdate(item)"><i class="far fa-edit"></i></a>
+                                                                }
+                                                            </td>
+                                                            <td>
+                                                                @if (AppData.CurrentPermission.Find(i => i.permissionID == 7).permissionD)
+                                                                {
+                                                                    <i class="far fa-trash-alt" @onclick="() => OnDeleteTemplate(item.InstrumentChecklistID)"></i>
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </BSTabContent>
+                            </BSTab>
+
+                            <BSTab InitialSelection="@(mapCheckListType == 6)">
+                                <div @onclick="(() => Ontab(6))">
+                                    <BSTabLabel>
+                                        <span>@AppData.LangResource[AppData.LanguageID, 320]</span>
+                                    </BSTabLabel>
+                                </div>
+                               
+                                <BSTabContent>
+                                    <button style="margin-top: 0.5rem; margin-bottom: 0.5rem;" type="button" @onclick="@(() => AddCheckList.Show())" class="btn btn-warning float-right">@AppData.LangResource[AppData.LanguageID, 315]</button>
+                                    <div class="table-responsive" style="margin-top: 0.5rem;">
+                                        <table class="table table-bordered table-striped text-center" style="width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 244]</th>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 117]</th>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 245]</th>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 145]</th>
+                                                    <th>@AppData.LangResource[AppData.LanguageID, 246]</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+
+                                                @foreach (var item in Yearly)
+                                                {
+                                                    if (item.IsActive != null && item.IsActive == true)
+                                                    {
+                                                        <tr>
+                                                            <td>@(Yearly.IndexOf(item)+1)</td>
+                                                            <td>@item.InstrumentChecklistName</td>
+                                                            <td>@item.InstrumentChecklistDescription</td>
+                                                            <td>
+                                                                @if (AppData.CurrentPermission.Find(j => j.permissionID == 7).permissionU)
+                                                                {
+                                                                    <a class="btn btn-warning" @onclick="()=>OnUpdate(item)"><i class="far fa-edit"></i></a>
+                                                                }
+                                                            </td>
+                                                            <td>
+                                                                @if (AppData.CurrentPermission.Find(i => i.permissionID == 7).permissionD)
+                                                                {
+                                                                    <i class="far fa-trash-alt" @onclick="() => OnDeleteTemplate(item.InstrumentChecklistID)"></i>
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </BSTabContent>
+                            </BSTab>
+
+
+                        }
+
+                    </BSTabList>
+                    <BSTabSelectedContent />
+                </BSTabGroup>
+
+                <div class="text-center">
+                    <a href="@($"Instruments/ShowInstrument/{instrumentID}")" class="btn margin-btn" style="background-color:#7F7F7F; color:#fff">@AppData.LangResource[AppData.LanguageID, 49]</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<EditForm Model="@addModalCheckList" OnValidSubmit="PostModalCheckList">
+    <!----<DataAnnotationsValidator />-->
+    <BSModal @ref="AddCheckList">
+        <BSModalHeader @onclick="Onclear" Class="btn-header-color">
+            @if (addModalCheckList.InstrumentChecklistID != 0)
+            {
+                <div>
+                    @AppData.LangResource[AppData.LanguageID, 619]&nbsp;
+                    @AppData.instrumentChecklistTypes.Find(i => i.InstrumentCheckListTypeID == typeID).InstrumentCheckListTypeName
+                </div>
+               
+            }
+            else
+            {
+                <div>
+                    @AppData.LangResource[AppData.LanguageID, 315]&nbsp;
+                    @AppData.instrumentChecklistTypes.Find(i => i.InstrumentCheckListTypeID == typeID).InstrumentCheckListTypeName
+                </div>
+                
+            }
+            
+        </BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 117]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText id="typeName" @bind-Value="addModalCheckList.InstrumentChecklistName" placeholder="@AppData.LangResource[AppData.LanguageID, 117]" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => addModalCheckList.InstrumentChecklistName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 194]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputTextArea rows="3" @bind-Value="addModalCheckList.InstrumentChecklistDescription" placeholder="@AppData.LangResource[AppData.LanguageID, 194]" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => addModalCheckList.InstrumentChecklistDescription)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+        </BSModalBody>
+        <BSModalFooter>
+            <button type="submit" class="btn " style="background-color:#4CBB17; color:#fff">@AppData.LangResource[AppData.LanguageID, 44]</button>
+            <button type="button" class="btn " @onclick="Onclear" style="background-color:#B90F1B; color:#fff">@AppData.LangResource[AppData.LanguageID, 158]</button>
+        </BSModalFooter>
+    </BSModal>
+</EditForm>
+
+
+<BSModal @ref="ModalResponseConfirmDeleteCheckListTem">
+
+    <BSModalHeader OnClick="@(() => ModalResponseConfirmDeleteCheckListTem.Hide())">@AppData.LangResource[AppData.LanguageID, 617]</BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert-modal-delete">
+                        @{
+                        string firstName = "-";
+
+                        if (typeID > 0)
+                        {
+                            var collections = new List<List<InstrumentChecklist>> { Daily, Weekly, Monthly, Quarterly, HaftYear, Yearly };
+                            foreach (var collection in collections)
+                            {
+                                var result = collection.Find(x => x.InstrumentChecklistID == deleteTemplateID);
+                                if (result != null)
+                                {
+                                    firstName = result.InstrumentChecklistName;
+                                    break;
+                                }
+                            }
+                        }
+
+                        @AppData.LangResource[AppData.LanguageID, 618] <br /> @firstName
+                    }
+                </div>
+            </div>
+        </div>
+    </BSModalBody>
+    <BSModalFooter>
+
+        <button type="submit" class="btn btn-danger" @onclick="ExpireInstrumentChecklist">@AppData.LangResource[AppData.LanguageID, 610]</button>
+        <button type="reset" class="btn btn-info" @onclick="@(() => ModalResponseConfirmDeleteCheckListTem.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+
+
+@code {
+
+
+    /// <summary>
+    /// Varliable
+    /// </summary>
+
+    InstrumentChecklist showCheckList = new InstrumentChecklist();
+    string ModelName;
+    string Number;
+    int? instrumentID;
+    int? mapCheckListType;
+    private bool isCheckListTypeTab_1 { get; set; }
+
+    InstrumentChecklist addModalCheckList = new InstrumentChecklist();
+
+
+
+    private List<InstrumentChecklist> Daily = new List<InstrumentChecklist>();
+    private List<InstrumentChecklist> Weekly = new List<InstrumentChecklist>();
+    private List<InstrumentChecklist> Monthly = new List<InstrumentChecklist>();
+    private List<InstrumentChecklist> Yearly = new List<InstrumentChecklist>();
+    private List<InstrumentChecklist> HaftYear = new List<InstrumentChecklist>();
+    private List<InstrumentChecklist> Quarterly = new List<InstrumentChecklist>();
+
+    private List<InstrumentModel> instrumentModels = new List<InstrumentModel>();
+    private List<Instrument> instruments = new List<Instrument>();
+    private List<InstrumentMapCheckListType> instrumentMapCheckListTypes = new List<InstrumentMapCheckListType>();
+    //private List<InstrumentType> instrumentTypes = new List<InstrumentType>();
+
+
+
+    /// <summary>
+    /// pass Parameter InstrumentModelID
+    /// </summary>
+    [Parameter]
+    public string modelID { get; set; }
+
+    [Parameter]
+    public string inID { get; set; }
+
+    [Parameter]
+    public int? typeID { get; set; } = 1;
+
+    private bool isTab1Active = false; // กำหนดให้ Tab 1 ปิดเริ่มต้น
+
+    private BSTabGroup TabGroup;
+    public BSModal? ModalResponseConfirmDeleteCheckListTem{ get; set; }
+    public int deleteTemplateID;
+
+    /// <summary>
+    /// OnInitializedAsync
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+
+        instrumentModels = AppData.instrumentModels;
+        instruments = AppData.instrumentsList;
+        //instrumentTypes = await Http.GetFromJsonAsync<List<InstrumentType>>("api/GetInstrumentType");
+        var resultModelName = instrumentModels.Find(i => i.InstrumentModelID == int.Parse(modelID));
+        if(resultModelName != null)
+        {
+            ModelName = resultModelName.InstrumentModelName;
+        }
+        else
+        {
+            ModelName = "No model";
+        }
+        instrumentID = instruments.Find(i => i.InstrumentID == int.Parse(inID)).InstrumentID;
+
+        Daily = await Http.GetFromJsonAsync<List<InstrumentChecklist>>($"{config["nurl"]}/api/GetInstrumentChecklist/{int.Parse(modelID)}/1");
+        Weekly = await Http.GetFromJsonAsync<List<InstrumentChecklist>>($"{config["nurl"]}/api/GetInstrumentChecklist/{int.Parse(modelID)}/2");
+        Monthly = await Http.GetFromJsonAsync<List<InstrumentChecklist>>($"{config["nurl"]}/api/GetInstrumentChecklist/{int.Parse(modelID)}/3");
+        Quarterly = await Http.GetFromJsonAsync<List<InstrumentChecklist>>($"{config["nurl"]}/api/GetInstrumentChecklist/{int.Parse(modelID)}/4");
+        HaftYear = await Http.GetFromJsonAsync<List<InstrumentChecklist>>($"{config["nurl"]}/api/GetInstrumentChecklist/{int.Parse(modelID)}/5");
+        Yearly = await Http.GetFromJsonAsync<List<InstrumentChecklist>>($"{config["nurl"]}/api/GetInstrumentChecklist/{int.Parse(modelID)}/6");
+
+        instrumentMapCheckListTypes = await _masterData.GetMasterDataAsync<InstrumentMapCheckListType>("InstrumentMapCheckListType");
+
+
+        var resultMapCheckListType = instrumentMapCheckListTypes.Find(x => x.InstrumentID == instrumentID && x.IsCheck == true);
+        if (resultMapCheckListType != null)
+        {
+            mapCheckListType = resultMapCheckListType.InstrumentCheckListTypeID;
+            if (mapCheckListType > 0)
+            {
+                Ontab(mapCheckListType);
+            }
+            //ToastService.ShowSuccess($"{mapCheckListType}");
+        }
+
+    }
+
+
+    /// <summary>
+    /// PostModalCheckList
+    /// </summary>
+    private async Task PostModalCheckList()
+    {
+        if (addModalCheckList.InstrumentChecklistID != 0)
+        {
+            var res = await Http.PutAsJsonAsync($"{config["nurl"]}/api/RegisterInstrumentChecklist", addModalCheckList);
+            if (res.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                ToastService.ShowSuccess("CheckList Save Successfully");
+            }
+        }
+        else
+        {
+            addModalCheckList.InstrumentModelID = int.Parse(modelID);
+            addModalCheckList.InstrumentChecklistType = typeID;
+            var res = await Http.PostAsJsonAsync($"{config["nurl"]}/api/RegisterInstrumentChecklist", addModalCheckList);
+
+            if (res.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                ToastService.ShowSuccess("CheckList Save Successfully");
+                switch (typeID)
+                {
+                    case 1:
+                        Daily.AddRange(await res.Content.ReadFromJsonAsync<List<InstrumentChecklist>>());
+                        break;
+                    case 2:
+                        Weekly.AddRange(await res.Content.ReadFromJsonAsync<List<InstrumentChecklist>>());
+                        break;
+                    case 3:
+                        Monthly.AddRange(await res.Content.ReadFromJsonAsync<List<InstrumentChecklist>>());
+                        break;
+                    case 4:
+                        Quarterly.AddRange(await res.Content.ReadFromJsonAsync<List<InstrumentChecklist>>());
+                        break;
+                    case 5:
+                        HaftYear.AddRange(await res.Content.ReadFromJsonAsync<List<InstrumentChecklist>>());
+                        break;
+                    case 6:
+                        Yearly.AddRange(await res.Content.ReadFromJsonAsync<List<InstrumentChecklist>>());
+                        break;
+
+
+
+                }
+
+            }
+        }
+        addModalCheckList = new InstrumentChecklist();
+
+        AddCheckList.Hide();
+        StateHasChanged();
+    }
+
+    public void OnUpdate(InstrumentChecklist i)
+    {
+        addModalCheckList = i;
+        AddCheckList.Show();
+
+    }
+
+    public void OnDeleteTemplate(int id)
+    {
+
+        deleteTemplateID = id;
+        ModalResponseConfirmDeleteCheckListTem.Show();
+
+    }
+
+    public void Onclear()
+    {
+        addModalCheckList = new InstrumentChecklist();
+    }
+
+    /// <summary>
+    /// DeleteCheckList
+    /// </summary>
+    public async Task ExpireInstrumentChecklist()
+    {
+        var upresult = await Http.PutAsync($"{config["nurl"]}/api/ExpireInstrumentChecklist/id?id={deleteTemplateID}", null);
+        
+        await OnInitializedAsync();
+        ModalResponseConfirmDeleteCheckListTem.Hide();
+    }
+
+    /// <summary>
+    /// ModalCheckList
+    /// </summary>
+    BSModal AddCheckList { get; set; }
+    BSModal EditCheckList { get; set; }
+
+    /// <summary>
+    /// clearURL
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("clearURL");
+            await jsRuntime.InvokeVoidAsync("BSTabsCheckList");
+        }
+    }
+    /// <summary>
+    /// OnTab
+    /// </summary>
+    ///
+    void Ontab(int? type)
+    {
+        typeID = type;
+    }
+}

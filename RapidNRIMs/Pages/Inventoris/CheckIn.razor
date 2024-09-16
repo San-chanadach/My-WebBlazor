@@ -1,0 +1,704 @@
+﻿@page "/Inventoris/CheckIn"
+@inject IJSRuntime jsRuntime
+@inject NavigationManager NavigationManager
+@inject AppData AppData
+@inject IToastService ToastService
+@inject HttpClient Http
+@inject IMasterData _masterData
+@using System.Threading
+@using RapidNRIMs.Model.Inventories
+@inject IConfiguration Config
+@inject ILanguageService LanguageService
+
+<PageTitle>Check In Page</PageTitle>
+
+<EditForm Model="@inventoryStockCheckIn">
+<div class="row margin-row-card">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">@AppData.LangResource[AppData.LanguageID,393]</div>
+            <div class="card-body">
+                <div class="form-row justify-content-between">
+                    <div class="form-group row col-md-5">
+                        <label class="col-sm-4 col-form-label">
+                            @AppData.LangResource[AppData.LanguageID, 177]
+                        </label>
+                        <div class="col-sm-8">
+                            <InputDate id="setReturnDate" @bind-Value="inventoryStockCheckIn.InventoryStockCheckIntDate" placeholder="@AppData.LangResource[AppData.LanguageID,177]" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group row col-md-7">
+                        <label class="col-sm-2 col-form-label">
+                            @AppData.LangResource[AppData.LanguageID, 512]
+                             <span class="color-necessary">*</span>
+                        </label>
+                         
+                       <div class="col-sm-1 input-group input-box-bottom ckeckStaff">
+                            <span class="ml-3 mt-2"><input @bind="inventoryStockCheckIn.IsStaff"  @onclick="@(()=> inventoryStockCheckIn.InventoryStockCheckInBy = null)" class="form-check-input" type="checkbox" name="inlineRadioOptions" id="inlineRadioOptions" />@AppData.LangResource[AppData.LanguageID, 475]</span>
+                       </diV>
+                       <div class="col-sm-6">
+                            @if (inventoryStockCheckIn.IsStaff)
+                            {<InputSelect class="form-control" @bind-Value="inventoryStockCheckIn.InventoryStockCheckInBy">
+                                    <option value="">@AppData.LangResource[AppData.LanguageID, 2]-Staff</option>
+                                    @foreach (var item in accounts)
+                                    {
+                                        if (item.IsActive)
+                                        {
+                                            <option value="@item.UserID">@item.FirstName</option>
+                                        }
+                                    }
+                            </InputSelect>
+                            }
+                            else
+                            {
+                                <InputSelect class="form-control" @bind-Value="inventoryStockCheckIn.InventoryStockCheckInBy" >
+                                    <option value="">@AppData.LangResource[AppData.LanguageID, 2]-OutSide</option>
+                                    @foreach (var item in other)
+                                    {
+                                    <option value="@item.UserID"  >@item.UserName</option>
+                                    }
+                                </InputSelect>
+                                <span class="span-btn-giveTo">
+                                    <button type="button" @onclick="@(() => AddOtherUser.Show())" class="btn btn-warning " >
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </span>
+                            }
+
+                        </div>
+                    </div>
+                </div>
+
+                 @if (!inventoryStockCheckIn.IsStaff && inventoryStockCheckIn.InventoryStockCheckInBy != null)
+                    {
+                        <div Class="card bg-light mb-3">
+                            <div Class="card-bordy">
+
+                                 <div class="form-row justify-content-between">
+                                    <div class="form-group row col-md-5">
+                                        <label class="col-sm-4 col-form-label">
+                                            <span>@AppData.LangResource[AppData.LanguageID, 401] <strong class="color-necessary">*</strong></span>
+                                        </label>
+                                        <div class="col-sm-8">
+                                            <InputText disabled @bind-Value="@other.Find(i=>i.UserID == inventoryStockCheckIn.InventoryStockCheckInBy).UserName" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row col-md-7">
+                                         <label class="col-sm-3 col-form-label">
+                                             <span>@AppData.LangResource[AppData.LanguageID, 402] <strong class="color-necessary">*</strong> </span>
+                                         </label>
+                                    
+                                        <div class="col-sm-6">
+                                            <InputText disabled @bind-Value="@other.Find(i=>i.UserID == inventoryStockCheckIn.InventoryStockCheckInBy).Department" class="form-control" />
+                                        </div>
+                                    </div>
+                                 </div>
+
+                                 <div class="form-row justify-content-between">
+                                    <div class="form-group row col-md-5">
+                                        <label class="col-sm-4 col-form-label">
+                                            <span>@AppData.LangResource[AppData.LanguageID, 403] <strong class="color-necessary">*</strong></span>
+                                        </label>
+                                        <div class="col-sm-8">
+                                            <InputText disabled @bind-Value="@other.Find(i=>i.UserID == inventoryStockCheckIn.InventoryStockCheckInBy).PhoneNumber" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row col-md-7">
+                                         <label class="col-sm-3 col-form-label"><span>@AppData.LangResource[AppData.LanguageID, 404] <strong class="color-necessary">*</strong> </span></label>
+                                        <div class="col-sm-6">
+                                            <InputText disabled @bind-Value="@other.Find(i=>i.UserID == inventoryStockCheckIn.InventoryStockCheckInBy).Email" class="form-control" />
+                                        </div>
+                                    </div>
+                                 </div>
+                            </div>
+                        </div>
+                    }
+
+
+                <div class="form-row justify-content-between">
+                    <div class="form-group row col-md-5">
+                        <label class="col-sm-4 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 116]</span>
+                        </label>
+                        <div class="col-sm-8">
+                            <InputText @bind-Value="checkInitem.InventoryStockNumber" placeholder="@AppData.LangResource[AppData.LanguageID,116]" class="form-control" />
+                            <ValidationMessage For="@(() => checkInitem.InventoryStockNumber)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" />
+                        </div>
+                    </div>
+                    <div class="form-group row col-md-7">
+                        <label class="col-sm-3 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID, 220]</span>
+                        </label>
+                        <div class="col-sm-3">
+                            
+                                <input type="number" min="0" @bind-value="checkInitem.InventoryStockQuantity" placeholder="@AppData.LangResource[AppData.LanguageID,220]" class="form-control" />
+                           
+                            <ValidationMessage For="@(() => checkInitem.InventoryStockQuantity)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px;" />
+                        </div>
+                        <div class="col-sm-1">
+                            <span class="addtolist-btn-giveTo">
+                                <button type="button" @onclick="AddtoList" class="btn btn-warning margin-btn">
+                                    @AppData.LangResource[AppData.LanguageID,256]
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row justify-content-center">
+                    <div class="form-group row col-md-10">
+                        <div class="table-responsive fixTableHead scroll-inner scrollBar-x justify-content-center margin-bottom-style">
+                            <table class="table table-striped text-center ">
+                                <thead class="fixedthead">
+                                    <tr>
+                                        <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,423]</th>
+                                        <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,424]</th>
+                                        <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,425]</th>
+                                        <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 428]</th>
+                                        <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,421]</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="scrollContent">
+                                    @foreach (var item in checkInlist)
+                                    {
+                                        <tr>
+                                            <td> @item.InventoryStockNumber</td>
+                                            <td>@item.InventoryStock.inventory.InventoryTHName</td>
+                                            <td> @item.InventoryStockQuantity</td>
+                                            <td>@item.InventoryStock.InventoryStockQuantity</td>
+                                            <td @onclick="@(()=> RemovefromList(@item))"> <i class="fas fa-trash  text-danger"> </i></td>
+
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center">
+            @if (inventoryStockCheckIn.InventoryStockCheckInBy != null && AppData.CurrentPermission.Find(i => i.permissionID == 11).permissionC) 
+            {
+                <button type="submit" @onclick="PostInventoryStockCheckIn" class="btn margin-btn" style="background-color:#2E2BFF; color:#fff" name="CheckOut" id="CheckOut">@AppData.LangResource[AppData.LanguageID, 17]</button>
+            }
+            else
+            {
+                 <button type="button" disabled class="btn margin-btn" style="background-color:#2E2BFF; color:#fff">@AppData.LangResource[AppData.LanguageID, 17]</button>
+            }
+            <button type="reset" @onclick="OnClear" class="btn margin-btn" style="background-color:#B90F1B; color:#fff" name="Clear" id="Clear">@AppData.LangResource[AppData.LanguageID, 45]</button>
+        </div>
+    </div>
+</div>
+</EditForm>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="col-2">
+                    <button type="submit" @onclick="OnsearchCheckInHistory" class="btn " style="background-color:#2E2BFF; color:#fff"><i class="fas fa-table mr-1"> </i>@AppData.LangResource[AppData.LanguageID,452]</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height:400px;">
+                    <table id="dataTable" class="table table-bordered table-striped text-center">
+                        <thead class="fixedthead">
+                            <tr>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,453]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,116]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,106]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,512]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,23]</th>
+                            </tr>
+                        </thead>
+                        <tbody class="scrollContent">
+                             @foreach (var item in checkInlistHistory)
+                            {
+                                <tr>
+                                     <td data-label="">@String.Format("{0:dd/MM/yyyy}", item.InventoryStockCheckIntDate)</td>
+                                     <td data-label="">@(item.InventoryStockNumber != ""? item.InventoryStockNumber:"-")</td>
+                                     <td data-label="">@(item.InventoryENName != ""? item.InventoryENName:"-")</td>
+                                     <td data-label="">
+                                        @if (item.IsStaff)
+                                        {
+                                            @(accounts.Find(i => i.UserID == @item.InventoryStockCheckInBy) != null? accounts.Find(i => i.UserID == @item.InventoryStockCheckInBy).FirstName:"-")
+                                        }
+                                        else
+                                        {
+                                            @(other.Find(i => i.UserID == @item.InventoryStockCheckInBy) != null? other.Find(i => i.UserID == @item.InventoryStockCheckInBy).UserName:"-")
+                                        }
+                                     </td>
+                                     <td>
+                                        <a type="button" class="btn btn-warning "  href="@Config["rurl"]/api/InventoryCheckInReport?CheckInID=@item.InventoryStockCheckInID&USerID=@item.ByUserID&isstaff=@(item.IsStaff?1:0)" download="" target="_blank">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<EditForm Model="@newOtherUser" OnValidSubmit="PostOtherUser">
+    <DataAnnotationsValidator />
+    <BSModal @ref="AddOtherUser">
+        <BSModalHeader OnClick="@(() => AddOtherUser.Hide())" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID, 644]</BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <label for="retrunDate" class="col-4  col-form-label">
+                    <span>Name*:</span>
+                </label>
+                <div class="col-8">
+                    <div class="input-group input-box-bottom">
+                        <InputText id="UserName" @bind-Value="newOtherUser.UserName" disable placeholder="UserName" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => newOtherUser.UserName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label for="checkoutDate" class="col-4 col-form-label ">
+                    <span>Department* :</span>
+                </label>
+                <div class="col-8">
+                    <div class="input-group input-box-bottom">
+                        <InputText id="Department" @bind-Value="newOtherUser.Department" placeholder="Department" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => newOtherUser.Department)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+
+            <div class="row">
+                <label for="retrunDate" class="col-4 col-form-label">
+                    <span>PhoneNumber* :</span>
+                </label>
+                <div class=" col-8 ">
+                    <div class="input-group input-box-bottom">
+                        <InputText id="instrumentNumber" @bind-Value="newOtherUser.PhoneNumber" placeholder="PhoneNumber" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => newOtherUser.PhoneNumber)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label for="checkoutDate" class="col-md-4 col-form-label ">
+                    <span>E-mail</span>
+                </label>
+                <div class=" col-8 ">
+                    <div class="input-group input-box-bottom">
+                        <InputText id="instrumentNumber" @bind-Value="newOtherUser.Email" placeholder="email" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+
+        </BSModalBody>
+        <BSModalFooter>
+            <button type="submit" class="btn" style="background-color:#4CBB17; color:#fff">@AppData.LangResource[AppData.LanguageID, 44]</button>
+            <button type="reset" class="btn" style="background-color:#B90F1B; color:#fff" @onclick="@(() => AddOtherUser.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+        </BSModalFooter>
+    </BSModal>
+</EditForm>
+
+<BSModal class="row style-justify mt-5" @ref="Load" IsCentered="true" Size="Size.Small" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+    <BSModalBody>
+         <div class="text-center mt-3">
+            <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+                    style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+         </div>
+         <div class="text-center pt-3" style=" font-size: 16pt">
+            @AppData.LangResource[AppData.LanguageID, 325]
+         </div>
+    </BSModalBody>
+</BSModal>
+
+@code {
+    BSModal Load { get; set; }
+
+    /// <summary>
+    /// Varliable
+    /// </summary>
+    //****ที่เพิ่มเข้ามาในอันนี้ คือ รีเฟรส ข้อมูลที่ทำการ CheckOut Consumable โดยทำการ Get ข้อมูลของ MinStock,Inventory มาอีกครั้งในตอน CheckOut Consumable*********
+    private List<MinStock> listMinStock = new List<MinStock>();
+    private List<Inventory> listInventory = new List<Inventory>();
+    private List<InventoryAgency> inventoryAgencys = new List<InventoryAgency>();
+    private List<InventoryBrand> inventoryBrands = new List<InventoryBrand>();
+    ///***********************************************************************************************************************************
+    private InventoryStockCheckIn inventoryStockCheckIn = new InventoryStockCheckIn()
+    {
+            InventoryStockCheckIntDate = DateTime.Today,
+    };
+    InventoryAction inventoryAction = new InventoryAction();
+    private List<InventoryAction> inventoryActions = new List<InventoryAction>();
+    List<InventoryStockCheckIn> inventoryStockCheckIns = new List<InventoryStockCheckIn>();
+    private List<Account> accounts = new List<Account>();
+    Account account = new Account();
+    OtherUser newOtherUser = new OtherUser();
+    OtherUser choose = new OtherUser();
+    List<OtherUser> other = new List<OtherUser>();
+    private List<InventoryStock> inventoryStocks = new List<InventoryStock>();
+    private List<Inventory> inventories = new List<Inventory>();
+    public List<InventoryStockCheckInItem> checkInlist = new List<InventoryStockCheckInItem>();
+    public List<InventoryStockCheckIn> checkInlistHistory = new List<InventoryStockCheckIn>();
+
+    InventoryStockCheckInItem checkInitem = new InventoryStockCheckInItem();
+
+
+    /// <summary>
+    /// SaveInventoryStockCheckOut
+    /// </summary>
+    private async Task PostInventoryStockCheckIn()
+    {
+        //var checkstocknumber =  inventoryStocks.Find(i => i.InventoryStockNumber == inventoryStockCheckOut.InventoryStockNumber && i.InventoryStockQuantity >= inventoryStockCheckOut.InventoryStockCheckOutQuantity);
+        Load.Show();
+        if (inventoryStockCheckIn.InventoryStockCheckInBy == null||
+            inventoryStockCheckIn.InventoryStockCheckIntDate==null)
+        {
+
+        }
+        else
+        {
+            try
+            {
+
+                inventoryStockCheckIn.InventoryStockNumber = checkInitem.InventoryStockNumber;
+                var resultENName = inventoryStocks.Find(x => x.InventoryStockNumber == checkInitem.InventoryStockNumber);
+                if(resultENName != null)
+                {
+                    var resultINS = inventories.Find(x => x.InventoryNumber == resultENName.InventoryNumber);
+                    if (resultINS != null)
+                    {
+                        inventoryStockCheckIn.InventoryENName = resultINS.InventoryENName;
+                    }
+                }
+                //ToastService.ShowSuccess($"Successfully CheckIn{inventoryStockCheckIn.InventoryENName}");
+                //inventoryStockCheckIn.InventoryENName = checkInitem.InventoryStock.inventory.InventoryENName;
+                //inventoryStockCheckIn.InventoryStockCheckInBy = AppData.UserID;
+                inventoryStockCheckIn.ByUserID = AppData.UserID;
+
+                var respond = await _masterData.PostMasterDataAsync("PostInventoryCheckIn", inventoryStockCheckIn);
+                if (respond != null) 
+                {
+                    foreach (var i in checkInlist)
+                    {
+                        i.InventoryStockCheckInID = respond.InventoryStockCheckInID;
+                        await Http.PostAsJsonAsync($"{Config["nurl"]}/api/RegisterInventoryStockCheckInitem", i);
+                    }
+
+                    string url = $"{Config["rurl"]}/api/InventoryCheckInReport?CheckInID={respond.InventoryStockCheckInID}&USerID={AppData.UserID}&isstaff={(respond.IsStaff ? 1 : 0)}";
+                    await jsRuntime.InvokeVoidAsync("OpenURL", url);
+
+                    ToastService.ShowSuccess("Successfully CheckIn");
+                    await SetNotification();
+                } else {
+                    ToastService.ShowError("Error!");
+                }
+
+                // //using var respond = await Http.PostAsJsonAsync("api/RegisterInventoryCheckIn", inventoryStockCheckIn);
+                // // inventoryStockCheckIn.InventoryStockCheckInBy = AppData.UserID;
+                // inventoryStockCheckIn.InventoryStockNumber =  checkInitem.InventoryStockNumber;
+                // inventoryStockCheckIn.InventoryENName = checkInitem.InventoryStock.inventory.InventoryENName;
+                // inventoryStockCheckIn.ByUserID = AppData.UserID;
+                // var respond = await _masterData.PostMasterDataAsync("PostInventoryCheckIn",inventoryStockCheckIn);
+                // if (respond != null)
+                // {
+
+                //     foreach (var i in checkInlist)
+                //     {
+                //         i.InventoryStockCheckInID =  respond.InventoryStockCheckInID;
+                //         await Http.PostAsJsonAsync($"{Config["nurl"]}/api/RegisterInventoryStockCheckInitem", i);
+
+                //     }
+
+                //     string url = $"{Config["rurl"]}/api/InventoryCheckInReport?CheckInID={respond.InventoryStockCheckInID}&USerID={AppData.UserID}&isstaff={(respond.IsStaff? 1: 0) }";
+                //     await jsRuntime.InvokeVoidAsync("OpenURL", url);
+                //     //((IJSInProcessRuntime)jsRuntime).InvokeVoid("OpenURL", url);
+                //     //Console.WriteLine(res);
+                //     ToastService.ShowSuccess("Successfully CheckIn");
+                //     await SetNotification();
+                // }
+                // else
+                // {
+                //     ToastService.ShowError(" Error!");
+                // }
+            }
+            catch (Exception e)
+            {
+                var value = e.Message;
+                ToastService.ShowError("Quantity is more than first stock quantity");
+
+            }
+        }
+
+
+
+
+        Load.Hide();
+    }
+
+    private async Task PostOtherUser()
+    {
+        try
+        {
+            var res =  await Http.PostAsJsonAsync($"{Config["nurl"]}/api/OtherUser", newOtherUser);
+            if (res.StatusCode == System.Net.HttpStatusCode.OK) {
+
+                var o = await res.Content.ReadFromJsonAsync<OtherUser>();
+                this.other.Add(o);
+                this.inventoryStockCheckIn.InventoryStockCheckInBy = o.UserID;
+                ToastService.ShowSuccess("OtherUser Save Successfully");
+            }
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError($"Error:{e.Message}");
+        }
+        AddOtherUser.Hide();
+        StateHasChanged();
+
+    }
+
+    /// <summary>
+    /// OnClear
+    /// </summary>
+    public void OnClear()
+    {
+        inventoryStockCheckIn = new InventoryStockCheckIn();
+        checkInitem = new InventoryStockCheckInItem();
+        checkInlist = new List<InventoryStockCheckInItem>();
+        this.inventoryStockCheckIn.IsStaff = true;
+    }
+
+
+
+    /// <summary>
+    /// OnInitializedAsync
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        inventories = AppData.inventorys;
+
+        inventoryStocks = await Http.GetFromJsonAsync<List<InventoryStock>>($"{Config["nurl"]}/api/GetInventoryStock");
+        inventoryActions = AppData.inventoryActions;
+
+        accounts = await Http.GetFromJsonAsync<List<Account>>($"{Config["aurl"]}/api/GetAccount");
+        //var result = accounts.Find(u => u.UserID == AppData.UserID).UserID;
+        //inventoryStockCheckIn.InventoryStockCheckInBy = result;
+
+        this.inventoryStockCheckIn.IsStaff = true;
+        other = await Http.GetFromJsonAsync<List<OtherUser>>($"{Config["nurl"]}/api/OtherUser");
+
+        //accounts =  await Http.GetFromJsonAsync<List<Account>>("https://www.eprsmarttool.com/RapidAuthenication_Service/api/GetAccount");
+
+        if(AppData.LanguageID == 0)
+        {
+            var resultAccounts = accounts.OrderBy(ac => ac.FirstName).ToList();
+            accounts = resultAccounts;
+            var resultOther = other.OrderBy(o => o.UserName).ToList();
+            other = resultOther;
+        }
+        else
+        {
+            var resultAccounts = accounts.OrderBy(ac => ac.FirstName).ToList();
+            accounts = resultAccounts;
+            var resultOther = other.OrderBy(o => o.UserName).ToList();
+            other = resultOther;
+        }
+    }
+
+    public async void OnsearchCheckInHistory()
+    {
+        await Task.Run(Loading);
+        Load.Show();
+        try
+        {
+
+
+            //inventoryStockCheckIn.InventoryStock.First().GetLookUp(AppData.inventorys);
+
+
+            checkInlistHistory = await Http.GetFromJsonAsync<List<InventoryStockCheckIn>>($"{Config["nurl"]}/api/RegisterInventoryCheckIn");
+
+            StateHasChanged();
+
+
+
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError($"Error: {e.Message}");
+        }
+        Load.Hide();
+    }
+
+    public async Task SetNotification()
+    {
+        //****ที่เพิ่มเข้ามาในอันนี้ คือ รีเฟรส ข้อมูลที่ทำการ CheckOut Consumable โดยทำการ Get ข้อมูลของ MinStock,Inventory มาอีกครั้งในตอน CheckOut Consumable*********
+        AppData.inventorys = await _masterData.GetMasterDataAsync<Inventory>("Inventory");
+        AppData.inventoryBrands = await _masterData.GetMasterDataAsync<InventoryBrand>("InventoryBrand");
+        AppData.inventoryAgencys = await _masterData.GetMasterDataAsync<InventoryAgency>("InventoryAgency");
+        AppData.mins = await Http.GetFromJsonAsync<List<RapidNRIMs.Model.Inventories.MinStock>>($"{Config["nurl"]}/api/GetInventoryminStock");
+
+        foreach (var i in AppData.inventorys)
+        {
+            i.Getlookup(AppData.inventoryBrands, AppData.inventoryAgencys);
+        }
+
+        listInventory = AppData.inventorys;
+        inventoryBrands = AppData.inventoryBrands;
+        inventoryAgencys = AppData.inventoryAgencys;
+        listMinStock = AppData.mins;
+        ///***********************************************************************************************************************************
+    }
+
+    /// <summary>
+    /// Modal AddGiveTo AddAction
+    /// </summary>
+    BSModal AddGiveTo { get; set; }
+    BSModal AddAction { get; set; }
+    BSModal AddOtherUser { get; set; }
+
+    /// <summary>
+    /// clearURL
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("clearURL");
+        }
+    }
+
+    /// <summary>
+    /// OnsearchCheckIN
+    /// </summary>
+    public async void Onsearch()
+    {
+        await Task.Run(Loading);
+        Load.Show();
+        var i = await Http.GetFromJsonAsync<List<InventoryStockCheckIn>>($"{Config["nurl"]}/api/RegisterInventoryCheckIn");
+        Console.WriteLine("List: "+i.Count);
+        inventoryStockCheckIns = i;
+        Console.WriteLine("ListI: " + inventoryStockCheckIns.Count);
+        StateHasChanged();
+        Load.Hide();
+    }
+
+    public async void AddtoList() {
+        try 
+        {
+
+            var resultStockNum = inventoryStocks.Find(x => x.InventoryStockNumber == checkInitem.InventoryStockNumber);
+            if (resultStockNum == null)
+            {
+                ToastService.ShowError("The StockNumber doesn't actually exist.");
+            }
+            else if (!checkInlist.Any(i => i.InventoryStockNumber == checkInitem.InventoryStockNumber))
+            {
+                var stock = await Http.GetFromJsonAsync<List<InventoryStock>>($"{Config["nurl"]}/api/GetInventoryStockByStockNumber/{checkInitem.InventoryStockNumber}");
+                
+                if (checkInitem.InventoryStockQuantity == null)
+                {
+
+                    ToastService.ShowError("Not Have Quantity , Please enter Quantity ");
+
+                }
+                else if(checkInitem.InventoryStockQuantity > stock.First().FirstStockQuantity)
+                {
+                    ToastService.ShowError("There is no remaining stock!");
+                }
+                else
+                {
+                    var stockItem = stock.First();
+                    stockItem.GetLookUp(AppData.inventorys);
+
+                    // สร้าง instance ใหม่สำหรับ checkOutitem
+                    var newCheckInItem = new InventoryStockCheckInItem
+                        {
+                            InventoryStock = stockItem,
+                            InventoryStockNumber = checkInitem.InventoryStockNumber,
+                            InventoryStockQuantity = checkInitem.InventoryStockQuantity,
+                            
+                            // กำหนดค่าอื่นๆที่จำเป็น
+                        };
+
+                    this.checkInlist.Add(newCheckInItem);
+
+                    ToastService.ShowSuccess("Add Success");
+                }
+                
+            }
+            else
+            {
+                ToastService.ShowError("Comsumable StockNumber Duplicatie");
+            }
+
+
+
+
+
+            // if (checkInitem.InventoryStockNumber == ""|| checkInitem.InventoryStockNumber is null)
+            // {
+            //     ToastService.ShowError("Inventory Stock Number is required.");
+            // }
+            // else 
+            // {
+            //     var stock = await Http.GetFromJsonAsync<List<InventoryStock>>($"{Config["nurl"]}/api/GetInventoryStockByStockNumber/{checkInitem.InventoryStockNumber}");
+
+            //     if (stock.Count() != 1 )
+            //     {
+            //         ToastService.ShowError("Consumable Stock Is Not Alive on Store or Discards");
+            //     }
+            //     else 
+            //     {
+            //         if ((checkInitem.InventoryStockQuantity) < 0)
+            //         {
+            //             ToastService.ShowError("Not Have Quantity , Please enter Quantity ");
+            //         }
+            //         else 
+            //         {
+            //             stock.First().GetLookUp(AppData.inventorys);
+            //             //checkInitem.InventoryStockID = stock.First().InventoryStockID;
+            //             checkInitem.InventoryStock = stock.First();
+            //             var addlist = checkInitem;
+            //             this.checkInlist.Add(addlist);
+            //             //******************add เสร็จให้ Clear**********
+            //             //checkInitem = new InventoryStockCheckInItem();
+            //             //******************************************/
+            //             ToastService.ShowSuccess("Add Success");
+            //         }
+            //     }
+            // }
+        } 
+        catch (Exception e) 
+        {
+            ToastService.ShowError($"Error:{e.Message}");
+        }
+        StateHasChanged();
+    }
+
+    public void RemovefromList(InventoryStockCheckInItem item)
+    {
+        try
+        {
+            this.checkInlist.Remove(item);
+            ToastService.ShowSuccess("Add Success");
+
+        }
+        catch (Exception e) {
+            throw;
+        }
+        StateHasChanged();
+    }
+
+    private void Loading()
+    {
+        System.Threading.Thread.Sleep(300);
+        // Retrieve data from the server and initialize
+        // Employees property which the View will bind
+    }
+}

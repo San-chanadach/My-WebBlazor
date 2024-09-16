@@ -1,0 +1,147 @@
+﻿@page "/Record/ShowSubEvent/AddSubEvent"
+@inject AppData AppData
+@inject IJSRuntime jsRuntime
+<div class="row margin-row-card">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                 @AppData.LangResource[AppData.LanguageID,164]:
+                <img class="img-qrcode float-right" src="assets/images/img-qrcode/qr-code.png">
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID,56]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <input type="date" class="form-control" name="EventDate" id="EventDate" placeholder="@AppData.LangResource[AppData.LanguageID,56]" autocomplete="off" autofocus>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID,37]</span>
+                    </label>
+                    <div class="col-12 col-md-12 col-lg-8 input-box-bottom">
+                        <textarea class="form-control" name="EventDetail" id="EventDetail" rows="2" placeholder="@AppData.LangResource[AppData.LanguageID,37]"></textarea>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID,57]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <select class="form-control" name="EventAssingedTeam" id="EventAssingedTeam">
+                                <option selected>Select</option>
+                                <option value="">Team 1</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID,10]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <input type="text" class="form-control input-box-bottom" name="SPIRID" id="SPIRID" placeholder="SPIR ID">
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <input type="text" class="form-control input-box-bottom" placeholder="300">
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <select class="form-control input-box-bottom">
+                                <option selected>Select</option>
+                                <option value="">𝜇Sv/h</option>
+                            </select>
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID,75]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <InputFile OnChange="ShowImageAddSubEvent" class="form-control" name="EventPicture" id="EventPicture" />
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span></span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            @if (imageShowAddSubEvent != null)
+                            {
+                                <img class="img-show float-left" src="@imageShowAddSubEvent" />
+                            }
+                            else
+                            {
+                                <img class="img-show float-left" src="assets/images/no-img/ImageNotFount.png">
+                            }
+                        </div>
+                    </div>
+                </div>
+                <!--/form-->
+            </div>
+        </div>
+        <div class="text-center">
+            <a href="Record/ShowEvent/Event" class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID,49]</a>
+            <button type="submit" class="btn btn-warning margin-btn" name="SaveSubEvent" id="SaveSubEvent">@AppData.LangResource[AppData.LanguageID,44]</button>
+            <button type="reset" class="btn btn-warning margin-btn" name="Clear" id="Clear">@AppData.LangResource[AppData.LanguageID,45]</button>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    //AddTextBox
+    string InputTextBox;
+
+    List<string> TextBox { get; set; } = new List<string>();
+    private void AddInputTextBox()
+    {
+        TextBox.Add(InputTextBox);
+    }
+
+    //ShowImage  
+    long maxFileSize = 1024 * 1024 * 15;
+
+    string imageShowAddSubEvent;
+
+
+    private async Task ShowImageAddSubEvent(InputFileChangeEventArgs e)
+    {
+        var format = "image/png";
+        var imageFile = await e.File.RequestImageFileAsync(format, 640, 480);
+
+        using var fileStream = imageFile.OpenReadStream(maxFileSize);
+        using var memoryStream = new MemoryStream();
+        await fileStream.CopyToAsync(memoryStream);
+
+        imageShowAddSubEvent = $"data:{format};base64,{Convert.ToBase64String(memoryStream.ToArray())}";
+    }
+
+    private string location;
+    private DateTime date;
+    private DateTime time;
+    private string detail;
+    private string assingedteam;
+    private string instrument;
+    private string picture;
+
+      protected override void OnInitialized()
+    {
+        ((IJSInProcessRuntime)jsRuntime).InvokeVoid("clearURL");
+    }
+}

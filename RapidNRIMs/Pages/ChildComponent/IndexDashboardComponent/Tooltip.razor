@@ -1,0 +1,69 @@
+﻿<div class="tooltip-container">
+    <div class="tooltip-trigger" @onmouseover="ShowTooltip" @onmouseout="HideTooltip">
+        @ChildContent
+    </div>
+    @if (IsVisible)
+    {
+        <div class="tooltip-content @GetTooltipPositionCssClass(Position)">
+            @TooltipText
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string TooltipText { get; set; }
+
+    [Parameter]
+    public string Direction { get; set; } = "top";
+
+    [Parameter]
+    public TooltipPosition Position { get; set; } = TooltipPosition.Top;
+
+    private bool IsVisible { get; set; }
+
+    // กำหนดตัวแปรสำหรับเก็บตำแหน่ง x และ y ของ tooltip
+    private double x;
+    private double y;
+
+    private string Top { get; set; }
+
+    private string Left { get; set; }
+
+    private void ShowTooltip(MouseEventArgs e)
+    {
+        IsVisible = true;
+        x = e.ClientX + 10; // กำหนดตำแหน่ง x ของ tooltip
+        y = e.ClientY + 10; // กำหนดตำแหน่ง y ของ tooltip
+    }
+
+    
+
+     private string GetTooltipPositionCssClass(TooltipPosition position)
+    {
+        return position switch
+        {
+            TooltipPosition.Top => "tooltip-top",
+            TooltipPosition.Right => "tooltip-right",
+            TooltipPosition.Bottom => "tooltip-bottom",
+            TooltipPosition.Left => "tooltip-left",
+            _ => throw new ArgumentException("Invalid tooltip position"),
+        };
+    }
+
+    public enum TooltipPosition
+    {
+        Top,
+        Right,
+        Bottom,
+        Left
+    }
+
+    private void HideTooltip()
+    {
+        IsVisible = false;
+    }
+}

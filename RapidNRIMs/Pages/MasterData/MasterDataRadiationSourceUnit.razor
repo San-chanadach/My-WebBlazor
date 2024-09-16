@@ -1,0 +1,433 @@
+﻿@page "/MasterData/MasterDataRadiationSourceUnit"
+@inject AppData AppData
+@inject IToastService ToastService
+@inject IMasterData _masterData
+@inject IJSRuntime jsRuntime
+
+
+@if (listRadiationSourceUnit == null)
+{
+    <div class="text-center mt-3">
+        <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+              style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+    </div>
+    <div class="text-center pt-3" style=" font-size: 16pt">
+        @AppData.LangResource[AppData.LanguageID, 325]
+    </div>
+}
+else
+{
+
+    <div class="row margin-row-card">
+        <div class="col-md-12">
+            <div class="float-right" style="margin-bottom:10px; margin-top:10px">
+                <button class="btn btn-warning" @onclick="@(() => ModalRadiationSourceUnitCreate.Show())">
+                    @AppData.LangResource[AppData.LanguageID, 499]
+                </button>
+
+            </div>
+        </div>
+    </div>
+    
+    <div class="row margin-row-card">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header"><i class="fas fa-table mr-1"></i>@AppData.LangResource[AppData.LanguageID, 501]</div>
+                <div class="card-body">
+                    <div class="scrollBar fixTableHead table-responsive scroll-inner heightTable" style="height: 700px;">
+                        <table id="dataTable" class="display table table-bordered table-striped text-center" width="100%">
+                            <thead class="fixedthead">
+                                <tr>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 322]</th>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 502]</th>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 145]</th>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 146]</th>
+                                </tr>
+                            </thead>
+                            <tbody class="scrollContent">
+                                @{int id = 1;}
+                                @foreach (var item in listRadiationSourceUnit)
+                                {
+                                   
+                                    if (item.IsActive != null && item.IsActive == true)
+                                    {
+                                         <tr>
+                                            <td>@id</td>
+                                            <td>@item.RadiationSourceUnitName</td>
+                                            <td>
+                                                <button type="button" class="btn btn-warning" @onclick="@(() =>RadiationSourceUnitUpdate(item.RadiationSourceUnitID))">
+                                                    <i class="fas fa-edit fa-sm"></i>
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <button  type="button" class="btn btn-danger" @onclick="@(() => RadiationSourceUnitDelete(item.RadiationSourceUnitID))">
+                                                    <i class="fas fa-trash-alt fa-sm"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        id++;
+                                    }  
+                                }
+                            </tbody>
+                           
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+<!--Loading-->
+<BSModal class="row style-justify mt-5" @ref="Load" IsCentered="true" Size="Size.Small" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+    <BSModalBody>
+        <div class="text-center mt-3">
+            <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+                  style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+        </div>
+        <div class="text-center pt-3" style=" font-size: 16pt">
+            @AppData.LangResource[AppData.LanguageID, 325]
+        </div>
+    </BSModalBody>
+</BSModal>
+
+<!--ModalRadiationSourceUnitCreate-->
+<BSModal @ref="ModalRadiationSourceUnitCreate">
+    <BSModalHeader OnClick="@(() => ModalRadiationSourceUnitCreate.Hide())">@AppData.LangResource[AppData.LanguageID, 499]</BSModalHeader>
+    <BSModalBody>
+
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 502]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" @bind-value="addRadiationSourceUnit.RadiationSourceUnitName" placeholder="@AppData.LangResource[AppData.LanguageID,502]" class="form-control" />
+                </div>
+            </div>
+        </div>
+      
+    </BSModalBody>
+    <BSModalFooter>
+        @if (AppData.CurrentPermission.Find(i => i.permissionID == 40).permissionC)
+        {
+            <button type="submit" @onclick="SaveCreateRadiationSourceUnit" class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+        else
+        {
+            <button type="button" disabled class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+        <button type="reset" class="btn btn-danger" @onclick="@(() => ModalRadiationSourceUnitCreate.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalRadiationSourceUnitEdit-->
+<BSModal @ref="ModalRadiationSourceUnitEdit">
+    <BSModalHeader OnClick="@(() => ModalRadiationSourceUnitEdit.Hide())">@AppData.LangResource[AppData.LanguageID, 500]</BSModalHeader>
+    <BSModalBody>
+
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 502]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" @bind-value="editRadiationSourceUnit.RadiationSourceUnitName" placeholder="@AppData.LangResource[AppData.LanguageID,502]" class="form-control" />
+                </div>
+            </div>
+        </div>
+    </BSModalBody>
+    <BSModalFooter>
+        @if (AppData.CurrentPermission.Find(i => i.permissionID == 40).permissionU)
+        {
+            <button type="submit" @onclick="SaveEditRadiationSourceUnit" class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+        else
+        {
+            <button type="button" disabled class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+        <button type="button" class="btn btn-danger" @onclick="@(() => ModalRadiationSourceUnitEdit.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalRadiationSourceUnitDelete-->
+<BSModal @ref="ModalRadiationSourceUnitDelete">
+    <BSModalHeader OnClick="@(() => ModalRadiationSourceUnitDelete.Hide())">@AppData.LangResource[AppData.LanguageID, 503]</BSModalHeader>
+    <BSModalBody>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert-modal-delete">
+                    @AppData.LangResource[AppData.LanguageID, 323] @AppData.LangResource[AppData.LanguageID, 502]:<br>@editRadiationSourceUnit.RadiationSourceUnitName @AppData.LangResource[AppData.LanguageID, 324] ?
+                </div>
+            </div>
+        </div>
+
+    </BSModalBody>
+    <BSModalFooter>
+        @if (AppData.CurrentPermission.Find(i => i.permissionID == 40).permissionD)
+        {
+            <button type="submit" @onclick="SaveDeleteRadiationSourceUnit" class="btn btn-danger">@AppData.LangResource[AppData.LanguageID, 610]</button>
+        }
+        else
+        {
+            <button type="button" disabled class="btn btn-danger">@AppData.LangResource[AppData.LanguageID, 610]</button>
+        }
+        <button type="button" class="btn btn-info" @onclick="@(() => ModalRadiationSourceUnitDelete.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalResponseError-->
+<BSModal Class="text-center" @ref="ModalResponseError" IsCentered="true" Size="Size.Large">
+    <BSModalBody>
+
+        <div class="row">
+            <div class="col-md-12 alert-modal-logo">
+                <img src="assets/images/img-common/delete_symbol.png" width="100" height="100" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <p class="alert-modal">@RequertMessage</p>
+            </div>
+        </div>
+        <button type="button" @onclick="@(() => ModalResponseError.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+
+    </BSModalBody>
+</BSModal>
+
+<!--ModalRespondSuccess-->
+<BSModal Class="text-center alert-modal-body" @ref="ModalRespondSuccess" IsCentered="true" Size="Size.Large">
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12 alert-modal-logo">
+                <img src="assets/images/img-common/tick_symbol.png" width="100" height="100" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="alert-modal">@RequertMessage</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <button @onclick="@(() => ModalRespondSuccess.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+            </div>
+        </div>
+    </BSModalBody>
+</BSModal>
+
+
+@code {
+    /// <summary>
+    /// RadiationSourceUnit
+    /// </summary>
+    private List<RadiationSourceUnit> listRadiationSourceUnit = new List<RadiationSourceUnit>();
+    private RadiationSourceUnit addRadiationSourceUnit = new RadiationSourceUnit();
+    private RadiationSourceUnit editRadiationSourceUnit = new RadiationSourceUnit();
+
+    /// <summary>
+    /// BSModal
+    /// </summary>
+    BSModal Load { get; set; }
+    BSModal ModalResponseError { get; set; }
+    BSModal ModalRespondSuccess { get; set; }
+    BSModal ModalRadiationSourceUnitCreate { get; set; }
+    BSModal ModalRadiationSourceUnitEdit { get; set; }
+    BSModal ModalRadiationSourceUnitDelete { get; set; }
+
+    /// <summary>
+    /// Variable
+    /// </summary>
+    private string RequertMessage;
+
+    /// <summary>
+    /// OnInitializedAsync
+    /// </summary>
+    /// <returns></returns>
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            AppData.radiationSourceUnits = await _masterData.GetMasterDataAsync<RadiationSourceUnit>("RadiationSourceUnit");
+            listRadiationSourceUnit = AppData.radiationSourceUnits;
+            ///await jsRuntime.InvokeAsync<object>("ResponsiveDataTables");
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+        }
+    }
+
+
+    /// <summary>
+    /// Modal show RadiationSourceUnitUpdate
+    /// </summary>
+    /// <param name="id"></param>
+    private async Task RadiationSourceUnitUpdate(int id)
+    {
+        try
+        {
+            var respond = await _masterData.GetMasterDataAsyncByID<RadiationSourceUnit>("RadiationSourceUnitByID", id);
+            if (string.IsNullOrEmpty(respond.Content))
+            {
+                editRadiationSourceUnit = respond;
+                ModalRadiationSourceUnitEdit.Show();
+            }
+            else
+            {
+                var requertException = respond.Content;
+                RequertMessage = requertException;
+                ModalResponseError.Show();
+            }
+
+            //editInstrumentUnit = listInstrumentUnit.Find(u => u.InstrumentUnitID == id);
+            ModalRadiationSourceUnitEdit.Show();
+
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+    }
+
+    /// <summary>
+    /// Modal show RadiationSourceUnitDelete
+    /// </summary>
+    /// <param name="id"></param>
+    private async Task RadiationSourceUnitDelete(int id)
+    {
+        try
+        {
+            var respond = await _masterData.GetMasterDataAsyncByID<RadiationSourceUnit>("RadiationSourceUnitByID", id);
+
+            if (string.IsNullOrEmpty(respond.Content))
+            {
+                editRadiationSourceUnit = respond;
+                ModalRadiationSourceUnitDelete.Show();
+            }
+            else
+            {
+                var requertException = respond.Content;
+                RequertMessage = requertException;
+                ModalResponseError.Show();
+            }
+
+            //editInstrumentUnit = listInstrumentUnit.Find(u => u.InstrumentUnitID == id);
+            ModalRadiationSourceUnitDelete.Show();
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+    }
+
+    /// <summary>
+    /// SaveCreateRadiationSourceUnit
+    /// </summary>
+    private async Task SaveCreateRadiationSourceUnit()
+    {
+        try
+        {
+            var respond = await _masterData.PostMasterDataAsync("PostRadiationSourceUnit", addRadiationSourceUnit);
+            if (!string.IsNullOrEmpty(respond.ToString()))
+            {
+                var requertException = respond.StatusMessage;
+                RequertMessage = requertException;
+                await OnInitializedAsync();
+                ModalRespondSuccess.Show();
+            }
+            else
+            {
+                var requertException = respond.Content;
+                RequertMessage = requertException;
+                ModalResponseError.Show();
+            }
+
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+        ModalRadiationSourceUnitCreate.Hide();
+    }
+
+    /// <summary>
+    /// SaveEditRadiationSourceUnit
+    /// </summary>
+    private async Task SaveEditRadiationSourceUnit()
+    {
+        try
+        {
+            var respond = await _masterData.PutMasterDataAsync("PutRadiationSourceUnit", editRadiationSourceUnit, editRadiationSourceUnit.RadiationSourceUnitID);
+            if (!string.IsNullOrEmpty(respond.ToString()))
+            {
+                var requertException = respond.StatusMessage;
+                RequertMessage = requertException;
+                await OnInitializedAsync();
+                ModalRespondSuccess.Show();
+            }
+            else
+            {
+                var requertException = respond.Content;
+                RequertMessage = requertException;
+                ModalResponseError.Show();
+            }
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+        ModalRadiationSourceUnitEdit.Hide();
+    }
+
+    /// <summary>
+    /// SaveDeleteRadiationSourceUnit
+    /// </summary>
+    private async Task SaveDeleteRadiationSourceUnit()
+    {
+        try
+        {
+            var respond = await _masterData.DeleteMasterDataAsync<RadiationSourceUnit>("DeleteRadiationSourceUnit", editRadiationSourceUnit.RadiationSourceUnitID);
+            if (!string.IsNullOrEmpty(respond.ToString()))
+            {
+                var requertException = respond.StatusMessage;
+                RequertMessage = requertException;
+                await OnInitializedAsync();
+                ModalRespondSuccess.Show();
+            }
+            else
+            {
+                var requertException = respond.Content;
+                RequertMessage = requertException;
+                ModalResponseError.Show();
+            }
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+        ModalRadiationSourceUnitDelete.Hide();
+    }
+
+    /// <summary>
+    /// ClearCreateRadiationSourceUnit
+    /// </summary>
+    private void ClearCreateRadiationSourceUnit()
+    {
+        addRadiationSourceUnit = new RadiationSourceUnit();
+    }
+
+}

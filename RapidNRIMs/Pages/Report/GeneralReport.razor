@@ -1,0 +1,399 @@
+﻿@page "/Report/GeneralReport"
+@inject AppData AppData
+@inject IJSRuntime jsRuntime
+@inject IConfiguration Config
+
+<PageTitle>General Report Page</PageTitle>
+
+<div class="row margin-row-card">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">@AppData.LangResource[AppData.LanguageID,24]</div>
+            <div class="card-body">
+                <BSTabGroup>
+                    <BSTabList>
+                        <BSTab>
+                            <div @onclick="OnClickTabResetDateTime">
+                                <BSTabLabel><span>@AppData.LangResource[AppData.LanguageID, 137]</span></BSTabLabel>
+                            </div>
+                           
+                            <BSTabContent>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <label class="col-12 col-md-4 col-lg-1 col-form-label">
+                                            <span>@AppData.LangResource[AppData.LanguageID, 56]</span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom">
+                                                <input type="date" class="form-control" @bind="start" name="StartDate" id="StartDate" placeholder="@AppData.LangResource[AppData.LanguageID,56]">
+                                            </div>
+                                        </div>
+                                        <label class="col-12 col-md-4 col-lg-1 col-form-label">
+                                            <span>@AppData.LangResource[AppData.LanguageID, 135]</span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom">
+                                                <input type="date" class="form-control" @bind="end" name="EndDate" id="EndDate" placeholder="@AppData.LangResource[AppData.LanguageID,135]">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <label class="col-12 col-md-4 col-lg-1 col-form-label">
+                                            <span></span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom"></div>
+                                        </div>
+                                        <label class="col-12 col-md-4 col-lg-1 col-form-label">
+                                            <span>
+                                                @if (AppData.CurrentPermission.Find(i => i.permissionID == 17).permissionE)
+                                                {
+                                                    <button type="button" @onclick="OnInstrumentStatReport" class="btn btn-warning" name="GeneralReport" id="GeneralReport">@AppData.LangResource[AppData.LanguageID, 23]</button>
+                                                }
+                                            </span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom"></div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </BSTabContent>
+                        </BSTab>
+
+                        <BSTab>
+                            <div @onclick="OnClickTabResetDateTime">
+                                <BSTabLabel>@AppData.LangResource[AppData.LanguageID, 582]</BSTabLabel>
+                            </div>
+                            <BSTabContent>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <label class="col-12 col-md-4 col-lg-1 col-form-label">
+                                            <span class="mb-0">@AppData.LangResource[AppData.LanguageID, 56]</span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom">
+                                                <input type="date" class="form-control" @bind="start" placeholder="@AppData.LangResource[AppData.LanguageID,449]">
+
+                                            </div>
+                                        </div>
+                                        <label class="col-12 col-md-4 col-lg-1 col-form-label">
+                                            <span>@AppData.LangResource[AppData.LanguageID, 135]</span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom">
+                                                <input type="date" class="form-control" @bind="end" placeholder="@AppData.LangResource[AppData.LanguageID,135]">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <label class="col-12 col-md-4 col-lg-1 col-form-label">
+                                            <span></span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom"></div>
+                                        </div>
+                                        <label class="col-12 col-md-4 col-lg-1 col-form-label">
+                                            <span>
+                                                @if (AppData.CurrentPermission.Find(i => i.permissionID == 17).permissionE)
+                                                {
+                                                    <button type="button" @onclick="OnInstrumentHistoryByReport" class="btn btn-warning">@AppData.LangResource[AppData.LanguageID, 23]</button>
+                                                }
+                                            </span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom"></div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </BSTabContent>
+                        </BSTab>
+
+                        <BSTab>
+                            <div @onclick="OnClickTabResetDateTime">
+                                <BSTabLabel>@AppData.LangResource[AppData.LanguageID, 448]</BSTabLabel>
+                            </div>
+                            <BSTabContent>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                                            <span>@AppData.LangResource[AppData.LanguageID, 61]</span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom">
+                                                <input type="text" @bind="instumentNumber" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,61]">
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                    <div class="row">
+                                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                                            <span class="mb-0">@AppData.LangResource[AppData.LanguageID, 449]</span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom">
+                                                <input type="date" class="form-control" @bind="start" placeholder="@AppData.LangResource[AppData.LanguageID,449]">
+
+                                            </div>
+                                        </div>
+                                        <label class="col-12 col-md-4 col-lg-1 col-form-label">
+                                            <span>@AppData.LangResource[AppData.LanguageID, 135]</span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom">
+                                                <input type="date" class="form-control" @bind="end" placeholder="@AppData.LangResource[AppData.LanguageID,135]">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <label class="col-12 col-md-4 col-lg-1 col-form-label">
+                                            <span></span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom"></div>
+                                        </div>
+                                        <label class="col-12 col-md-4 col-lg-1 col-form-label mt-2">
+                                            <span>
+                                                @if (AppData.CurrentPermission.Find(i => i.permissionID == 17).permissionE)
+                                                {
+                                                    <button type="button" @onclick="OnInstrumentHistoryReport" class="btn btn-warning">@AppData.LangResource[AppData.LanguageID, 23]</button>
+                                                }
+                                            </span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom"></div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </BSTabContent>
+                        </BSTab>
+
+                        <BSTab>
+                            <div @onclick="OnClickTabResetDateTime">
+                                <BSTabLabel>@AppData.LangResource[AppData.LanguageID, 138]</BSTabLabel>
+                            </div>
+                            <BSTabContent>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <label class="col-12 col-md-4 col-lg-1 col-form-label">
+                                            <span>@AppData.LangResource[AppData.LanguageID, 56]</span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom">
+                                                <input type="date" class="form-control" @bind="start" name="StartDate" id="StartDate" placeholder="@AppData.LangResource[AppData.LanguageID,56]">
+                                            </div>
+                                        </div>
+                                        <label class="col-12 col-md-4 col-lg-1 col-form-label">
+                                            <span>@AppData.LangResource[AppData.LanguageID, 135]</span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom">
+                                                <input type="date" class="form-control" @bind="end" name="EndDate" id="EndDate" placeholder="@AppData.LangResource[AppData.LanguageID,135]">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <label class="col-12 col-md-4 col-lg-1 col-form-label">
+                                            <span></span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom"></div>
+                                        </div>
+                                        <label class="col-12 col-md-4 col-lg-1 col-form-label">
+                                            <span>
+                                                @if (AppData.CurrentPermission.Find(i => i.permissionID == 17).permissionE)
+                                                {
+                                                    <button type="button" @onclick="OnInventoryStatReport" class="btn btn-warning" name="GeneralReport" id="GeneralReport">@AppData.LangResource[AppData.LanguageID, 23]</button>
+                                                }
+                                            </span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </BSTabContent>
+                        </BSTab>
+
+                        <BSTab>
+                            <div @onclick="OnClickTabResetDateTime">
+                                <BSTabLabel>@AppData.LangResource[AppData.LanguageID, 483]</BSTabLabel>
+                            </div>
+                            <BSTabContent>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <label class="col-12 col-md-4 col-lg-1 col-form-label">
+                                            <span>@AppData.LangResource[AppData.LanguageID, 56]</span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom">
+                                                <input type="date" class="form-control" @bind="start" name="StartDate" id="StartDate" placeholder="@AppData.LangResource[AppData.LanguageID,56]">
+                                            </div>
+                                        </div>
+                                        <label class="col-12 col-md-4 col-lg-1 col-form-label">
+                                            <span>@AppData.LangResource[AppData.LanguageID, 135]</span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom">
+                                                <input type="date" class="form-control" @bind="end" name="EndDate" id="EndDate" placeholder="@AppData.LangResource[AppData.LanguageID,135]">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <label class="col-12 col-md-4 col-lg-1 col-form-label">
+                                            <span></span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom"></div>
+                                        </div>
+                                        <label class="col-12 col-md-4 col-lg-1 col-form-label">
+                                            <span>
+                                                @if (AppData.CurrentPermission.Find(i => i.permissionID == 17).permissionE)
+                                                {
+                                                    <button type="button" @onclick="OnDiscardStatReport" class="btn btn-warning" name="GeneralReport" id="GeneralReport">@AppData.LangResource[AppData.LanguageID, 23]</button>
+                                                }
+                                            </span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </BSTabContent>
+                        </BSTab>
+
+                        <BSTab>
+                            <div @onclick="OnClickTabResetDateTime">
+                                <BSTabLabel>Personal Dose Statistics</BSTabLabel>
+                            </div>
+                                <BSTabContent>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <label class="col-12 col-md-4 col-lg-1 col-form-label">
+                                                <span>@AppData.LangResource[AppData.LanguageID, 56]</span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom">
+                                                <input type="date" class="form-control" @bind="start" name="StartDate" id="StartDate" placeholder="@AppData.LangResource[AppData.LanguageID,56]">
+                                            </div>
+                                        </div>
+                                        <label class="col-12 col-md-4 col-lg-1 col-form-label">
+                                            <span>@AppData.LangResource[AppData.LanguageID, 135]</span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom">
+                                                <input type="date" class="form-control" @bind="end" name="EndDate" id="EndDate" placeholder="@AppData.LangResource[AppData.LanguageID,135]">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <label class="col-12 col-md-4 col-lg-1 col-form-label">
+                                            <span></span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom"></div>
+                                        </div>
+                                        <label class="col-12 col-md-4 col-lg-1 col-form-label">
+                                            <span>
+                                                @if (AppData.CurrentPermission.Find(i => i.permissionID == 17).permissionE)
+                                                {
+                                                    <button type="button" @onclick="OnTotalPersonalDoseReport" class="btn btn-warning" name="GeneralReport" id="GeneralReport">@AppData.LangResource[AppData.LanguageID, 23]</button>
+                                                }
+                                            </span>
+                                        </label>
+                                        <div class="col-12 col-md-8 col-lg-3">
+                                            <div class="input-group input-box-bottom"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </BSTabContent>
+                        </BSTab>
+                    </BSTabList>
+                    <BSTabSelectedContent />
+                </BSTabGroup>
+            </div>
+        </div>
+
+    </div>
+</div>
+@code {
+    DateTime start = DateTime.Today;
+    DateTime end = DateTime.Today.AddDays(30);
+
+    string instumentNumber;
+
+    public void OnClickTabResetDateTime()
+    {
+        instumentNumber = "";
+        start = DateTime.Today.Date;
+        end = DateTime.Today.Date;
+    }
+
+    public void OnInstrumentStatReport()
+    {
+        string s = start.ToString("yyyy-MM-dd");
+        string e = end.ToString("yyyy-MM-dd");
+        string url = $"{Config["rurl"]}/api/InsStatReport?start=" + s + "&&end=" + e;
+        jsRuntime.InvokeVoidAsync("OpenURL", url);
+        //((IJSInProcessRuntime)jsRuntime).InvokeVoid("OpenURL", url);
+    }
+
+    public void OnInventoryStatReport()
+    {
+        string s = start.ToString("yyyy-MM-dd");
+        string e = end.ToString("yyyy-MM-dd");
+        string url = $"{Config["rurl"]}/api/InvStatReport?start=" + s + "&&end=" + e;
+        jsRuntime.InvokeVoidAsync("OpenURL", url);
+        //((IJSInProcessRuntime)jsRuntime).InvokeVoid("OpenURL", url);
+    }
+
+    public void OnDiscardStatReport()
+    {
+        string s = start.ToString("yyyy-MM-dd");
+        string e = end.ToString("yyyy-MM-dd");
+        string url = $"{Config["rurl"]}/api/InsDiscardStatReport?start=" + s + "&&end=" + e;
+        jsRuntime.InvokeVoidAsync("OpenURL", url);
+        //((IJSInProcessRuntime)jsRuntime).InvokeVoid("OpenURL", url);
+    }
+
+
+    public void OnInstrumentHistoryReport()
+    {
+        string s = start.ToString("yyyy-MM-dd");
+        string e = end.ToString("yyyy-MM-dd");
+        string url = $"{Config["rurl"]}/api/InsHisReport?start={s}&&end={e}&&InstrumentNumber={instumentNumber}";
+        jsRuntime.InvokeVoidAsync("OpenURL", url);
+        
+    }
+
+    public void OnInstrumentHistoryByReport()
+    {
+        string s = start.ToString("yyyy-MM-dd");
+        string e = end.ToString("yyyy-MM-dd");
+        string url = $"{Config["rurl"]}/api/InsFileReport?start={s}&&end={e}";
+        jsRuntime.InvokeVoidAsync("OpenURL", url);
+        ////((IJSInProcessRuntime)jsRuntime).InvokeVoid("OpenURL", url);
+    }
+
+    public void OnTotalPersonalDoseReport()
+    {
+        string s = start.ToString("yyyy-MM-dd");
+        string e = end.ToString("yyyy-MM-dd");
+        string url = $"{Config["rurl"]}/api/TotalPersonalDose?start={s}&end={e}";
+        jsRuntime.InvokeVoidAsync("OpenURL", url);
+        ////((IJSInProcessRuntime)jsRuntime).InvokeVoid("OpenURL", url);
+    }
+
+    /// <summary>
+    /// clearURL
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("clearURL");
+        }
+    }
+}

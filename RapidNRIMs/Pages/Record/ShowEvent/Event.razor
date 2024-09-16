@@ -1,0 +1,192 @@
+﻿@page "/Record/ShowEvent/Event"
+@inject AppData AppData
+@inject IJSRuntime jsRuntime
+<div class="row margin-row-card">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                @AppData.LangResource[AppData.LanguageID,28]:
+                <img class="img-qrcode float-right" src="assets/images/img-qrcode/qr-code.png">
+            </div>
+            <div class="card-body">
+                <form method="post" action="">
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID,29]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <input type="text" class="form-control" name="EventName" id="EventName" placeholder="@AppData.LangResource[AppData.LanguageID,29]" autocomplete="off" autofocus>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID,31]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <select class="form-control" name="EventType" id="EventType">
+                                    <option selected>Event Type</option>
+                                    <option value="">Training</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID,32]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <input type="date" class="form-control" name="EventStartDate" id="EventStartDate" placeholder="@AppData.LangResource[AppData.LanguageID,32]" autocomplete="off" autofocus>
+                            </div>
+                        </div>
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID,33]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <input type="date" class="form-control" name="EventEndDate" id="EventEndDate" placeholder="@AppData.LangResource[AppData.LanguageID,33]" autocomplete="off" autofocus>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID,34]</span>
+                        </label>
+                        <div class="col-12 col-md-12 col-lg-8 input-box-bottom">
+                            <textarea class="form-control" name="EventObjective" id="EventObjective" rows="2" placeholder="@AppData.LangResource[AppData.LanguageID,34]"></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID,35]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <select class="form-control" name="EventLeader" id="EventLeader">
+                                    <option selected>@AppData.LangResource[AppData.LanguageID,35]</option>
+                                    <option value="">Kitkawin Aramrun</option>
+                                </select>
+                            </div>
+                        </div>
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID,36]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <select class="form-control" name="EventTeam" id="EventTeam">
+                                    <option selected>Team</option>
+                                    <option value="">Theerapatt Manuwong</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID,10]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <input type="text" class="form-control" name="EventInstrument" id="EventInstrument" placeholder="@AppData.LangResource[AppData.LanguageID,10]" autocomplete="off" autofocus>
+                            </div>
+                        </div>
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID,18]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <input type="text" class="form-control" name="EventInventory" id="EventInventory" placeholder="@AppData.LangResource[AppData.LanguageID,18]" autocomplete="off" autofocus>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID,37]</span>
+                        </label>
+                        <div class="col-12 col-md-12 col-lg-8 input-box-bottom">
+                            <textarea class="form-control" name="EventDetail" id="EventDetail" rows="2" placeholder="@AppData.LangResource[AppData.LanguageID,37]"></textarea>
+                        </div>
+                    </div>
+                </form>
+                <div class="text-center">
+                    <a href="Record/ShowSubEvent/AddSubEvent" class="btn btn-warning margin-btn" name="AddSubEvent" id="AddSubEvent">@AppData.LangResource[AppData.LanguageID,58]</a>
+                    <a href="Record/ShowSubEvent/SubEventManage" class="btn btn-warning margin-btn" name="SubEventManage" id="SubEventManage">@AppData.LangResource[AppData.LanguageID,163]</a>
+                    <button type="submit" class="btn btn-warning margin-btn" name="SaveEventExample" id="SaveEventExample">@AppData.LangResource[AppData.LanguageID,44]</button>
+                    <button type="reset" class="btn btn-warning margin-btn" name="Clear" id="Clear">@AppData.LangResource[AppData.LanguageID,45]</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row margin-row-card">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">@AppData.LangResource[AppData.LanguageID,38]</div>
+            <div class="card-body">
+                <form method="post" action="">
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID,39]</span>
+                        </label>
+                        <div class="col-12 col-md-12 col-lg-8">
+                            <div class="input-group input-box-bottom">
+                                <textarea class="form-control" name="EventAddress" id="EventAdress" rows="2" placeholder="@AppData.LangResource[AppData.LanguageID,39]"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID,40]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <input type="text" class="form-control" name="EventCity" id="EventCity" placeholder="@AppData.LangResource[AppData.LanguageID,40]" autocomplete="off" autofocus>
+                            </div>
+                        </div>
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID,41]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <input type="text" class="form-control" name="EventProvince" id="EventProvince" placeholder="@AppData.LangResource[AppData.LanguageID,41]" autocomplete="off" autofocus>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID,42]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <input type="text" class="form-control" name="EventCountry" id="EventCountry" placeholder="@AppData.LangResource[AppData.LanguageID,42]" autocomplete="off" autofocus>
+                            </div>
+                        </div>
+                        <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID,43]</span>
+                        </label>
+                        <div class="col-12 col-md-8 col-lg-3">
+                            <div class="input-group input-box-bottom">
+                                <input type="text" class="form-control" name="EventZipCode" id="EventZipCode" placeholder="@AppData.LangResource[AppData.LanguageID,43]" autocomplete="off" autofocus>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="text-center">
+            <a href="Record/ManageEvent" class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID,49]</a>
+            <button type="submit" class="btn btn-warning margin-btn" name="SaveEventRegister" id="SaveEventRegister">@AppData.LangResource[AppData.LanguageID,44]</button>
+            <button type="reset" class="btn btn-warning margin-btn" name="Clear" id="Clear">@AppData.LangResource[AppData.LanguageID,45]</button>
+        </div>
+    </div>
+</div>
+@code {
+    protected override void OnInitialized()
+    {
+        ((IJSInProcessRuntime)jsRuntime).InvokeVoid("clearURL");
+    }
+    
+}

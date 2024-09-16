@@ -1,0 +1,516 @@
+﻿@page "/MasterData/MasterDataInstrumentModel"
+@inject AppData AppData
+@inject IToastService ToastService
+@inject IMasterData _masterData
+@inject IJSRuntime jsRuntime
+
+
+@if (listInstrumentModel == null)
+{
+    <div class="text-center mt-3">
+        <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+              style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+    </div>
+    <div class="text-center pt-3" style=" font-size: 16pt">
+        @AppData.LangResource[AppData.LanguageID, 325]
+    </div>
+}
+else
+{
+    <div class="row margin-row-card">
+        <div class="col-md-12">
+            <div class="float-right" style="margin-bottom:10px; margin-top:10px">
+                <button class="btn btn-warning" @onclick="@(() => ModalInstrumentModelCreate.Show())">
+                    @AppData.LangResource[AppData.LanguageID, 350]
+                </button>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row margin-row-card">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header"><i class="fas fa-table mr-1"></i>@AppData.LangResource[AppData.LanguageID, 351]</div>
+                <div class="card-body">
+                    <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height:700px;">
+                        <table id="dataTable" class="table table-bordered table-striped text-center" width="100%">
+                            <thead class="fixedthead">
+                                <tr>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 322]</th>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 191]</th>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 188]</th>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 192]</th>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 145]</th>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 146]</th>
+
+                                </tr>
+                            </thead>
+                            <tbody class="scrollContent">
+                                @{int id = 1;}
+                                @foreach (var item in listInstrumentModel)
+                                {
+                                    @if(item.InstrumentModelName != "-" && item.IsActive != null && item.IsActive == true)
+                                    {
+                                        <tr>
+                                            <td>@id</td>
+                                            <td>@item.InstrumentModelName</td>
+                                            @if (item.InstrumentBrandID != 0)
+                                            {
+                                                <td>@(item.Brand != null ? item.Brand.InstrumentBrandName:"-")</td>
+                                            }
+                                            else
+                                            {
+                                                <td></td>
+                                            }
+                                            <td>@item.InstrumentModelDescription</td>
+                                            <td>
+                                                <button type="button" class="btn btn-warning" @onclick="@(() => InstrumentModelUpdate(item.InstrumentModelID))">
+                                                    <i class="fas fa-edit fa-sm"></i>
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-danger" @onclick="@(() => InstrumentModelDelete(item.InstrumentModelID))">
+                                                    <i class="fas fa-trash-alt fa-sm"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        id++;
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!--Loading-->
+<BSModal class="row style-justify mt-5" @ref="Load" IsCentered="true" Size="Size.Small" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+    <BSModalBody>
+        <div class="text-center mt-3">
+            <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+                  style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+        </div>
+        <div class="text-center pt-3" style=" font-size: 16pt">
+            @AppData.LangResource[AppData.LanguageID, 325]
+        </div>
+    </BSModalBody>
+</BSModal>
+
+<!--ModalInstrumentModelCreate-->
+<BSModal @ref="ModalInstrumentModelCreate">
+    <BSModalHeader OnClick="@(() => ModalInstrumentModelCreate.Hide())">@AppData.LangResource[AppData.LanguageID, 350]</BSModalHeader>
+    <BSModalBody>
+
+        <div class="row">
+            <label for="modelName" class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 191]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" @bind-value="addInstrumentModel.InstrumentModelName" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,191]" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <label for="brandID" class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 188]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <select class="form-control" @bind="addInstrumentModel.InstrumentBrandID" id="brand">
+                        <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                        @foreach (var item in listInstrumentBrand)
+                        {
+                            @if(item.IsActive != null && item.IsActive == true)
+                            {
+                                <option value="@item.InstrumentBrandID">@item.InstrumentBrandName</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 192]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" @bind-value="addInstrumentModel.InstrumentModelDescription" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,192]" />
+                </div>
+               
+            </div>
+        </div>
+    </BSModalBody>
+    <BSModalFooter>
+        @if (AppData.CurrentPermission.Find(i => i.permissionID == 28).permissionC)
+        {
+            <button type="submit" @onclick="SaveCreateInstrumentModel" class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+        else
+        {
+            <button type="button" disabled class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+        <button type="reset" class="btn btn-danger" @onclick="@(() => ModalInstrumentModelCreate.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalInstrumentModelEdit-->
+<BSModal @ref="ModalInstrumentModelEdit">
+    <BSModalHeader OnClick="@(() => ModalInstrumentModelEdit.Hide())">@AppData.LangResource[AppData.LanguageID, 352]</BSModalHeader>
+    <BSModalBody>
+
+        <div class="row">
+            <label for="modelName" class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 191]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" @bind-value="editInstrumentModel.InstrumentModelName" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,191]" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <label for="brandID" class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 188]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <select class="form-control" @bind="editInstrumentModel.InstrumentBrandID" id="brand">
+                        <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                        @foreach (var item in listInstrumentBrand)
+                        {
+                            @if (item.IsActive != null && item.IsActive == true)
+                            {
+                                <option value="@item.InstrumentBrandID">@item.InstrumentBrandName</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 192]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" @bind-value="editInstrumentModel.InstrumentModelDescription" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,192]" />
+                </div>
+
+            </div>
+        </div>
+
+    </BSModalBody>
+    <BSModalFooter>
+        @if (AppData.CurrentPermission.Find(i => i.permissionID == 28).permissionU)
+        {
+            <button type="submit" @onclick="SaveEditInstrumentModel" class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+        else
+        {
+            <button type="button" disabled class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+        <button type="reset" class="btn btn-danger" @onclick="@(() => ModalInstrumentModelEdit.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalInstrumentModelDelete-->
+<BSModal @ref="ModalInstrumentModelDelete">
+    <BSModalHeader OnClick="@(() => ModalInstrumentModelDelete.Hide())">@AppData.LangResource[AppData.LanguageID, 353]</BSModalHeader>
+    <BSModalBody>
+
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="alert-modal-delete">
+                    @AppData.LangResource[AppData.LanguageID, 323] @AppData.LangResource[AppData.LanguageID, 191]:<br>@editInstrumentModel.InstrumentModelName @AppData.LangResource[AppData.LanguageID, 324] ?
+                </h4>
+            </div>
+        </div>
+
+    </BSModalBody>
+    <BSModalFooter>
+        @if (AppData.CurrentPermission.Find(i => i.permissionID == 28).permissionD)
+        {
+            <button type="submit" @onclick="SaveDeleteInstrumentModel" class="btn btn-danger">@AppData.LangResource[AppData.LanguageID, 610]</button>
+        }
+        else
+        {
+            <button type="button" disabled class="btn btn-danger">@AppData.LangResource[AppData.LanguageID, 610]</button>
+        }
+        <button type="reset" class="btn btn-info" @onclick="@(() => ModalInstrumentModelDelete.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalResponseError-->
+<BSModal Class="text-center" @ref="ModalResponseError" IsCentered="true" Size="Size.Large">
+    <BSModalBody>
+
+        <div class="row">
+            <div class="col-md-12 alert-modal-logo">
+                <img src="assets/images/img-common/delete_symbol.png" width="100" height="100" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <p class="alert-modal">@RequertMessage</p>
+            </div>
+        </div>
+        <button type="button" @onclick="@(() => ModalResponseError.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+    </BSModalBody>
+</BSModal>
+
+<!--ModalRespondSuccess-->
+<BSModal Class="text-center alert-modal-body" @ref="ModalRespondSuccess" IsCentered="true" Size="Size.Large">
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12 alert-modal-logo">
+                <img src="assets/images/img-common/tick_symbol.png" width="100" height="100" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="alert-modal">@RequertMessage</h4>
+            </div>
+        </div>
+        <button type="button" @onclick="@(() => ModalRespondSuccess.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+    </BSModalBody>
+</BSModal>
+
+
+@code {
+
+    /// <summary>
+    /// InstrumentModel
+    /// </summary>
+    private List<InstrumentModel> listInstrumentModel = new List<InstrumentModel>();
+    private List<InstrumentBrand> listInstrumentBrand = new List<InstrumentBrand>();
+    private InstrumentModel editInstrumentModel = new InstrumentModel();
+    private InstrumentModel addInstrumentModel = new InstrumentModel();
+
+    /// <summary>
+    /// BSModal
+    /// </summary>
+    BSModal Load { get; set; }
+    BSModal ModalInstrumentModelCreate { get; set; }
+    BSModal ModalInstrumentModelEdit { get; set; }
+    BSModal ModalInstrumentModelDelete { get; set; }
+    BSModal ModalResponseError { get; set; }
+    BSModal ModalRespondSuccess { get; set; }
+
+    /// <summary>
+    /// Variable
+    /// </summary>
+    private string RequertMessage;
+
+    /// <summary>
+    /// OnInitializedAsync
+    /// </summary>
+    /// <returns></returns>
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //listInstrumentModel = await _masterData.GetMasterDataAsync<InstrumentModel>("InstrumentModel");
+            //listInstrumentBrand = await _masterData.GetMasterDataAsync<InstrumentBrand>("InstrumentBrand");
+            AppData.instrumentBrands = await _masterData.GetMasterDataAsync<InstrumentBrand>("InstrumentBrand");
+            AppData.instrumentModels = await _masterData.GetMasterDataAsync<InstrumentModel>("InstrumentModel");
+            listInstrumentModel = AppData.instrumentModels;
+            listInstrumentBrand = AppData.instrumentBrands;
+
+            foreach (var i in listInstrumentModel)
+            {
+                i.Getlookup(listInstrumentBrand);
+            }
+
+            if(AppData.LanguageID == 0)
+            {
+                var resultListInstrumentBrand = listInstrumentBrand.OrderBy(lb => lb.InstrumentBrandName).ToList();
+                listInstrumentBrand = resultListInstrumentBrand;
+            }
+
+            
+            //await jsRuntime.InvokeAsync<object>("ThisDataTablesAdd");
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+        }
+    }
+
+    /// <summary>
+    /// Modal show InstrumentModelUpdate
+    /// </summary>
+    /// <param name="id"></param>
+    private void InstrumentModelUpdate(int id)
+    {
+        try
+        {
+            //var respond = await _masterData.GetMasterDataAsyncByID<InstrumentModel>("InstrumentModelByID", id);
+
+            //if (string.IsNullOrEmpty(respond.Content))
+            //{
+            //    editInstrumentModel = respond;
+            //    ModalInstrumentModelEdit.Show();
+            //}
+            //else
+            //{
+            //    var requertException = respond.Content;
+            //    RequertMessage = requertException;
+            //    ModalResponseError.Show();
+            //}
+
+            editInstrumentModel = listInstrumentModel.Find(m => m.InstrumentModelID == id);
+            ModalInstrumentModelEdit.Show();
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+    }
+
+    /// <summary>
+    /// Modal show InstrumentModelDelete
+    /// </summary>
+    /// <param name="id"></param>
+    private void InstrumentModelDelete(int id)
+    {
+        try
+        {
+            //var respond = await _masterData.GetMasterDataAsyncByID<InstrumentModel>("InstrumentModelByID", id);
+
+            //if (string.IsNullOrEmpty(respond.Content))
+            //{
+            //    editInstrumentModel = respond;
+            //    ModalInstrumentModelDelete.Show();
+            //}
+            //else
+            //{
+            //    var requertException = respond.Content;
+            //    RequertMessage = requertException;
+            //    ModalResponseError.Show();
+            //}
+
+            editInstrumentModel = listInstrumentModel.Find(m => m.InstrumentModelID == id);
+            ModalInstrumentModelDelete.Show();
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+        ModalInstrumentModelDelete.Show();
+    }
+
+    /// <summary>
+    /// SaveCreateInstrumentModel
+    /// </summary>
+    private async Task SaveCreateInstrumentModel()
+    {
+        try
+        {
+            var respond = await _masterData.PostMasterDataAsync("PostInstrumentModel", addInstrumentModel);
+            if (!string.IsNullOrEmpty(respond.ToString()))
+            {
+                var requertException = respond.StatusMessage;
+                RequertMessage = requertException;
+                await OnInitializedAsync();
+                ModalRespondSuccess.Show();
+            }
+            else
+            {
+                var requertException = respond.Content;
+                RequertMessage = requertException;
+                ModalResponseError.Show();
+            }
+
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+        ModalInstrumentModelCreate.Hide();
+    }
+
+    /// <summary>
+    /// SaveEditInstrumentModel
+    /// </summary>
+    private async Task SaveEditInstrumentModel()
+    {
+        try
+        {
+            var respond = await _masterData.PutMasterDataAsync("PutInstrumentModel", editInstrumentModel, editInstrumentModel.InstrumentModelID);
+            if (!string.IsNullOrEmpty(respond.ToString()))
+            {
+                var requertException = respond.StatusMessage;
+                RequertMessage = requertException;
+                await OnInitializedAsync();
+                ModalRespondSuccess.Show();
+            }
+            else
+            {
+                var requertException = respond.Content;
+                RequertMessage = requertException;
+                ModalResponseError.Show();
+            }
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+        ModalInstrumentModelEdit.Hide();
+    }
+
+    /// <summary>
+    /// SaveDeleteInstrumentModel
+    /// </summary>
+    private async Task SaveDeleteInstrumentModel()
+    {
+        try
+        {
+            var respond = await _masterData.DeleteMasterDataAsync<InstrumentModel>("DeleteInstrumentModel", editInstrumentModel.InstrumentModelID);
+            if (!string.IsNullOrEmpty(respond.ToString()))
+            {
+                var requertException = respond.StatusMessage;
+                RequertMessage = requertException;
+                await OnInitializedAsync();
+                ModalRespondSuccess.Show();
+            }
+            else
+            {
+                var requertException = respond.Content;
+                RequertMessage = requertException;
+                ModalResponseError.Show();
+            }
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+        ModalInstrumentModelDelete.Hide();
+    }
+
+    /// <summary>
+    /// ClearCreateInstrumentModel
+    /// </summary>
+    private void ClearCreateInstrumentModel()
+    {
+        addInstrumentModel = new InstrumentModel();
+    }
+
+
+}

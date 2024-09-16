@@ -1,0 +1,5 @@
+﻿<StaticWebAssets Version="1.0">
+  <ContentRoot BasePath="/" Path="C:\Users\Pavarit\source\repos\BC\BC\bin\Debug\net5.0\wwwroot\" />
+  <ContentRoot BasePath="/" Path="C:\Users\Pavarit\source\repos\BC\BC\obj\Debug\net5.0\scopedcss\bundle\" />
+  <ContentRoot BasePath="_content/Append.Blazor.Printing" Path="C:\Users\Pavarit\.nuget\packages\append.blazor.printing\1.0.0\build\..\staticwebassets\" />
+</StaticWebAssets>

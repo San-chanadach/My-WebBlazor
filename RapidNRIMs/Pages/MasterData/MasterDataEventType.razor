@@ -1,0 +1,443 @@
+﻿@page "/MasterData/MasterDataEventType"
+@using System.Threading
+@inject AppData AppData
+@inject IToastService ToastService
+@inject IMasterData _masterData
+@inject IMasterDataRecord _masterDataRecord
+@inject IJSRuntime jsRuntime
+
+@if (listRecordEventType == null)
+{
+    <div class="text-center mt-3">
+        <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+              style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+    </div>
+    <div class="text-center pt-3" style=" font-size: 16pt">
+        @AppData.LangResource[AppData.LanguageID, 325]
+    </div>
+}
+else
+{
+    <div class="row margin-row-card">
+        <div class="col-md-12">
+            <div class="float-right" style="margin-bottom:10px; margin-top:10px">
+               
+                <button class="btn btn-warning"  @onclick="@(() => ModalEventTypeCreate.Show())">
+                    @AppData.LangResource[AppData.LanguageID, 384]
+                </button>
+                
+            </div>
+        </div>
+    </div>
+
+    <div class="row margin-row-card">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header"><i class="fas fa-table mr-1"></i>@AppData.LangResource[AppData.LanguageID, 385]</div>
+                <div class="card-body">
+                    <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height:700px;">
+                        <table id="dataTable" class="table table-bordered table-striped text-center" width="100%">
+                            <thead class="fixedthead">
+                                <tr>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 322]</th>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 386]</th>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 387]</th>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 145]</th>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 146]</th>
+                                </tr>
+                            </thead>
+                            <tbody class="scrollContent">
+                                @{ int id = 1;}
+                                @foreach (var item in listRecordEventType)
+                                {
+                                    @if(item.IsActive != null && item.IsActive == true)
+                                    {
+                                        <tr>
+                                            <td>@id</td>
+                                            <td>@item.EventTypeTHName</td>
+                                            <td>@item.EventTypeENName</td>
+                                            <td>
+                                                <button type="button" class="btn btn-warning" @onclick="@(() => EventTypeUpdate(item.EventTypeID))">
+                                                    <i class="fas fa-edit fa-sm"></i>
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-danger" @onclick="@(() => EventTypeDelete(item.EventTypeID))">
+                                                    <i class="fas fa-trash-alt fa-sm"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        id++;
+                                    }
+                                    
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!--Loading-->
+<BSModal class="row style-justify mt-5" @ref="Load" IsCentered="true" Size="Size.Small" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+    <BSModalBody>
+        <div class="text-center mt-3">
+            <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+                  style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+        </div>
+        <div class="text-center pt-3" style=" font-size: 16pt">
+             @AppData.LangResource[AppData.LanguageID, 325]
+        </div>
+    </BSModalBody>
+</BSModal>
+
+<!--ModalEventTypeCreate-->
+<BSModal @ref="ModalEventTypeCreate">
+    <BSModalHeader OnClick="@(() => ModalEventTypeCreate.Hide())">@AppData.LangResource[AppData.LanguageID, 384]</BSModalHeader>
+    <BSModalBody>
+
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-5 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 386]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" @bind-value="addEventType.EventTypeTHName" placeholder="@AppData.LangResource[AppData.LanguageID, 386]" class="form-control" />
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-5 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 387]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" @bind-value="addEventType.EventTypeENName" placeholder="@AppData.LangResource[AppData.LanguageID, 387]" class="form-control" />
+                </div>
+            </div>
+        </div>
+
+    </BSModalBody>
+    <BSModalFooter>
+         @if (AppData.CurrentPermission.Find(i => i.permissionID == 21).permissionC)
+         {
+            <button type="submit" @onclick="SaveCreateEventType" class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+         }
+         else
+         {
+            <button type="button" disabled class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+         }
+         <button type="reset" @onclick="@(() => ModalEventTypeCreate.Hide())" class="btn btn-danger">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalEventTypeEdit-->
+<BSModal @ref="ModalEventTypeEdit">
+    <BSModalHeader OnClick="@(() => ModalEventTypeEdit.Hide())">@AppData.LangResource[AppData.LanguageID, 388]</BSModalHeader>
+    <BSModalBody>
+
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 386]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" @bind-value="editEventType.EventTypeTHName" placeholder="@AppData.LangResource[AppData.LanguageID, 386]" class="form-control" />
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 387]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" @bind-value="editEventType.EventTypeENName" placeholder="@AppData.LangResource[AppData.LanguageID, 387]" class="form-control" />
+                </div>
+            </div>
+        </div>
+
+    </BSModalBody>
+    <BSModalFooter>
+         @if (AppData.CurrentPermission.Find(i => i.permissionID == 21).permissionU)
+         {
+            <button type="submit" @onclick="SaveEditEventType" class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+         }
+         else
+         {
+            <button type="button" disabled class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+         }
+        <button type="reset" class="btn btn-danger" @onclick="@(() => ModalEventTypeEdit.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalEventTypeDelete-->
+<BSModal @ref="ModalEventTypeDelete">
+    <BSModalHeader OnClick="@(() => ModalEventTypeDelete.Hide())">@AppData.LangResource[AppData.LanguageID, 389]</BSModalHeader>
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="alert-modal-delete">
+                    @AppData.LangResource[AppData.LanguageID, 323] @AppData.LangResource[AppData.LanguageID, 387]:<br>@editEventType.EventTypeENName @AppData.LangResource[AppData.LanguageID, 324] ?
+                </h4>
+            </div>
+        </div>
+    </BSModalBody>
+    <BSModalFooter>
+         @if (AppData.CurrentPermission.Find(i => i.permissionID == 21).permissionD)
+         {
+            <button type="submit" @onclick="SaveDeleteEventType" class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+         }
+         else
+         {
+            <button type="button" disabled class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+         }
+        <button type="reset" class="btn btn-danger" @onclick="@(() => ModalEventTypeDelete.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalResponseError-->
+<BSModal Class="text-center" @ref="ModalResponseError" IsCentered="true" Size="Size.Large">
+    <BSModalBody>
+
+        <div class="row">
+            <div class="col-md-12 alert-modal-logo">
+                <img src="assets/images/img-common/delete_symbol.png" width="100" height="100" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <p class="alert-modal">@RequertMessage</p>
+            </div>
+        </div>
+        <button type="button" @onclick="@(() => ModalResponseError.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+    </BSModalBody>
+</BSModal>
+
+<!--ModalRespondSuccess-->
+<BSModal Class="text-center alert-modal-body" @ref="ModalRespondSuccess" IsCentered="true" Size="Size.Large">
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12 alert-modal-logo">
+                <img src="assets/images/img-common/tick_symbol.png" width="100" height="100" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="alert-modal">@RequertMessage</h4>
+            </div>
+        </div>
+        <button type="button" @onclick="@(() => ModalRespondSuccess.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+    </BSModalBody>
+</BSModal>
+
+
+@code {
+
+    /// <summary>
+    /// listRecordEventType
+    /// </summary>
+    private List<RecordEventType> listRecordEventType = new List<RecordEventType>();
+    private RecordEventType addEventType = new RecordEventType();
+    private RecordEventType editEventType = new RecordEventType();
+
+
+    /// <summary>
+    /// BSModal
+    /// </summary>
+    BSModal Load { get; set; }
+    BSModal ModalResponseError { get; set; }
+    BSModal ModalRespondSuccess { get; set; }
+    BSModal ModalEventTypeCreate { get; set; }
+    BSModal ModalEventTypeEdit { get; set; }
+    BSModal ModalEventTypeDelete { get; set; }
+
+    /// <summary>
+    /// Variable
+    /// </summary>
+    private string RequertMessage;
+
+    /// <summary>
+    /// OnInitializedAsync
+    /// </summary>
+    /// <returns></returns>
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            AppData.recordEventTypes = await _masterData.GetMasterDataAsync<RecordEventType>("EventType");
+            listRecordEventType = AppData.recordEventTypes;
+            //await jsRuntime.InvokeAsync<object>("ThisDataTablesAdd");
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+        }
+    }
+
+    /// <summary>
+    /// Modal show EventTypeUpdate
+    /// </summary>
+    /// <param name="id"></param>
+    private async void EventTypeUpdate(int id)
+    {
+        try
+        {
+            var respond = await _masterData.GetMasterDataAsyncByID<RecordEventType>("EventTypeByID", id);
+            if (string.IsNullOrEmpty(respond.Content))
+            {
+                editEventType = respond;
+                ModalEventTypeEdit.Show();
+            }
+            else
+            {
+                var requertException = respond.Content;
+                RequertMessage = requertException;
+                ModalResponseError.Show();
+            }
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+    }
+
+    /// <summary>
+    /// Modal show EventTypeDelete
+    /// </summary>
+    /// <param name="id"></param>
+    private async void EventTypeDelete(int id)
+    {
+        try
+        {
+            var respond = await _masterData.GetMasterDataAsyncByID<RecordEventType>("EventTypeByID", id);
+            if (string.IsNullOrEmpty(respond.Content))
+            {
+                editEventType = respond;
+                ModalEventTypeDelete.Show();
+            }
+            else
+            {
+                var requertException = respond.Content;
+                RequertMessage = requertException;
+                ModalResponseError.Show();
+            }
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+    }
+
+    /// <summary>
+    /// SaveCreateEventType
+    /// </summary>
+    private async Task SaveCreateEventType()
+    {
+        try
+        {
+            var respond = await _masterData.PostMasterDataAsync("PostEventType", addEventType);
+            if (!string.IsNullOrEmpty(respond.ToString()))
+            {
+                var requertException = respond.StatusMessage;
+                RequertMessage = requertException;
+                await OnInitializedAsync();
+                ModalRespondSuccess.Show();
+            }
+            else
+            {
+                var requertException = respond.Content;
+                RequertMessage = requertException;
+                ModalResponseError.Show();
+            }
+
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+        ModalEventTypeCreate.Hide();
+    }
+
+    /// <summary>
+    /// SaveEditEventType
+    /// </summary>
+    private async Task SaveEditEventType()
+    {
+        try
+        {
+            var respond = await _masterData.PutMasterDataAsync("PutEventType", editEventType, editEventType.EventTypeID);
+            if (!string.IsNullOrEmpty(respond.ToString()))
+            {
+                var requertException = respond.StatusMessage;
+                RequertMessage = requertException;
+                await OnInitializedAsync();
+                ModalRespondSuccess.Show();
+            }
+            else
+            {
+                var requertException = respond.Content;
+                RequertMessage = requertException;
+                ModalResponseError.Show();
+            }
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+        ModalEventTypeEdit.Hide();
+    }
+
+    /// <summary>
+    /// SaveDeleteEventType
+    /// </summary>
+    private async Task SaveDeleteEventType()
+    {
+        try
+        {
+            var respond = await _masterData.DeleteMasterDataAsync<RecordEventType>("DeleteEventType", editEventType.EventTypeID);
+            if (!string.IsNullOrEmpty(respond.ToString()))
+            {
+                var requertException = respond.StatusMessage;
+                RequertMessage = requertException;
+                await OnInitializedAsync();
+                ModalRespondSuccess.Show();
+            }
+            else
+            {
+                var requertException = respond.Content;
+                RequertMessage = requertException;
+                ModalResponseError.Show();
+            }
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+        ModalEventTypeDelete.Hide();
+    }
+
+    /// <summary>
+    /// ClearCreateEventType
+    /// </summary>
+    private void ClearCreateEventType()
+    {
+        addEventType = new RecordEventType();
+    }
+
+}

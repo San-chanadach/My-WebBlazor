@@ -1,0 +1,922 @@
+﻿@page "/Instruments/Calibration/{instrumentnumber}"
+@inject IJSRuntime jsRuntime
+@inject AppData AppData
+@inject IInstrumentService InstrumentService
+@inject IInstrumentBrandService InstrumentBrandService
+@inject IInstrumentModelService InstrumentModelService
+@inject IInstrumentAgencyService InstrumentAgencyService
+@inject IInstrumentCalibrationService InstrumentCalibrationService
+@inject IMasterDataInstrument _masterDataInstrument
+@inject IToastService ToastService
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@using System.Threading;
+@using RapidNRIMs.Model.Instruments
+@inject IConfiguration config
+
+<PageTitle>Calibration Page</PageTitle>
+
+<div class="row margin-row-card">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">@AppData.LangResource[AppData.LanguageID, 13]</div>
+            <div class="card-body">
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">@AppData.LangResource[AppData.LanguageID, 61]</label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group">
+                            <input type="text" @bind-value="instrumentnumber" class="form-control enter-btn" name="InstrumentNumber" id="InstrumentNumber" placeholder="@AppData.LangResource[AppData.LanguageID,61]">
+                            <span class="input-icon-search" @onclick="Onsearch" id='btn_signin'><i class="fa fa-search instrumentnumber-search"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">@AppData.LangResource[AppData.LanguageID, 96]</div>
+            <div class="scrollBar-x card-body scroll-inner">
+                <table class="table table-bordered table-striped text-center" id="dataTable" width="100%">
+                    <thead>
+                        <tr>
+                            <th>@AppData.LangResource[AppData.LanguageID, 89]</th>
+                            <th>@AppData.LangResource[AppData.LanguageID, 90]</th>
+                            <th>@AppData.LangResource[AppData.LanguageID, 91]</th>
+                            <th>@AppData.LangResource[AppData.LanguageID, 92]</th>
+                            <th>@AppData.LangResource[AppData.LanguageID, 71]</th>
+                            <th>@AppData.LangResource[AppData.LanguageID, 70]</th>
+                            <th>@AppData.LangResource[AppData.LanguageID, 76]</th>
+                            <th>@AppData.LangResource[AppData.LanguageID, 81]</th>
+                            <th>@AppData.LangResource[AppData.LanguageID, 172]</th>
+                            <th>@AppData.LangResource[AppData.LanguageID, 451]</th>
+                            <th>@AppData.LangResource[AppData.LanguageID, 418]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var item in instrumentCalibrations)
+                        {
+                            <tr @onclick="() => ShowInstrumentCalibration(item.InstrumentCalibrationID)" class="@((ID == item.InstrumentCalibrationID) ? "selected none-bg" : "")">
+                                <td>@(item.instrument != null ? item.instrument.InstrumentNumber:"-")</td>
+                                <td>@(item.instrument != null ? item.instrument.InstrumentENName:"-")</td>
+                                <td>@(item.instrument != null ? item.instrument.InstrumentAssetNumber:"-")</td>
+                                <td>@(item.instrument != null ? item.instrument.InstrumentSerialNumber:"-")</td>
+                                <td>@(item.instrument != null ? item.instrument.Brand.InstrumentBrandName:"-")</td>
+                                <td>@(item.instrument != null ? item.instrument.Model.InstrumentModelName:"-")</td>
+                                <td>@(item.instrument != null ? item.instrument.Agency.InstrumentAgencyName:"-")</td>
+                                <td>@item.InstrumentCalibrationDate.Value.Date.ToString("dd/MM/yyyy")</td>
+                                <td>@item.InstrumentCalibrationNext.Value.Date.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    @if (item.InstrumentCalibrationFile != "")
+                                    {
+                                        <a href="@($"{config["nurl"]}{config["nurlFileInstrument"]}{item.InstrumentCalibrationFile}")" class="btn btn-warning margin-btn" target="_blank">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" disabled class="btn btn-warning margin-btn">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="input-group input-box-bottom">
+                                        <input type="text" @bind-value="@item.Note" class="form-control" />
+                                        <button @onclick="@(() =>OnUpdateNote(item))" class="btn btn-primary">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="text-center">
+            @if (instrumentId != null)
+            {
+                <a href="@($"Instruments/ShowInstrument/{instrumentId}")" class="btn btn-warning margin-btn" name="ShowInstrument" id="ShowInstrument">@AppData.LangResource[AppData.LanguageID, 94]</a>
+            }
+
+            @if (ID == null)
+            {
+                <button disabled class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID, 480]</button>
+            }
+            else
+            {
+                <button @onclick="@(() => ModalEditCalibration.Show())" class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID, 480]</button>
+
+            }
+
+
+            @if (AppData.CurrentPermission.Find(i => i.permissionID == 5).permissionE)
+            {
+                <button type="submit" class="btn margin-btn" style="background-color:#1E97DB; color:#fff" @onclick="ShowModalAddCalibration" name="Calibration" id="Calibration">@AppData.LangResource[AppData.LanguageID, 13]</button>
+            }
+
+            <button type="reset" @onclick="OnClear" class="btn margin-btn" style="background-color:#B90F1B; color:#fff">@AppData.LangResource[AppData.LanguageID, 45]</button>
+        </div>
+    </div>
+</div>
+
+
+<EditForm Model="@instrumentCalibration" OnValidSubmit="PostInstrumentCalibration">
+    <!---DataAnnotationsValidator /-->
+    <BSModal @ref="InstrumentCalibration">
+        <BSModalHeader @onclick="clearInputFile" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID, 13]</BSModalHeader>
+        <BSModalBody>
+            @foreach (var item in FilteredToDos)
+            {
+                <div class="row">
+                    <div class="col-md-12 form-group">
+                        <span class="span-img-calibration">
+                            <!--img class="img-qrcode" src="assets/images/img-qrcode/qr-code.png"-->
+                        </span>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="col-12 col-md-5 col-lg-6 col-form-label">
+                        <span> @AppData.LangResource[AppData.LanguageID, 61]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-7">
+                        <div class="input-group input-box-bottom">
+                            <input type="text" disabled @bind-value="@item.InstrumentNumber" placeholder="@item.InstrumentNumber" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                        <span> @AppData.LangResource[AppData.LanguageID, 168]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-7">
+                        <div class="input-group input-box-bottom">
+                            @if (AppData.LanguageID == 0)
+                            {
+                                <input type="text" disabled placeholder="@item.InstrumentENName" class="form-control" />
+                            }
+                            else
+                            {
+                                <input type="text" disabled placeholder="@item.InstrumentTHName" class="form-control" />
+                            }
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                        <span> @AppData.LangResource[AppData.LanguageID, 81]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-7">
+                        <div class="input-group input-box-bottom">
+                            <InputDate @bind-Value="instrumentCalibration.InstrumentCalibrationDate" placeholder=" @AppData.LangResource[AppData.LanguageID,81]" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 172]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-7">
+                        <div class="input-group input-box-bottom">
+                            <InputDate @bind-Value="instrumentCalibration.InstrumentCalibrationNext" placeholder="@AppData.LangResource[AppData.LanguageID,172]" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 229]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-7">
+                        <div class="input-group input-box-bottom">
+                            <InputFile OnChange="@OnInputFileDocumentChange" class="custom-file-input file-name-custom" id="documentFile" />
+                            @if (AppData.LanguageID == 0)
+                            {
+                                <label class="custom-file-label" id="documentFileLabel" for="documentFile" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                            }
+                            else
+                            {
+                                <label class="custom-file-label" id="documentFileLabel" for="documentFile" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                            }
+                        </div>
+                       
+                    </div>
+                </div>
+            }
+        </BSModalBody>
+        <BSModalFooter>
+            @if (instrumentCalibration.InstrumentCalibrationDate == null || instrumentCalibration.InstrumentCalibrationNext == null)
+            {
+                <button type="submit" disabled class="btn" style="background-color:#4CBB17; color:#fff">@AppData.LangResource[AppData.LanguageID, 44]</button>
+            }
+            else
+            {
+                <button type="submit" class="btn" style="background-color:#4CBB17; color:#fff">@AppData.LangResource[AppData.LanguageID, 44]</button>
+            }
+
+           
+            <button type="reset" class="btn" style="background-color:#B90F1B; color:#fff" @onclick="clearInputFile">@AppData.LangResource[AppData.LanguageID, 158]</button>
+        </BSModalFooter>
+    </BSModal>
+</EditForm>
+
+<EditForm Model="@editCalibration" OnValidSubmit="SaveEditInstrumentCalibration">
+    <BSModal @ref="ModalEditCalibration">
+        <BSModalHeader @onclick="ModalOnClear" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID, 480]</BSModalHeader>
+        <BSModalBody>
+            @foreach (var item in FilteredToDos)
+            {
+                <div class="row">
+                    <div class="col-md-12 form-group">
+                        <span class="span-img-calibration">
+                            <!--img class="img-qrcode" src="assets/images/img-qrcode/qr-code.png"-->
+                        </span>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                        <span> @AppData.LangResource[AppData.LanguageID, 61]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-7">
+                        <div class="input-group input-box-bottom">
+                            <input type="text" disabled @bind-value="@item.InstrumentNumber" placeholder="@item.InstrumentNumber" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                        <span> @AppData.LangResource[AppData.LanguageID, 168]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-7">
+                        <div class="input-group input-box-bottom">
+                            @if (AppData.LanguageID == 0)
+                            {
+                                <input type="text" disabled placeholder="@item.InstrumentENName" class="form-control" />
+                            }
+                            else
+                            {
+                                <input type="text" disabled placeholder="@item.InstrumentTHName" class="form-control" />
+                            }
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                        <span> @AppData.LangResource[AppData.LanguageID, 81]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-7">
+                        <div class="input-group input-box-bottom">
+                            <input type="date" disabled @bind-value="editCalibration.InstrumentCalibrationDate" placeholder=" @AppData.LangResource[AppData.LanguageID,81]" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 172]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-7">
+                        <div class="input-group input-box-bottom">
+                            <input disabled type="date" @bind-value="editCalibration.InstrumentCalibrationNext" placeholder="@AppData.LangResource[AppData.LanguageID,172]" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 229]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-7">
+                        <div class="input-group input-box-bottom">
+                            <InputFile OnChange="@OnInputFileDocumentChange" class="custom-file-input file-name-custom" id="documentFile" />
+                            @if (AppData.LanguageID == 0)
+                            {
+                                <label class="custom-file-label" for="documentFile" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                            }
+                            else
+                            {
+                                <label class="custom-file-label" for="documentFile" data-browse="@AppData.LangResource[AppData.LanguageID, 313]">@AppData.LangResource[AppData.LanguageID, 313]</label>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </BSModalBody>
+        <BSModalFooter>
+            <button type="submit" class="btn" style="background-color:#4CBB17; color:#fff">@AppData.LangResource[AppData.LanguageID, 44]</button>
+            <button type="reset" class="btn" style="background-color:#B90F1B; color:#fff" @onclick="ModalOnClear">@AppData.LangResource[AppData.LanguageID, 158]</button>
+        </BSModalFooter>
+    </BSModal>
+</EditForm>
+
+<!--ModalResponseError-->
+<BSModal Class="text-center" @ref="ModalResponseError" IsCentered="true" Size="Size.Large">
+    <BSModalBody>
+
+        <div class="row">
+            <div class="col-md-12 alert-modal-logo">
+                <img src="assets/images/img-common/delete_symbol.png" width="100" height="100" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <p class="alert-modal">Update Error</p>
+            </div>
+        </div>
+        <button type="button" @onclick="@(() => ModalResponseError.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+    </BSModalBody>
+</BSModal>
+
+<!--ModalRespondSuccess-->
+<BSModal Class="text-center alert-modal-body" @ref="ModalRespondSuccess" IsCentered="true" Size="Size.Large">
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12 alert-modal-logo">
+                <img src="assets/images/img-common/tick_symbol.png" width="100" height="100" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="alert-modal">Upadate Successfully</h4>
+            </div>
+        </div>
+        <button type="button" @onclick="@(() => ModalRespondSuccess.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+    </BSModalBody>
+</BSModal>
+
+<!--EditForm Modal Loading--->
+<BSModal class="row style-justify mt-5" @ref="Load" IsCentered="true" Size="Size.Small" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+    <BSModalBody>
+        <div class="text-center mt-3">
+            <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+                  style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+        </div>
+        <div class="text-center pt-3" style=" font-size: 16pt">
+            @AppData.LangResource[AppData.LanguageID, 325]
+        </div>
+    </BSModalBody>
+</BSModal>
+
+@code {
+    private List<Instrument> instruments = new List<Instrument>();
+    private List<InstrumentBrand> instrumentBrands = new List<InstrumentBrand>();
+    private List<InstrumentModel> instrumentModels = new List<InstrumentModel>();
+    private List<InstrumentAgency> instrumentAgencys = new List<InstrumentAgency>();
+    private List<InstrumentStatus> instrumentStatus = new List<InstrumentStatus>();
+    private List<InstrumentCalibration> instrumentCalibrations = new List<InstrumentCalibration>();
+    private List<Instrument> instrumentById = new List<Instrument>();
+
+
+    [Parameter]
+    public string instrumentnumber { get; set; }
+
+    [Parameter]
+    public int? instrumentId { get; set; }
+    public int? ID { get; set; }
+
+    BSModal InstrumentCalibration { get; set; }
+    BSModal ModalEditCalibration { get; set; }
+    BSModal ModalResponseError { get; set; }
+    BSModal ModalRespondSuccess { get; set; }
+
+
+
+    private InstrumentCalibration instrumentCalibration = new InstrumentCalibration();
+
+    private InstrumentCalibration editCalibration = new InstrumentCalibration();
+
+
+    public bool pass { get; set; } = true;
+    public bool fail { get; set; } = false;
+    List<Instrument> FilteredToDos => instruments.Where(i => i.InstrumentNumber.ToLower().Contains(instrumentnumber.ToLower())).ToList();
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Run(Loading);
+        Load.Show();
+        instrumentBrands = AppData.instrumentBrands;
+        instrumentModels = AppData.instrumentModels;
+
+        instrumentAgencys = AppData.instrumentAgencies;
+        instrumentStatus = AppData.instrumentStatus;
+
+        instruments = await Http.GetFromJsonAsync<List<Instrument>>($"{config["nurl"]}/api/GetInstrumentByInstrumentNumber/{instrumentnumber}");
+
+
+
+        if (instruments.Count >= 1)
+        {
+            instrumentId = instruments.First().InstrumentID;
+            Console.WriteLine(instrumentId);
+            instrumentCalibrations = await Http.GetFromJsonAsync<List<InstrumentCalibration>>($"{config["nurl"]}/api/GetInstrumentCalibration/{instrumentId}");
+            foreach (var j in instruments)
+            {
+                j.GetLookup(instrumentBrands, instrumentModels, instrumentAgencys, instrumentStatus);
+            }
+
+            foreach (var m in instrumentCalibrations)
+            {
+                m.GetLookup(FilteredToDos);
+            }
+        }
+
+
+
+        Load.Hide();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeAsync<object>("showFileName");
+            await jsRuntime.InvokeAsync<object>("onClickEnter", "#btn_signin");
+            await jsRuntime.InvokeAsync<object>("ResponsiveDataTables");
+            await jsRuntime.InvokeVoidAsync("clearURL");
+        }
+    }
+
+    public void CheckPassFail()
+    {
+
+        if (pass == true)
+        {
+            instrumentCalibration.InstrumentCalibrationStatus = pass;
+        }
+
+
+    }
+    private void ChangFail()
+    {
+        instrumentCalibration.InstrumentCalibrationStatus = fail;
+
+    }
+
+    private string backgroundColor;
+    private void ShowModalAddCalibration()
+    {
+
+        ID = null;
+
+        //instrumentCalibration.InstrumentCalibrationDate = DateTime.Today;
+        //instrumentCalibration.InstrumentCalibrationNext = DateTime.Today;
+
+
+
+        InstrumentCalibration.Show();
+
+
+        // เพิ่ม class "none-bg" ให้กับ tr.selected
+        jsRuntime.InvokeVoidAsync("addNoneBgClassToSelectedRows");
+
+
+    }
+
+    private async Task PostInstrumentCalibration()
+    {
+        await Task.Run(Loading);
+        Load.Show();
+        try
+        {
+            if (instrumentCalibration.InstrumentCalibrationNext.HasValue != null && instrumentCalibration.InstrumentCalibrationDate.HasValue != null && instrumentCalibration.InstrumentCalibrationNext.Value.Date >= instrumentCalibration.InstrumentCalibrationDate.Value.Date)
+            {
+                instrumentCalibration.InstrumentID = instrumentId;
+
+                using var response = await Http.PostAsJsonAsync($"{config["nurl"]}/api/RegisterInstrumentCalibration", instrumentCalibration);
+                List<InstrumentCalibration> article = await response.Content.ReadFromJsonAsync<List<InstrumentCalibration>>();
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+
+                    ToastService.ShowSuccess("Calibration Save Successfully");
+                    Console.WriteLine(article);
+                }
+                else
+                {
+                    ToastService.ShowError("Error Please Contract System Administrator");
+                }
+
+                this.instrumentCalibration = article.First();
+                await FileDocument();
+                //InstrumentCalibration.Hide();
+
+                //Load.Hide();
+
+                AppData.SetNoti(await Http.GetFromJsonAsync<List<InstrumentCalibration>>($"{config["nurl"]}/api/GetDueInstrumentCalibration"),
+                         await Http.GetFromJsonAsync<List<InstrumentMaintenance>>($"{config["nurl"]}/api/GetDueInstrumentMaintenance")
+                         , AppData.instrumentsList);
+                foreach (var i in AppData.instrumentBrands)
+                {
+                    i.Getlookup(AppData.instrumentModels);
+                }
+                foreach (var i in AppData.instrumentsList)
+                {
+                    i.GetLookup(AppData.instrumentBrands, AppData.instrumentModels, AppData.instrumentAgencies, AppData.instrumentStatus);
+                }
+
+                // instrumentCalibration = new InstrumentCalibration()
+                //     {
+                //         InstrumentCalibrationDate = DateTime.Today,
+                //         InstrumentCalibrationNext = DateTime.Today
+                //     };
+
+                await OnInitializedAsync();
+            }
+            else
+            {
+                ToastService.ShowError("Calibration date Next must be after Calibration date");
+            }
+
+
+        }
+        catch (Exception e)
+        {
+
+        }
+        InstrumentCalibration.Hide();
+        Load.Hide();
+
+    }
+
+    
+
+    private void ShowInstrumentError()
+    {
+        //ToastService.ShowError("Calibration list is not selected.");
+    }
+
+    /*******************************************UploadFile*************************************************************************/
+    private IBrowserFile? fileDocument;
+    private string pathAddDocumentFolder { get; set; } = "AddDocument";
+    private string pathEditDocumentFolder { get; set; } = "EditDocument";
+    /// <summary>
+    /// Document File
+    /// </summary>
+    protected async Task OnInputFileDocumentChange(InputFileChangeEventArgs e)
+    {
+        fileDocument = e.File;
+        //var formatDocumentFile = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        var fileType = fileDocument.ContentType;
+        var sizefile = fileDocument.Size;
+        //35457280
+        if (sizefile > 2154227)
+        {
+            if (ID == null)
+            {
+                ToastService.ShowError("The file size cannot exceed 30MB.");
+                instrumentCalibration.InstrumentCalibrationFile = "";
+            }
+            else
+            {
+                ToastService.ShowError("The file size cannot exceed 30MB.");
+                editCalibration.InstrumentCalibrationFile = "";
+            }
+
+        }
+        else if (fileType != "application/pdf")
+        {
+            if (ID == null)
+            {
+                ToastService.ShowError("File Type Document Incorrect !");
+                instrumentCalibration.InstrumentCalibrationFile = "";
+            }
+            else
+            {
+                ToastService.ShowError("File Type Document Incorrect !");
+                editCalibration.InstrumentCalibrationFile = "";
+            }
+
+        }
+        else
+        {
+            if (ID == null)
+            {
+                Load.Show();
+                await Task.Run(Loading);
+                string newFileName = await GenerateUniqueFileName(fileDocument.Name, pathAddDocumentFolder);
+                instrumentCalibration.InstrumentCalibrationFile = newFileName;
+                Load.Hide();
+            }
+            else
+            {
+                Load.Show();
+                await Task.Run(Loading);
+                string newFileName = await GenerateUniqueFileName(fileDocument.Name, pathEditDocumentFolder);
+                editCalibration.InstrumentCalibrationFile = newFileName;
+                Load.Hide();
+            }
+
+        }
+
+    }
+
+    /// <summary>
+    /// Document File
+    /// </summary>
+    private async Task FileDocument()
+    {
+        if (fileDocument != null)
+        {
+            try
+            {
+                var fileType = fileDocument.ContentType;
+                var sizefile = fileDocument.Size;
+                if (sizefile <= 2154227 && fileType == "application/pdf")
+                {
+                    if (ID == null)
+                    {
+                        string newFileName = await GenerateUniqueFileName(fileDocument.Name, pathAddDocumentFolder);
+                        string path = Path.Combine(config.GetValue<string>("FileStorage")!, "Instrument", "Calibration", pathAddDocumentFolder, newFileName);
+
+                        Directory.CreateDirectory(Path.Combine(config.GetValue<string>("FileStorage")!, "Instrument", "Calibration", pathAddDocumentFolder));
+
+                        await using FileStream fs = new(path, FileMode.Create);
+                        await fileDocument.OpenReadStream(sizefile).CopyToAsync(fs);
+                    }
+                    else
+                    {
+                        string newFileName = await GenerateUniqueFileName(fileDocument.Name, pathEditDocumentFolder);
+                        string path = Path.Combine(config.GetValue<string>("FileStorage")!, "Instrument", "Calibration", pathEditDocumentFolder, newFileName);
+
+                        Directory.CreateDirectory(Path.Combine(config.GetValue<string>("FileStorage")!, "Instrument", "Calibration", pathEditDocumentFolder));
+
+                        await using FileStream fs = new(path, FileMode.Create);
+                        await fileDocument.OpenReadStream(sizefile).CopyToAsync(fs);
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowError($"File: {fileDocument.Name} Error: {ex.Message}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// GenerateUniqueFileDocument
+    /// </summary>
+    private async Task<string> GenerateUniqueFileName(string originalFileName, string folderName)
+    {
+        string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(originalFileName);
+        string fileExtension = Path.GetExtension(originalFileName);
+        string newFileName = fileNameWithoutExtension + fileExtension;
+
+        if (ID == null && folderName == "AddDocument")
+        {
+            int counter = 1;
+            string path = Path.Combine(config.GetValue<string>("FileStorage")!, "Instrument", "Calibration", folderName, newFileName);
+
+            while (File.Exists(path))
+            {
+                newFileName = $"{fileNameWithoutExtension}({counter}){fileExtension}";
+                path = Path.Combine(config.GetValue<string>("FileStorage")!, "Instrument", "Calibration", folderName, newFileName);
+                counter++;
+            }
+        }
+        else
+        {
+            int counter = 1;
+            string path = Path.Combine(config.GetValue<string>("FileStorage")!, "Instrument", "Calibration", folderName, newFileName);
+
+            while (File.Exists(path))
+            {
+                newFileName = $"{fileNameWithoutExtension}({counter}){fileExtension}";
+                path = Path.Combine(config.GetValue<string>("FileStorage")!, "Instrument", "Calibration", folderName, newFileName);
+                counter++;
+            }
+        }
+
+
+
+
+
+        return newFileName;
+    }
+
+
+
+    /// <summary>
+    /// Document File
+    /// </summary>
+    //private long sizeFile;
+    //private async Task OnInputFileDocumentChange(InputFileChangeEventArgs e)
+    //{
+    //    var formatDocumentFile = e.File.ContentType;
+    //    var sizefile = e.File.Size;
+    //    sizeFile = sizefile;
+    //    var fileName = e.File.Name;
+
+    //    if (sizeFile > 2597152)
+    //    {
+    //        ToastService.ShowError("The file size cannot exceed 2MB.");
+    //        instrumentCalibration.InstrumentCalibrationFile = "";
+    //    }
+    //    else if (formatDocumentFile != "application/pdf")
+    //    {
+    //        ToastService.ShowError("File Type Document Incorrect !");
+    //        instrumentCalibration.InstrumentCalibrationFile = "";
+    //    }
+    //    else
+    //    {
+    //        await Task.Run(Loading);
+    //        Load.Show();
+    //        using MemoryStream memoryStream = new MemoryStream();
+    //        await e.File.OpenReadStream(sizeFile).CopyToAsync(memoryStream);
+    //        var buffer = memoryStream.GetBuffer();
+    //        var fileDocumentDataUrl = $"data:{formatDocumentFile};base64,{Convert.ToBase64String(buffer)}";
+    //        //fileDocumentDataUrls.Add(fileDocumentDataUrl);
+    //        //Console.WriteLine(fileDocumentDataUrl);
+    //        //Console.WriteLine(sizefile);
+    //        instrumentCalibration.InstrumentCalibrationFileName = fileName;
+    //        instrumentCalibration.InstrumentCalibrationFile = fileDocumentDataUrl;
+    //        Load.Hide();
+    //    }
+    //}
+
+    public async Task Onsearch()
+    {
+        try
+        {
+            var instrumentNumber = (await Http.GetFromJsonAsync<List<Instrument>>($"{config["nurl"]}/api/GetInstrumentByInstrumentNumber/{instrumentnumber}"))
+                .Find(i => i.InstrumentNumber == instrumentnumber);
+
+            if (instrumentNumber != null)
+            {
+                instruments = await Http.GetFromJsonAsync<List<Instrument>>($"{config["nurl"]}/api/GetInstrumentByInstrumentNumber/{instrumentnumber}");
+            }
+            else
+            {
+                ToastService.ShowError("Please enter InstrumentNumber");
+            }
+
+
+
+            if (instruments.Count >= 1)
+            {
+                instrumentId = instruments.First().InstrumentID;
+                Console.WriteLine(instrumentId);
+                instrumentCalibrations = await Http.GetFromJsonAsync<List<InstrumentCalibration>>($"{config["nurl"]}/api/GetInstrumentCalibration/{instrumentId}");
+
+                foreach (var j in instruments)
+                {
+                    j.GetLookup(instrumentBrands, instrumentModels, instrumentAgencys, instrumentStatus);
+
+                }
+
+                foreach (var m in instrumentCalibrations)
+                {
+                    m.GetLookup(FilteredToDos);
+                }
+
+                //await jsRuntime.InvokeAsync<object>("onClickEnter", "#btn_signin");
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError($"Error:{ex.Message}");
+        }
+
+
+    }
+
+    public void OnClear()
+    {
+        instrumentCalibrations = new List<InstrumentCalibration>();
+        instruments = new List<Instrument>();
+        instrumentnumber = "-";
+        instrumentId = 0;
+    }
+
+    public async void ModalOnClear()
+    {
+        if (ID != null)
+        {
+            ID = null;
+            //await jsRuntime.InvokeVoidAsync("clearFileInput", "documentFile", "documentFileLabel");
+            await OnInitializedAsync();
+
+            ModalEditCalibration.Hide();
+
+        }
+
+    }
+
+    public async void clearInputFile()
+    {
+        instrumentCalibration.InstrumentCalibrationDate = null;
+        instrumentCalibration.InstrumentCalibrationNext = null;
+        await jsRuntime.InvokeVoidAsync("clearFileInput", "documentFile", "documentFileLabel");
+        InstrumentCalibration.Hide();
+        StateHasChanged();
+    }
+
+
+    /// <summary>
+    /// Calibration Update Remark
+    /// </summary>
+    /// <param name="i"></param>
+    /// <returns></returns>
+    public async Task OnUpdateNote(InstrumentCalibration i)
+    {
+        try
+        {
+            var response = await Http.PutAsJsonAsync<InstrumentCalibration>($"{config["nurl"]}/api/RegisterInstrumentCalibration", i);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                ToastService.ShowSuccess(" Save Successfully");
+
+            }
+            else
+            {
+                ToastService.ShowError("Error !");
+            }
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError("Err:" + e);
+        }
+        await OnInitializedAsync();
+    }
+
+    /// <summary>
+    /// Modal show InstrumentCalibration Update
+    /// </summary>
+    /// <param name="id"></param>
+    private async Task ShowInstrumentCalibration(int? id)
+    {
+        ID = id;
+        editCalibration = instrumentCalibrations.Find(i => i.InstrumentCalibrationID == id);
+
+
+    }
+
+    /// <summary>
+    /// SaveEditInstrumentCalibration
+    /// </summary>
+    private async Task SaveEditInstrumentCalibration()
+    {
+        await Task.Run(Loading);
+        Load.Show();
+        var respond = await _masterDataInstrument.PutInstrumentMasterDataAsync("PutInstrumentCalibration", editCalibration);
+
+        if (respond != null)
+        {
+            ModalRespondSuccess.Show();
+        }
+        else
+        {
+            ModalResponseError.Show();
+        }
+        await OnInitializedAsync();
+        await FileDocument();
+        ModalEditCalibration.Hide();
+
+        Load.Hide();
+
+    }
+
+
+
+    private async Task DownloadFile(string fileDocument, string fileName)
+    {
+        try
+        {
+            if (fileName != null)
+            {
+                string[] base64String = fileDocument.Split(',');
+                await jsRuntime.InvokeVoidAsync("downloadFile", "application/pdf", base64String[1], fileName);
+            }
+            else
+            {
+                string[] base64String = fileDocument.Split(',');
+                await jsRuntime.InvokeVoidAsync("downloadFile", "application/pdf", base64String[1], Guid.NewGuid());
+            }
+
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError($"Error:{e.Message}");
+        }
+
+    }
+
+    BSModal Load { get; set; }
+
+    private void Loading()
+    {
+        System.Threading.Thread.Sleep(300);
+        // Retrieve data from the server and initialize
+        // Employees property which the View will bind
+    }
+}

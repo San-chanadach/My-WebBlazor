@@ -1,0 +1,132 @@
+﻿@inherits CalibrateNeedDashboardBase
+
+<div class="col-lg-4 col-md-6 mt-4 mb-4 margin-top-paper">
+    <div class="card-dashbord z-index-2 ">
+        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+            <a href="@($"Instruments/InstrumentCAL")" style="text-decoration:none;">
+                <div class="card-header text-white txt-size-paper-two" style="background-color:#1E97DB">
+                    <b>@AppData.LangResource[AppData.LanguageID, 530] @AppData.DueCal.Count() @AppData.LangResource[AppData.LanguageID, 537]</b>
+                    <div class="float-right">
+                    </div>
+                </div>
+            </a>
+            <div class="card-body bg-light">
+                <div class="scrollBar fixTableHead table-responsive scroll-inner height-size-paper-two">
+                    @if (AppData.DueCal.Count != 0)
+                    {
+                        <table id="dataTable" class="table table-striped text-wrap txt-size-paper-two-content">
+                            <thead class="fixedthead">
+                                <tr>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 408]</th>
+                                    <th class="alternateRow text-right">@AppData.LangResource[AppData.LanguageID, 409]</th>
+                                </tr>
+                            </thead>
+                            <tbody class="scrollContent">
+                                @*@{
+                            var dueItems = AppData.DueCal
+                            .Where(item => item.instrument != null && item.InstrumentCalibrationNext.HasValue)
+                            .OrderBy(item => item.InstrumentCalibrationNext.Value)
+                            .ToList();
+                            }
+                            @foreach (var item in dueItems)
+                            {
+                            if (item.instrument != null)
+                            {
+
+                            var rowStyle = "";
+                            var iconPath = ""; // เพิ่มตัวแปรเก็บ path ของไอคอนรูปภาพ
+
+                            //DateTime dueDate = item.InstrumentCalibrationNext.Value.AddMonths(-1);
+                            DateTime currentDate = DateTime.Now;
+                            DateTime dueDate = item.InstrumentCalibrationNext.Value;
+
+                            if (currentDate.Day >= dueDate.Day)
+                            {
+                            dueDate = dueDate.AddMonths(-1);
+                            }
+
+
+                            if (dueDate <= currentDate)
+                            {
+                            rowStyle = "color: #fff; background-color: #ff0000;";
+                            iconPath = "assets/icons/icon-dashbord/overdue-5.png"; // กำหนด path ของไอคอนรูปภาพสีแดง
+                            }
+                            else if (dueDate.AddMonths(-1) <= currentDate) // เพิ่มเงื่อนไขใหม่
+                            {
+                            rowStyle = "background-color: #ffff00;"; // เปลี่ยนเป็นสีเหลือง
+                            }
+
+                            <tr style="@rowStyle">
+                            <td style="cursor:default">
+
+                            @item.instrument.InstrumentENName
+                            <!--img src="@iconPath" alt="Icon" class="icon-image" /---> <!-- แสดงรูปภาพไอคอน -->
+                            </td>
+                            <td style="cursor:default" class="text-right">@dueDate.ToString("dd/MM/yyyy")</td>
+                            </tr>
+
+                            Update ************************************
+                            {                            @foreach (var item in AppData.DueCal
+                            .Where(item => item.instrument != null && item.InstrumentCalibrationNext.HasValue)
+                            .OrderByDescending(item => item.InstrumentCalibrationNext.Value < DateTime.Now.Date)
+                            .ThenBy(item => Math.Abs((item.InstrumentCalibrationNext.Value.Date - DateTime.Now.Date).TotalDays))
+                            .ThenBy(item => item.InstrumentCalibrationNext.Value.Date))
+
+
+                            }
+                            }*@
+
+                            <!------------สิ่งที่จะแก้ไขคือ เปลี่ยนเงื่อนไข แจ้งเตือน 5 วันไม่เอาเเล้ว และเปลี่ยนการแสดงของ ถ้า 1 เดือนให้เป็นสีเหลืองไปเลย อันนี้หน่อยบอกให้แก้ไขนะ------------------------------>
+                                @foreach (var item in AppData.DueCal
+                               .Where(item => item.instrument != null && item.InstrumentCalibrationNext.HasValue)
+                               .OrderBy(item => item.InstrumentCalibrationNext.Value.Date)
+                               .ThenBy(item => Math.Abs((item.InstrumentCalibrationNext.Value.Date - DateTime.Now.Date).TotalDays))
+                               .ThenBy(item => item.InstrumentCalibrationNext.Value.Date))
+                                {
+                                    DateTime calibrationNext = item.InstrumentCalibrationNext.Value.Date;
+                                    DateTime currentDate = DateTime.Now.Date;
+                                    TimeSpan timeDifference = calibrationNext - currentDate;
+                                    var rowColorClass = "";
+
+                                    if (calibrationNext < currentDate)
+                                    {
+                                        rowColorClass = "bg-danger text-white"; // แถวเกินกำหนดสีแดง
+                                    }
+                                    else
+                                    {
+                                        rowColorClass = "bg-warning"; // แถวใกล้ถึงกำหนดสีเหลือง
+                                    }
+                                    @*  else if (timeDifference.TotalDays <= 5)
+                                    {
+                                        rowColorClass = "bg-warning"; // แถวใกล้ถึงกำหนดสีเหลือง
+                                    } *@
+
+                                    <tr class="@rowColorClass">
+                                        <td style="cursor:default">@item.instrument.InstrumentENName</td>
+                                        <td style="cursor:default" class="text-right">@calibrationNext.ToString("dd/MM/yyyy")</td>
+                                    </tr>
+                                }
+
+
+
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <BSAlert Color="Color.Danger" IsDismissible="true">
+                            @AppData.LangResource[AppData.LanguageID, 411]
+                        </BSAlert>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+@*@foreach (var item in AppData.DueCal
+                               .Where(item => item.instrument != null && item.InstrumentCalibrationNext.HasValue)
+                               .OrderBy(item => Math.Abs((item.InstrumentCalibrationNext.Value.Date - DateTime.Now.Date).TotalDays))
+                               .ThenBy(item => item.InstrumentCalibrationNext.Value.Date))*@

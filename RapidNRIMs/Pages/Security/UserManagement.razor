@@ -1,0 +1,618 @@
+﻿@page "/Security/UserManagement"
+@inject IJSRuntime jsRuntime
+@inject AppData AppData
+@inject NavigationManager NavigationManager
+@inject IToastService ToastService
+@inject HttpClient Http
+@inject IConfiguration  Config
+@using System.Threading
+
+<PageTitle>User Management Page</PageTitle>
+
+
+<BSTabGroup>
+    <BSTabList>
+        <!--Tab TeamProject-->
+        <BSTab>
+            <BSTabLabel>@AppData.LangResource[AppData.LanguageID, 36]</BSTabLabel>
+                <BSTabContent>
+                    <div class="row margin-row-card mt-2">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header"><i class="fas fa-table mr-1"></i>@AppData.LangResource[AppData.LanguageID, 141]</div>
+                                <div class="card-body">
+                                    <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height:750px;">
+                                        <table class="table table-bordered table-striped text-center">
+                                            <thead class="fixedthead">
+                                                <tr>
+
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 143]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 144]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 93]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 145]</th>
+                                                    <!---th>@AppData.LangResource[AppData.LanguageID,146]</th-->
+                                                </tr>
+
+                                            </thead>
+                                            <tbody class="scrollContent">
+
+                                                @foreach (var item in accounts)
+                                                {
+                                                    <tr>
+
+                                                        <td>@item.FirstName</td>
+
+                                                        <td>@item.LastName</td>
+
+                                                        @if (item.IsActive)
+                                                        {
+                                                            <td>
+                                                                <a class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 484]</a>
+                                                            </td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td>
+                                                                <a class="btn btn-danger" @onclick="(()=>OnActivaed(item.UserID))">@AppData.LangResource[AppData.LanguageID, 485]</a>
+                                                            </td>
+                                                        }
+
+                                                        <!--td>18018610</td-->
+
+                                                        <td>
+                                                            <a class="btn btn-warning" href="@($"Security/UserProfile/{item.UserID}/1")"><i class="far fa-edit"></i></a>
+                                                        </td>
+
+                                                        <!--td><a class="btn btn-danger" href=""><i class="fas fa-trash-alt"></i></a></td-->
+
+
+                                                    </tr>
+                                                    i++;
+                                                }
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                @if (AppData.CurrentPermission.Find(i => i.permissionID == 18).permissionE)
+                                {
+                                    <button type="submit" @onclick="@(() => AddUserManagement.Show())" class="btn btn-warning margin-btn" name="AddNewUser" id="AddNewUser">@AppData.LangResource[AppData.LanguageID, 304]</button>
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+                           
+                </BSTabContent>
+        </BSTab>
+        <!--Tab SuppportTeamProject-->
+        <BSTab>
+            <BSTabLabel>@AppData.LangResource[AppData.LanguageID, 437]</BSTabLabel>
+            <BSTabContent>
+                <div class="row margin-row-card mt-2">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header"><i class="fas fa-table mr-1"></i>@AppData.LangResource[AppData.LanguageID, 141]</div>
+                            <div class="card-body">
+                                <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height:750px;">
+                                    <table class="table table-bordered table-striped text-center">
+                                        <thead class="fixedthead">
+                                            <tr>
+
+                                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 438]</th>
+                                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 439]</th>
+                                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 402]</th>
+                                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 403]</th>
+                                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 404]</th>
+                                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 145]</th>
+                                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 146]</th>
+                                            </tr>
+
+                                        </thead>
+                                        <tbody class="scrollContent">
+                                            @foreach (var item in SupportTeam)
+                                            {
+                                                if (item.Order == 1)
+                                                {
+                                                    <tr>
+                                                        <td>@item.Name</td>
+                                                        <td>@item.Position</td>
+                                                        <td>@item.Department</td>
+                                                        <td>@item.PhoneNumber</td>
+                                                        <td>@item.Email</td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-warning" @onclick="@(() => PutSupportTeam(item.ProjectSupportTeamID))">
+                                                                <i class="fas fa-edit fa-sm"></i>
+                                                            </button>
+                                                        </td>
+                                                        <td>
+                                                            
+                                                            <button type="button" class="btn btn-danger" @onclick="@(() => DeleteSupportTeam(item.ProjectSupportTeamID))">
+                                                                <i class="fas fa-trash-alt fa-sm"></i>
+                                                            </button>
+                                                           
+
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                
+                                                
+                                            }
+                                            
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            @if (AppData.CurrentPermission.Find(i => i.permissionID == 18).permissionE)
+                            {
+                                <button type="submit" @onclick="@(() => ModalAddSupportTeam.Show())" class="btn btn-warning margin-btn" name="AddNewUser" id="AddNewUser">Add Support Team</button>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+
+            </BSTabContent>
+        </BSTab>
+    </BSTabList>
+    <BSTabSelectedContent />
+</BSTabGroup>
+        
+
+<EditForm Model="@registerAccount" OnValidSubmit="PostUserAccount">
+    <!--<DataAnnotationsValidator />-->
+    <BSModal @ref="AddUserManagement">
+        <BSModalHeader OnClick="@(() => AddUserManagement.Hide())" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID, 148]</BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 142]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <input type="text" class="form-control" @bind-value="registerAccount.UserName" placeholder="@AppData.LangResource[AppData.LanguageID,142]">
+                    </div>
+                    <ValidationMessage For="@(() => registerAccount.UserName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label for="firstName" class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 143]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <input type="text" class="form-control" @bind-value="registerAccount.FirstName" id="firstName" placeholder="@AppData.LangResource[AppData.LanguageID,143]" />
+                    </div>
+                    <ValidationMessage For="@(() => registerAccount.FirstName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label for="lastName" class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 144]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <input type="text" class="form-control" @bind-value="registerAccount.LastName" id="lastName" placeholder="@AppData.LangResource[AppData.LanguageID,144]" />
+                    </div>
+                    <ValidationMessage For="@(() => registerAccount.LastName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label for="email" class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 79]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <input type="text" class="form-control" @bind-value="registerAccount.Email" id="email" placeholder="@AppData.LangResource[AppData.LanguageID,79]" />
+                    </div>
+                    <ValidationMessage For="@(() => registerAccount.Email)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label for="pass" class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 150]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <input type="password" @bind-value="registerAccount.PasswordHash" class="form-control" id="pass" placeholder="@AppData.LangResource[AppData.LanguageID,150]" />
+                    </div>
+                    <ValidationMessage For="@(() => registerAccount.PasswordHash)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 149]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <input type="password" @bind-value="registerAccount.ConfrimPassword" class="form-control" name="ConfirmPassword" id="ConfirmPassword" placeholder="@AppData.LangResource[AppData.LanguageID,149]">
+                    </div>
+                    <ValidationMessage For="@(() => registerAccount.ConfrimPassword)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+        </BSModalBody>
+        <BSModalFooter>
+
+            <button type="submit" class="btn" style="background-color:#4CBB17; color:#fff">@AppData.LangResource[AppData.LanguageID, 44]</button>
+            <button type="reset" class="btn" style="background-color:#B90F1B; color:#fff" @onclick="OnClear" name="Cancel" id="Cancel">@AppData.LangResource[AppData.LanguageID, 158]</button>
+        </BSModalFooter>
+    </BSModal>
+</EditForm>
+
+
+<BSModal @ref="ModalAddSupportTeam">
+    <BSModalHeader OnClick="@(() => ModalAddSupportTeam.Hide())" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID, 640]</BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 438]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <input type="text" class="form-control" @bind-value="addSupportTeam.Name" placeholder="@AppData.LangResource[AppData.LanguageID,438]">
+                    </div>
+                </div>
+        </div>
+        <div class="row">
+            <label for="firstName" class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 439]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" class="form-control" @bind-value="addSupportTeam.Position"  placeholder="@AppData.LangResource[AppData.LanguageID,439]" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <label for="lastName" class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 402]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" class="form-control" @bind-value="addSupportTeam.Department" placeholder="@AppData.LangResource[AppData.LanguageID,402]" />
+                </div>
+                
+            </div>
+        </div>
+        <div class="row">
+            <label for="lastName" class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 403]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" class="form-control" @bind-value="addSupportTeam.PhoneNumber" placeholder="@AppData.LangResource[AppData.LanguageID,403]" />
+                </div>
+                
+            </div>
+        </div>
+        <div class="row">
+            <label for="email" class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 404]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" class="form-control" @bind-value="addSupportTeam.Email" id="email" placeholder="@AppData.LangResource[AppData.LanguageID,404]" />
+                </div>
+                
+            </div>
+        </div>
+    </BSModalBody>
+    <BSModalFooter>
+
+        <button type="submit" class="btn" @onclick="PostSupportTeam" style="background-color:#4CBB17; color:#fff">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        <button type="reset" class="btn" style="background-color:#B90F1B; color:#fff" @onclick="OnAddSupportClear" name="Cancel" id="Cancel">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<BSModal @ref="ModalUpdateSupportTeam">
+    <BSModalHeader OnClick="@(() => ModalUpdateSupportTeam.Hide())" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID, 641]</BSModalHeader>
+    <BSModalBody>
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 438]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" class="form-control" @bind-value="editSupportTeam.Name" placeholder="@AppData.LangResource[AppData.LanguageID,438]">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <label for="firstName" class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 439]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" class="form-control" @bind-value="editSupportTeam.Position" placeholder="@AppData.LangResource[AppData.LanguageID,439]" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <label for="lastName" class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 402]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" class="form-control" @bind-value="editSupportTeam.Department" placeholder="@AppData.LangResource[AppData.LanguageID,402]" />
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <label for="lastName" class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 403]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" class="form-control" @bind-value="editSupportTeam.PhoneNumber" placeholder="@AppData.LangResource[AppData.LanguageID,403]" />
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <label for="email" class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 404]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" class="form-control" @bind-value="editSupportTeam.Email" id="email" placeholder="@AppData.LangResource[AppData.LanguageID,404]" />
+                </div>
+
+            </div>
+        </div>
+    </BSModalBody>
+    <BSModalFooter>
+
+        <button type="submit" class="btn" @onclick="SaveUpdateSupportTeam" style="background-color:#4CBB17; color:#fff">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        <button type="reset" class="btn" style="background-color:#B90F1B; color:#fff" @onclick="@(() => ModalUpdateSupportTeam.Hide())" name="Cancel" id="Cancel">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalSupportTeamDelete-->
+<BSModal @ref="ModalDeleteSupportTeam">
+    <BSModalHeader OnClick="@(() => ModalDeleteSupportTeam.Hide())">@AppData.LangResource[AppData.LanguageID, 642]</BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert-modal-delete">
+                        @AppData.LangResource[AppData.LanguageID, 595] <br>@editSupportTeam.Name?
+                    </div>
+            </div>
+        </div>
+    </BSModalBody>
+    <BSModalFooter>
+       
+        <button type="submit" @onclick="SaveDeleteSupportTeam" class="btn btn-danger">@AppData.LangResource[AppData.LanguageID, 610]</button>
+        <button type="reset" class="btn btn-info" @onclick="@(() => ModalDeleteSupportTeam.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+
+@code {
+
+    public ProjectSupportTeam addSupportTeam = new ProjectSupportTeam();
+    public ProjectSupportTeam editSupportTeam = new ProjectSupportTeam();
+
+    /// <summary>
+    /// varliable get Account
+    /// </summary>
+    private List<Account> accounts = new List<Account>();
+    private List<ProjectSupportTeam> SupportTeam = new List<ProjectSupportTeam>();
+
+    /// <summary>
+    /// varliable registerAccount
+    /// </summary>
+    RegisterAccount registerAccount = new RegisterAccount();
+
+    /// <summary>
+    /// PostUserAccount
+    /// </summary>
+    public async Task PostUserAccount()
+    {
+        if (registerAccount.ConfrimPassword == registerAccount.PasswordHash)
+        {
+
+            using var response = await Http.PostAsJsonAsync($"{Config["aurl"]}/api/RegisterAccount/N", registerAccount);
+            List<RegisterAccount> article = await response.Content.ReadFromJsonAsync<List<RegisterAccount>>();
+            registerAccount = article.First();
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+
+                await Http.PostAsync($"{Config["aurl"]}/api/EmailSender/{registerAccount.Email}/{registerAccount.userID}", null);
+                ToastService.ShowSuccess("UserAccount save Successfully");
+
+                await OnInitializedAsync();
+            }
+            else
+            {
+                ToastService.ShowError("Error Please Contract System Administrator");
+            }
+
+            registerAccount = new RegisterAccount();
+            AddUserManagement.Hide();
+        }
+        else
+        {
+            ToastService.ShowError("password does not match");
+        }
+
+    }
+
+    private async Task PostSupportTeam()
+    {
+        try
+        {
+            addSupportTeam.ProjectID = 0; 
+            var respond = await Http.PostAsJsonAsync($"{Config["nurl"]}/api/ProjectSupportTeam", addSupportTeam);
+            if (respond != null)
+            {
+                ToastService.ShowSuccess("Support Team Save Successfully");
+                SupportTeam = await Http.GetFromJsonAsync<List<ProjectSupportTeam>>($"{Config["nurl"]}/api/ProjectSupportTeam");
+            }
+            else
+            {
+                ToastService.ShowError($"Error");
+            }
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError($"Error: {e.Message}");
+        }
+        ModalAddSupportTeam.Hide();
+    }
+
+    private async Task PutSupportTeam(int id)
+    {
+        try
+        {
+            var respond = await Http.GetFromJsonAsync<List<ProjectSupportTeam>>($"{Config["nurl"]}/api/ProjectSupportTeam/ProjectSupport/{id}");
+            if (respond != null)
+            {
+                editSupportTeam = respond.First();
+                ModalUpdateSupportTeam.Show();
+            }
+            else
+            {
+                ToastService.ShowError($"Error");
+            }
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError($"Error: {e.Message}");
+        }
+    }
+
+    private async Task DeleteSupportTeam(int id)
+    {
+        try
+        {
+            var respond = await Http.GetFromJsonAsync<List<ProjectSupportTeam>>($"{Config["nurl"]}/api/ProjectSupportTeam/ProjectSupport/{id}");
+            if (respond != null)
+            {
+                editSupportTeam = respond.First();
+                ModalDeleteSupportTeam.Show();
+            }
+            else
+            {
+                ToastService.ShowError($"Error");
+            }
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError($"Error: {e.Message}");
+        }
+    }
+
+    private async Task SaveUpdateSupportTeam()
+    {
+        try
+        {
+            var respond = await Http.PutAsJsonAsync($"{Config["nurl"]}/api/ProjectSupportTeam/{editSupportTeam.ProjectSupportTeamID}", editSupportTeam);
+            if (respond != null)
+            {
+                ToastService.ShowSuccess("Support Team Uppdate Successfully");
+                SupportTeam = await Http.GetFromJsonAsync<List<ProjectSupportTeam>>($"{Config["nurl"]}/api/ProjectSupportTeam");
+            }
+            else
+            {
+                ToastService.ShowError($"Error");
+            }
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError($"Error: {e.Message}");
+        }
+        ModalUpdateSupportTeam.Hide();
+    }
+
+    private async Task SaveDeleteSupportTeam()
+    {
+        try
+        {
+            var respond = await Http.DeleteAsync($"{Config["nurl"]}/api/ProjectSupportTeam/{editSupportTeam.ProjectSupportTeamID}");
+            if (respond != null)
+            {
+                ToastService.ShowSuccess("Support Team Delete Successfully");
+                SupportTeam = await Http.GetFromJsonAsync<List<ProjectSupportTeam>>($"{Config["nurl"]}/api/ProjectSupportTeam");
+            }
+            else
+            {
+                ToastService.ShowError($"Error");
+            }
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError($"Error: {e.Message}");
+        }
+        ModalDeleteSupportTeam.Hide();
+    }
+
+    /// <summary>
+    /// OnClear
+    /// </summary>
+    public void OnClear()
+    {
+        registerAccount = new RegisterAccount();
+        AddUserManagement.Hide();
+    }
+
+    public void OnAddSupportClear()
+    {
+        addSupportTeam = new ProjectSupportTeam();
+        ModalAddSupportTeam.Hide();
+    }
+
+    public void OnEditSupportClear()
+    {
+        editSupportTeam = new ProjectSupportTeam();
+        ModalUpdateSupportTeam.Hide();
+    }
+
+    /// <summary>
+    /// OnInitializedAsync
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+
+        accounts = await Http.GetFromJsonAsync<List<Account>>($"{Config["aurl"]}/api/GetAccount");
+        SupportTeam = await Http.GetFromJsonAsync<List<ProjectSupportTeam>>($"{Config["nurl"]}/api/ProjectSupportTeam");
+
+    }
+
+    /// <summary>
+    /// Modal AddUserManagement
+    /// </summary>
+    BSModal AddUserManagement { get; set; }
+    BSModal ModalAddSupportTeam { get; set; }
+    BSModal ModalUpdateSupportTeam { get; set; }
+    BSModal ModalDeleteSupportTeam { get; set; }
+
+    public async Task OnActivaed(Guid UserID)
+    {
+        await Http.GetAsync($"{Config["aurl"]}/api/ActivateAccount/{UserID}");
+        Account act = accounts.Find(i => i.UserID == UserID);
+        act.IsActive = true;
+        await Http.PutAsJsonAsync($"{Config["aurl"]}/api/UpdateUserAccount/{UserID}", act);
+        accounts.Find(i => i.UserID == UserID).IsActive = true;
+
+    }
+
+    int i = 1;
+
+    /// <summary>
+    /// clearURL
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("clearURL");
+        }
+    }
+}

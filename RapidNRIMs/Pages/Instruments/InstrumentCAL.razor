@@ -1,0 +1,127 @@
+﻿@page "/Instruments/InstrumentCAL"
+@inject IJSRuntime jsRuntime
+@inject AppData AppData
+@inject IInstrumentService InstrumentService
+@inject IInstrumentBrandService InstrumentBrandService
+@inject IInstrumentModelService InstrumentModelService
+@inject IInstrumentDiscardService InstrumentDiscardService
+@inject IInstrumentAgencyService InstrumentAgencyService
+@inject IToastService ToastService
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@using System.Threading
+@using System.Globalization
+@inject IConfiguration config
+
+<PageTitle>Due Calibration Page</PageTitle>
+
+<div class="col-md-12">
+    <div class="card-header text-white" style="background-color:#1E97DB">@AppData.LangResource[AppData.LanguageID, 13]</div>
+    <div class="card-body bg-light">
+        <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height:720px;">
+            @if (AppData.DueCal.Count != 0)
+            {
+                <table id="dataTable" class="table table-striped text-center">
+                    <thead class="fixedthead">
+                        <tr>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 408]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 61]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 409]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 410]</th>
+                        </tr>
+                    </thead>
+                    <tbody class="scrollContent">
+                        @foreach (var item in AppData.DueCal
+                               .Where(item => item.instrument != null && item.InstrumentCalibrationNext.HasValue)
+                               .OrderBy(item => item.InstrumentCalibrationNext.Value.Date)
+                               .ThenBy(item => Math.Abs((item.InstrumentCalibrationNext.Value.Date - DateTime.Now.Date).TotalDays))
+                               .ThenBy(item => item.InstrumentCalibrationNext.Value.Date))
+                        {
+                            
+                                DateTime calibrationNext = item.InstrumentCalibrationNext.Value.Date;
+                                DateTime currentDate = DateTime.Now.Date;
+                                TimeSpan timeDifference = calibrationNext - currentDate;
+                                var rowColorClass = "";
+
+                                if (calibrationNext < currentDate)
+                                {
+                                    rowColorClass = "bg-danger text-white"; // แถวเกินกำหนด Due สีแดง
+                                }
+                                else
+                                {
+                                    rowColorClass = "bg-warning"; // ยังไม่ถึงเวลากำหนด Due
+                                }
+                            @*  else if (timeDifference.TotalDays <= 5)
+                                {
+                                rowColorClass = "bg-warning"; // แถวใกล้ถึงกำหนด Due สีเหลือง
+                                } *@
+                                <tr class="@rowColorClass" @onclick="() => TrClickedAtIndex(item.instrument.InstrumentID)">
+                                    <td style="cursor:default">@item.instrument.InstrumentENName</td>
+                                    <td style="cursor:default">@item.instrument.InstrumentNumber</td>
+                                    <td style="cursor:default">@item.InstrumentCalibrationNext.Value.Date.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        <a href="@($"Instruments/Calibration/{item.instrument.InstrumentNumber}")" class="btn" style="background-color:#1E97DB; color:#fff" name="ShowCAl" id="ShowInstrument">@AppData.LangResource[AppData.LanguageID, 410]</a>
+                                        <!--  <a href="@($"Instrument/ShowInstrument/{item.instrument.InstrumentID}")" class="btn btn-primary" name="ShowInstrument" id="ShowInstrument">Show Instrument</a>-->
+
+                                    </td>
+                                </tr>
+                            
+
+                            @*<BSAlert Color="Color.Danger" IsDismissible="true">
+                    Alert Instrument Name:@item.instrument.InstrumentENName - Number: @item.instrument.InstrumentNumber   is Due Calibrate  in @item.InstrumentCalibrationNext.ToString("dd/MM/yyyy")
+                    </BSAlert>*@
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <BSAlert Color="Color.Danger" IsDismissible="true">
+                    @AppData.LangResource[AppData.LanguageID, 411]
+                </BSAlert>
+            }
+
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+
+
+
+    /// <summary>
+    /// onclick select table getbyID
+    /// </summary>
+    public int? ID { get; set; }
+    public void TrClickedAtIndex(int? Number)
+    {
+        ID = Number;
+    }
+
+    /// <summary>
+    /// Instrument list is not selected
+    /// </summary>
+    private void ShowInstrumentError()
+    {
+        ToastService.ShowError("Instrument list is not selected.");
+    }
+
+    /// <summary>
+    /// ModalDiscard
+    /// </summary>
+    BSModal InstrumentDiscard { get; set; }
+
+    /// <summary>
+    /// clearURL
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("clearURL");
+        }
+    }
+
+}

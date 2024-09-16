@@ -1,0 +1,86 @@
+﻿@inherits PopularInstrumentCheckOutDashboardBase
+
+<div class="col-lg-6 col-md-6 mt-4 mb-4 height-size-popular margin-top-paper">
+    <div class="card-dashbord z-index-2 ">
+        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent ">
+            <div class="card-header text-white txt-size-paper-two" style="background-color:#3CBBCE">
+                <b>@AppData.LangResource[AppData.LanguageID,551]</b>
+            </div>
+            <div class="scrollBar fixTableHead table-responsive scroll-inner height-size-popular">
+                <table id="dataTable" class="table table-striped text-wrap txt-size-paper-two-content-popular">
+                    <thead class="fixedthead">
+                        <tr>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,61]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,168]</th>
+                            <!--th class="alternateRow">@AppData.LangResource[AppData.LanguageID,407]</!--th-->
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,583]</th>
+                            <th class="alternateRow" style="text-align:right">@AppData.LangResource[AppData.LanguageID,230]</th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody class="scrollContent">
+                        @{
+                            var instruments = instrumentCheckOutList
+                            .Where(checkout => checkout.InstrumentCheckOutDate.HasValue &&
+                            checkout.instrument != null &&
+                            !string.IsNullOrEmpty(checkout.instrument.InstrumentENName) &&
+                            checkout.InstrumentCheckOutDate.Value >= DateTime.Now.AddMonths(-12)) // แก้ไขตรงนี้
+                            .GroupBy(checkout => new { checkout.InstrumentNumber, checkout.instrument.InstrumentENName })
+                            .Select(group => new
+                            {
+                                group.Key.InstrumentNumber,
+                                group.Key.InstrumentENName,
+                                Count = group.Count(),
+                                LastCheckOutDate = group.Max(checkout => checkout.InstrumentCheckOutDate.Value.Date)
+                            })
+                            .OrderByDescending(item => item.Count)
+                            .ToList();
+
+                        }
+
+
+
+
+
+                        @foreach (var item in instruments)
+                        {
+
+
+                            <tr>
+                                <td data-label="" style="cursor:default">@item.InstrumentNumber</td>
+                                <td data-label="" style="cursor:default;">@item.InstrumentENName</td>
+                                <td data-label="" class="text-center" style="cursor:default">
+                                    @item.Count
+                                </td>
+                                <td class="text-right" style="cursor:default">@item.LastCheckOutDate.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                        }
+
+
+
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@*@{
+    var currentYear = DateTime.Now.Year;
+
+    var instruments = instrumentCheckOutList
+    .Where(checkout => checkout.InstrumentCheckOutDate.HasValue && checkout.instrument != null && !string.IsNullOrEmpty(checkout.instrument.InstrumentENName) && checkout.InstrumentCheckOutDate.Value.Year == currentYear)
+    .GroupBy(checkout => new { checkout.InstrumentNumber, checkout.instrument.InstrumentENName })
+    .Select(group => new
+    {
+        group.Key.InstrumentNumber,
+        group.Key.InstrumentENName,
+        Count = group.Count(),
+        LastCheckOutDate = group.Max(checkout => checkout.InstrumentCheckOutDate.Value.Date)
+    })
+    .OrderByDescending(item => item.Count)
+    .ToList();
+}*@

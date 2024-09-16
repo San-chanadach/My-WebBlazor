@@ -1,0 +1,44 @@
+﻿@inherits ManageProjectBase
+<!--ModalResponseConfirmCheckOut-->
+<BSModal @ref="ModalResponseConfirmCheckOutInstrument">
+    <BSModalHeader OnClick="@(() => ModalResponseConfirmCheckOutInstrument.Hide())">Confirm Check Out  Instrument</BSModalHeader>
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="alert-modal-delete">
+                    Want to Check Out All Instrument @AppData.LangResource[AppData.LanguageID, 324]  ?
+                </h4>
+            </div>
+        </div>
+    </BSModalBody>
+    <BSModalFooter>
+
+        <button type="submit" @onclick="PostInstrumentCheckOut" class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+
+
+        <button type="reset" class="btn btn-danger" @onclick="@(() => ModalResponseConfirmCheckOutInstrument.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+
+<!--ModalResponseConfirmCheckIn-->
+<BSModal @ref="ModalResponseConfirmCheckInInstrument">
+    <BSModalHeader OnClick="@(() => ModalResponseConfirmCheckInInstrument.Hide())">Confirm Check In  Instrument</BSModalHeader>
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="alert-modal-delete">
+                    Want to Check In All Instrument @AppData.LangResource[AppData.LanguageID, 324]  ?
+                </h4>
+            </div>
+        </div>
+    </BSModalBody>
+    <BSModalFooter>
+
+        <button type="submit" @onclick="PostInstrumentCheckIn" class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+
+
+        <button type="reset" class="btn btn-danger" @onclick="@(() => ModalResponseConfirmCheckInInstrument.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+

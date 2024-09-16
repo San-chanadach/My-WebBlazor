@@ -1,0 +1,222 @@
+﻿@inherits ProjectSearchBase
+
+@page "/Record/ProjectSearch"
+
+
+<div class="row margin-row-card">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">@AppData.LangResource[AppData.LanguageID,558]</div>
+            <div class="card-body">
+                <div class="row">
+                    <label for="projectNumber" class="col-12 col-md-4 col-lg-2 col-form-label">
+                            <span>@AppData.LangResource[AppData.LanguageID,540]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <input type="text" @bind-value="recordProject.ProjectNumber" placeholder="@AppData.LangResource[AppData.LanguageID,540]" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label for="provinceRegional" class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID,554]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <select class="form-control" @bind="recordProject.ProjectRegional">
+                                <option value="0">@AppData.LangResource[AppData.LanguageID,2]</option>
+                                @foreach (var item in AppData.recordRegionals)
+                                {
+                                    @if (AppData.LanguageID == 0)
+                                    {
+                                        <option value="@item.RegionalNumber">@item.RegionalENName</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item.RegionalNumber">@item.RegionalTHName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <label for="projectType" class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID,555]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <select class="form-control" @bind="recordProject.ProjectType">
+                                <option value="0">@AppData.LangResource[AppData.LanguageID,2]</option>
+                                @foreach (var item in AppData.recordProjectTypes)
+                                {
+                                    if (item.IsActive == true && item.IsActive != null)
+                                    {
+                                        @if (AppData.LanguageID == 0)
+                                        {
+                                            <option value="@item.ProjectTypeID">@item.ProjectTypeENName</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.ProjectTypeID">@item.ProjectTypeTHName</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label for="registertBy" class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID,556]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <select class="form-control" @bind="recordProject.ProjectRegisteredBy">
+                                <option selected value="">@AppData.LangResource[AppData.LanguageID,2]</option>
+                                @foreach (var item in accounts)
+                                {
+                                    if (item.IsActive)
+                                    {
+                                        <option value="@item.UserID">@item.FirstName</option>
+                                    }
+                                }
+                            </select>
+                                
+                        </div>
+                    </div>
+                    <label for="informerName" class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID,235]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                             <input type="text"  @bind-value="recordProject.ProjectInformerName"  placeholder="@AppData.LangResource[AppData.LanguageID,235]" class="form-control" />
+                                
+                        </div>
+                    </div>
+                </div>
+                
+                
+                <div class="text-center" style="margin-top:0.5rem;">
+                    <button type="submit" class="btn" @onclick="OnSearch" style="background-color:#2E2BFF; color:#fff">@AppData.LangResource[AppData.LanguageID,48]</button>
+                    <button type="reset"  class="btn" @onclick="ClearProjectSearch" style="background-color:#B90F1B; color:#fff">@AppData.LangResource[AppData.LanguageID,45]</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header"><i class="fas fa-table mr-1"></i>@AppData.LangResource[AppData.LanguageID,559]</div>
+            <div class="card-body">
+
+                <div class="scrollBar fixTableHead table-responsive scroll-inner scrollBarX"  style="height:425px;">
+                    <table id="dataTable" class="table table-bordered table-striped text-center" width="100%">
+                        <thead class="fixedthead">
+                            <tr>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 93]</th> 
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,540]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,553]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,555]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,554]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,556]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,235]</th>
+
+                            </tr>
+                        </thead>
+                        <tbody class="scrollContent">
+                           @foreach(var item in FilteredrecordProjects)
+                           {
+                                <tr @onclick="() => TrClickedAtIndex(item.ProjectID)">
+                                    <td>
+                                        @if(item.ProjectInsStatusID == 3)
+                                        {
+                                            <span class="badge badge-pill badge-dark">
+                                                Complete
+                                            </span>
+                                        }
+                                        else if(item.ProjectInsStatusID == 2)
+                                        {
+                                            <span class="badge badge-pill badge-warning">
+                                                Pending
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-pill badge-success">
+                                                Normal
+                                            </span>
+                                        }
+
+                                    </td>
+                                    <td>@item.ProjectNumber</td>
+                                    <td class="cell-content">@item.ProjectName</td>
+                                    @if (AppData.LanguageID == 0)
+                                    {
+                                        <td>@(AppData.recordProjectTypes.Find(x => x.ProjectTypeID == item.ProjectType) != null ? AppData.recordProjectTypes.Find(x => x.ProjectTypeID == item.ProjectType).ProjectTypeENName:"-")</td>
+                                    }
+                                    else
+                                    {
+                                        <td>@(AppData.recordProjectTypes.Find(x => x.ProjectTypeID == item.ProjectType) != null ? AppData.recordProjectTypes.Find(x => x.ProjectTypeID == item.ProjectType).ProjectTypeTHName:"-")</td>
+                                    }
+                                   
+                                    @if (AppData.LanguageID == 0)
+                                    {
+                                        <td>@(AppData.recordRegionals.Find(x => x.RegionalNumber == item.ProjectRegional) != null ? AppData.recordRegionals.Find(x => x.RegionalNumber == item.ProjectRegional).RegionalENName:"-")</td>
+                                    }
+                                    else
+                                    {
+                                        <td>@(AppData.recordRegionals.Find(x => x.RegionalNumber == item.ProjectRegional) != null ? AppData.recordRegionals.Find(x => x.RegionalNumber == item.ProjectRegional).RegionalTHName:"-")</td>
+                                    }
+                                    
+                                    <td>
+                                       @(accounts.Find(x => x.UserID == item.ProjectRegisteredBy) != null ? accounts.Find(x => x.UserID == item.ProjectRegisteredBy).FirstName:"-")
+                                       @(accounts.Find(x => x.UserID == item.ProjectRegisteredBy) != null ? accounts.Find(x => x.UserID == item.ProjectRegisteredBy).LastName:"-")
+                                    </td>
+                                    <td class="cell-content">@item.ProjectInformerName</td>
+                                </tr>
+                           }
+                            
+
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div class="text-center" style="margin-bottom:2rem; margin-top:-1rem">
+
+    @if(ID == null)
+    {
+       <button style="cursor: pointer; background-color:#FEAE00; color:#333;" disabled class="btn">@AppData.LangResource[AppData.LanguageID,560]</button>
+    }
+    else
+    {
+         <a href="@($"Record/ManageProject/{ID}")" class="btn" style="background-color:#FEAE00; color:#333">@AppData.LangResource[AppData.LanguageID,560]</a>
+    }
+
+
+    
+
+</div>
+
+
+<BSModal class="row style-justify mt-5" @ref="Load" IsCentered="true" Size="Size.Small" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+    <BSModalBody>
+        <div class="text-center mt-3">
+            <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+                  style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+        </div>
+        <div class="text-center pt-3" style=" font-size: 16pt">
+            @AppData.LangResource[AppData.LanguageID, 325]
+        </div>
+    </BSModalBody>
+</BSModal>
+
+
+

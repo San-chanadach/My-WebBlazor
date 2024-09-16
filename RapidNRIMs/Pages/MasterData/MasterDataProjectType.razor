@@ -1,0 +1,240 @@
+﻿@inherits MasterDataProjectTypeBase
+@page "/MasterData/MasterDataProjectType"
+@using System.Threading
+
+@if (listRecordProjectType == null)
+{
+    <div class="text-center mt-3">
+        <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+              style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+    </div>
+    <div class="text-center pt-3" style=" font-size: 16pt">
+        @AppData.LangResource[AppData.LanguageID, 325]
+    </div>
+}
+else
+{
+    <div class="row margin-row-card">
+        <div class="col-md-12">
+            <div class="float-right" style="margin-bottom:10px; margin-top:10px">
+
+                <button class="btn btn-warning" @onclick="@(() => ModalProjectTypeCreate.Show())">
+                    @AppData.LangResource[AppData.LanguageID, 585]
+                </button>
+                
+            </div>
+        </div>
+    </div>
+
+    <div class="row margin-row-card">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header"><i class="fas fa-table mr-1"></i>List Project</div>
+                <div class="card-body">
+                    <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height:700px;">
+                        <table id="dataTable" class="table table-bordered table-striped text-center" width="100%">
+                            <thead class="fixedthead">
+                                <tr>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 322]</th>
+                                    <th class="alternateRow">Project Type Name (TH)</th>
+                                    <th class="alternateRow">Project Type Name (EN)</th>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 145]</th>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 146]</th>
+                                </tr>
+                            </thead>
+                            <tbody class="scrollContent">
+                                @{ int id = 1;}
+                                @foreach (var item in listRecordProjectType)
+                                {
+                                    @if(item.IsActive != null && item.IsActive == true)
+                                    {
+                                        <tr>
+                                            <td>@id</td>
+                                            <td>@item.ProjectTypeTHName</td>
+                                            <td>@item.ProjectTypeENName</td>
+                                            <td>
+                                                <a type="button" class="btn btn-warning" @onclick="@(() => ProjectTypeUpdate(item.ProjectTypeID))">
+                                                    <i class="fas fa-edit fa-sm"></i>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-danger" @onclick="@(() => ProjectTypeDelete(item.ProjectTypeID))">
+                                                    <i class="fas fa-trash-alt fa-sm"></i>
+                                                </button>
+                                               
+                                            </td>
+                                        </tr>
+                                        id++;
+                                    }
+                                    
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!--Loading-->
+<BSModal class="row style-justify mt-5" @ref="Load" IsCentered="true" Size="Size.Small" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+    <BSModalBody>
+        <div class="text-center mt-3">
+            <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+                  style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+        </div>
+        <div class="text-center pt-3" style=" font-size: 16pt">
+             @AppData.LangResource[AppData.LanguageID, 325]
+        </div>
+    </BSModalBody>
+</BSModal>
+
+<!--ModalProjectTypeCreate-->
+<BSModal @ref="ModalProjectTypeCreate">
+    <BSModalHeader OnClick="@(() => ModalProjectTypeCreate.Hide())">Add Project Type</BSModalHeader>
+    <BSModalBody>
+
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-5 col-form-label">
+                <span>Project Type Name (TH)</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" @bind-value="addProjectType.ProjectTypeTHName" placeholder="Project Type Name (TH)" class="form-control" />
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-5 col-form-label">
+                <span>Project Type Name (EN)</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" @bind-value="addProjectType.ProjectTypeENName" placeholder="Project Type Name (EN)" class="form-control" />
+                </div>
+            </div>
+        </div>
+
+    </BSModalBody>
+    <BSModalFooter>
+         @if (AppData.CurrentPermission.Find(i => i.permissionID == 21).permissionC)
+         {
+            <button type="submit" @onclick="SaveCreateProjectType" class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+         }
+         else
+         {
+            <button type="button" disabled class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+         }
+                   <button type="reset" @onclick="@(() => ModalProjectTypeCreate.Hide())" class="btn btn-danger">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalProjectTypeEdit-->
+<BSModal @ref="ModalProjectTypeEdit">
+    <BSModalHeader OnClick="@(() => ModalProjectTypeEdit.Hide())">Edit Project Type</BSModalHeader>
+    <BSModalBody>
+
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>Project Type Name (TH)</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" @bind-value="editProjectType.ProjectTypeTHName" placeholder="Project Type Name (TH)" class="form-control" />
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>Project Type Name (EN)</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" @bind-value="editProjectType.ProjectTypeENName" placeholder="Project Type Name (EN)" class="form-control" />
+                </div>
+            </div>
+        </div>
+
+    </BSModalBody>
+    <BSModalFooter>
+         @if (AppData.CurrentPermission.Find(i => i.permissionID == 21).permissionU)
+         {
+            <button type="submit" @onclick="SaveEditProjectType" class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+         }
+         else
+         {
+            <button type="button" disabled class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+         }
+        <button type="reset" class="btn btn-danger" @onclick="@(() => ModalProjectTypeEdit.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalProjectTypeDelete-->
+<BSModal @ref="ModalProjectTypeDelete">
+    <BSModalHeader OnClick="@(() => ModalProjectTypeDelete.Hide())">Delete Project Type</BSModalHeader>
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert-modal-delete">
+                    @AppData.LangResource[AppData.LanguageID, 323] Project Type Name (EN):<br>@editProjectType.ProjectTypeENName @AppData.LangResource[AppData.LanguageID, 324] ?
+                </div>
+            </div>
+        </div>
+    </BSModalBody>
+    <BSModalFooter>
+         @if (AppData.CurrentPermission.Find(i => i.permissionID == 21).permissionD)
+         {
+            <button type="submit" @onclick="SaveDeleteProjectType" class="btn btn-danger">@AppData.LangResource[AppData.LanguageID, 610]</button>
+         }
+         else
+         {
+            <button type="button" disabled class="btn btn-danger">@AppData.LangResource[AppData.LanguageID, 610]</button>
+         }
+        <button type="reset" class="btn btn-info" @onclick="@(() => ModalProjectTypeDelete.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalResponseError-->
+<BSModal Class="text-center" @ref="ModalResponseError" IsCentered="true" Size="Size.Large">
+    <BSModalBody>
+
+        <div class="row">
+            <div class="col-md-12 alert-modal-logo">
+                <img src="assets/images/img-common/delete_symbol.png" width="100" height="100" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <p class="alert-modal">@RequertMessage</p>
+            </div>
+        </div>
+        <button type="button" @onclick="@(() => ModalResponseError.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+    </BSModalBody>
+</BSModal>
+
+<!--ModalRespondSuccess-->
+<BSModal Class="text-center alert-modal-body" @ref="ModalRespondSuccess" IsCentered="true" Size="Size.Large">
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12 alert-modal-logo">
+                <img src="assets/images/img-common/tick_symbol.png" width="100" height="100" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="alert-modal">@RequertMessage</h4>
+            </div>
+        </div>
+        <button type="button" @onclick="@(() => ModalRespondSuccess.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+    </BSModalBody>
+</BSModal>
+
+
+@code {
+
+    
+
+}

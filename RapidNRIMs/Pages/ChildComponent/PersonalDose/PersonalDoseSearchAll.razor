@@ -1,0 +1,383 @@
+﻿@page "/ChildComponent/PersonalDose/PersonalDoseSearchAll"
+@page "/ChildComponent/PersonalDose/PersonalDoseSearchAll/{parameterUserID}/{parameterUserSupportTeamID}"
+@using System.Globalization
+@inherits PersonalDoseSearchAllBase
+
+<div class="row margin-row-card">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">@AppData.LangResource[AppData.LanguageID, 633]</div>
+            <div class="card-body">
+                <div class="form-row ml-3">
+                    <div class="form-group row col-md-5">
+                        <label class="col-sm-4 col-form-label">@AppData.LangResource[AppData.LanguageID, 623]</label>
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                @if (personalDose.UserSupportTeamID != 0 && inputValueSupportTeam != "" || inputValueSupportTeam != supportName)
+                                {
+                                    <input type="text" id="teaminput" class="form-control" @bind="inputValueTeam" disabled @oninput="ChangeUserTeamAutoComplete" placeholder="@AppData.LangResource[AppData.LanguageID, 2]" />
+                                    <span class="input-icon-search">
+                                        <i class="fas fa-caret-down fa-1x instrumentmumber-search" id="icon-suggestion-team"></i>
+                                    </span>
+
+                                }
+                                else
+                                {
+                                    <input type="text" id="teaminput" class="form-control" @bind="inputValueTeam" @oninput="ChangeUserTeamAutoComplete" placeholder="@AppData.LangResource[AppData.LanguageID, 2]" />
+                                    @if (!string.IsNullOrEmpty(inputValueTeam))
+                                    {
+                                        <span class="input-icon-search" style="display:none;">
+                                            <i class="fas fa-caret-down fa-1x instrumentmumber-search" id="icon-suggestion-team"></i>
+                                        </span>
+
+                                    }
+                                    else
+                                    {
+                                        <span class="input-icon-search" @onclick="OnclickTeamAll">
+                                            <i class="fas fa-caret-down fa-1x instrumentmumber-search" id="icon-suggestion-team"></i>
+                                        </span>
+                                    }
+                                }
+                            </div>
+                            <div class="input-group">
+                                <ul id="teamsuggestions">
+
+                                    @foreach (var team in teamsuggestions)
+                                    {
+                                        <li @onclick="() => SelectItemTeam(team)">@team</li>
+                                    }
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="form-group row col-md-5">
+                        <label class="col-sm-4 col-form-label">@AppData.LangResource[AppData.LanguageID, 624]</label>
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                @if (personalDose.UserID != null && inputValueTeam != "" || inputValueTeam != userName)
+                                {
+                                    <input type="text" id="supportinput" class="form-control" @bind="inputValueSupportTeam" disabled @oninput="ChangeSupportTeamAutoComplete" placeholder="@AppData.LangResource[AppData.LanguageID, 2]" />
+                                    <span class="input-icon-search">
+                                        <i class="fas fa-caret-down fa-1x instrumentmumber-search" id="icon-suggestion-support"></i>
+                                    </span>
+
+                                }
+                                else
+                                {
+
+                                    <input type="text" id="supportinput" class="form-control" @bind="inputValueSupportTeam" @oninput="ChangeSupportTeamAutoComplete" placeholder="@AppData.LangResource[AppData.LanguageID, 2]" />
+                                    @if (!string.IsNullOrEmpty(inputValueSupportTeam))
+                                    {
+                                        <span class="input-icon-search" style="display:none;">
+                                            <i class="fas fa-caret-down fa-1x instrumentmumber-search" id="icon-suggestion-support"></i>
+                                        </span>
+
+                                    }
+                                    else
+                                    {
+                                        <span class="input-icon-search" @onclick="OnclickSupportAll">
+                                            <i class="fas fa-caret-down fa-1x instrumentmumber-search" id="icon-suggestion-support"></i>
+                                        </span>
+                                    }
+
+                                    
+                                    
+                                }
+                            </div>
+                            <div class="input-group">
+                                <ul id="supportsuggestions">
+                                    @foreach (var support in supporteamsuggestions)
+                                    {
+                                        <li @onclick="() => SelectItemSupportTeam(support)">@support.Name</li>
+                                    }
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="form-group row col-md-1">
+                        <span >
+                            <button type="button" id="OnsearchDoseUserAll" @onclick="OnsearchDoseUserAll" class="btn btn-primary ml-3" style="margin-right: 10px;">@AppData.LangResource[AppData.LanguageID, 634]</button>
+                            <button type="button" id="OnsearchDoseUserAll" @onclick="OnClearPersonalDose" class="btn btn-danger">@AppData.LangResource[AppData.LanguageID, 45]</button>
+                        </span>
+                          
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row margin-row-card">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">@AppData.LangResource[AppData.LanguageID, 635]</div>
+            <div class="card-body">
+
+                <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height:380px;">
+                    <table id="dataTable" class="table table-bordered table-striped text-center">
+                        <thead class="fixedthead">
+                            <tr>
+                                <th class="alternateRow text-left">@AppData.LangResource[AppData.LanguageID, 628]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 636]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 637]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 638]</th>
+                            </tr>
+                        </thead>
+                        <tbody class="scrollContent">
+
+
+                                @if (personalDose.OriginalUserID != null)
+                                {
+                                    var result = listPersonalDose
+                                    .Where(x => x.CreateRegister.Year == DateTime.Today.Year) // กรองตามปีของวันนี้
+                                    .OrderBy(x => x.UserID == personalDose.OriginalUserID)
+                                    .GroupBy(x => new { x.UserID, x.UserSupportTeamID, x.PositionName })
+                                    .Select(group => new
+                                    {
+                                        UserID = group.Key.UserID,
+                                        UserSupportTeamID = group.Key.UserSupportTeamID,
+                                        DoseAccumulationDay = group.Where(item => item.CreateRegister.Date == DateTime.Today.Date).Sum(item => (double?)item.DoseAccumulation) ?? 0,
+                                        DoseAccumulationMonth = group.Where(item => item.CreateRegister.Month == DateTime.Today.Month).Sum(item => (double?)item.DoseAccumulation) ?? 0,
+                                        DoseAccumulationYear = group.Sum(item => (double?)item.DoseAccumulation) ?? 0,
+                                        DoseAccumulationUnit = group.First().DoseAccumulationUnit,
+                                        CreateRegister = group.First().CreateRegister
+                                    });
+
+
+                                
+
+                                    foreach (var item in result)
+                                    {
+                                        <tr @onclick="(item.UserID != Guid.Empty) ? () => TrClickedAtIndex(item.UserID, null) : () => TrClickedAtIndex(null, item.UserSupportTeamID)">
+                                            @if (item.UserID != new Guid("00000000-0000-0000-0000-000000000000"))
+                                            {
+                                                <td class="text-left">
+                                                    <div>
+                                                        @accounts.Find(j => j.UserID == item.UserID).FirstName  @accounts.Find(j => j.UserID == item.UserID).LastName
+                                                        @{
+                                                            //var resultRecord = records.Find(x => x.EventID == item.FromEventPersonalDose) != null ? records.Find(x => x.EventID == item.FromEventPersonalDose).EventNumber : "No Event";
+                                                            var resultPosition = accounts.Find(x => x.UserID == item.UserID) != null ? accounts.Find(x => x.UserID == item.UserID).PositionName : "-";
+                                                        }
+                                                        &nbsp;<b>(@resultPosition)</b>
+                                                    </div>
+                                                </td>
+                                            }
+                                            else if (item.UserSupportTeamID != 0)
+                                            {
+                                                <td class="text-left">
+
+                                                    <div>
+                                                        @(SupportTeam.Find(x => x.ProjectSupportTeamID == item.UserSupportTeamID) != null ? SupportTeam.Find(x => x.ProjectSupportTeamID == item.UserSupportTeamID).Name : "-")
+                                                        @{
+                                                            //var resultRecord = records.Find(x => x.EventID == item.FromEventPersonalDose) != null ? records.Find(x => x.EventID == item.FromEventPersonalDose).EventNumber : "No Event";
+                                                            var resultPosition = SupportTeam.Find(x => x.ProjectSupportTeamID == item.UserSupportTeamID) != null ? SupportTeam.Find(x => x.ProjectSupportTeamID == item.UserSupportTeamID).Position : "-";
+                                                        }
+                                                        &nbsp;<b>(@resultPosition)</b>
+                                                    </div>
+
+                                                </td>
+                                            }
+
+                                            <td style="color: @(item.DoseAccumulationDay > 80 ? "red" : "#333")">
+                                                @(item.DoseAccumulationDay > 0 ? string.Format("{0:F4}", item.DoseAccumulationDay) : "-")
+                                                @(AppData.recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit) != null ? AppData.recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit).RecordEventUnitName : "-")
+                                            </td>
+
+                                            <td style="color: @(item.DoseAccumulationMonth > 80 * 30 ? "red" : "#333")">
+                                                @(item.DoseAccumulationMonth > 0 ? string.Format("{0:F4}", item.DoseAccumulationMonth) : "-")
+                                                @(AppData.recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit) != null ? AppData.recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit).RecordEventUnitName : "-")
+                                            </td>
+
+                                            <td style="color: @(item.DoseAccumulationYear > 80 * 365 ? "red" : "#333")">
+                                                @(item.DoseAccumulationYear > 0 ? string.Format("{0:F4}", item.DoseAccumulationYear) : "-")
+                                                @(AppData.recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit) != null ? AppData.recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit).RecordEventUnitName : "-")
+                                            </td>
+
+                                        </tr>
+                                    }
+                                }
+                                else if (personalDose.OriginalSupportID != null)
+                                {
+                                    var result = listPersonalDose
+                                    .Where(x => x.CreateRegister.Year == DateTime.Today.Year) // กรองตามปีของวันนี้
+                                    .OrderBy(x => x.UserSupportTeamID == personalDose.OriginalSupportID) 
+                                    .GroupBy(x => new { x.UserID, x.UserSupportTeamID, x.PositionName })
+                                    .Select(group => new
+                                    {
+                                        UserID = group.Key.UserID,
+                                        UserSupportTeamID = group.Key.UserSupportTeamID,
+                                        DoseAccumulationDay = group.Where(item => item.CreateRegister.Date == DateTime.Today.Date).Sum(item => (double?)item.DoseAccumulation) ?? 0,
+                                        DoseAccumulationMonth = group.Where(item => item.CreateRegister.Month == DateTime.Today.Month).Sum(item => (double?)item.DoseAccumulation) ?? 0,
+                                        DoseAccumulationYear = group.Sum(item => (double?)item.DoseAccumulation) ?? 0,
+                                        DoseAccumulationUnit = group.First().DoseAccumulationUnit,
+                                        CreateRegister = group.First().CreateRegister
+                                    });
+
+                                
+
+                                    foreach (var item in result)
+                                    {
+                                        <tr @onclick="(item.UserID != Guid.Empty) ? () => TrClickedAtIndex(item.UserID, null) : () => TrClickedAtIndex(null, item.UserSupportTeamID)">
+                                            @if (item.UserID != new Guid("00000000-0000-0000-0000-000000000000"))
+                                            {
+                                                <td class="text-left">
+                                                    <div>
+                                                        @accounts.Find(j => j.UserID == item.UserID).FirstName  @accounts.Find(j => j.UserID == item.UserID).LastName
+                                                        @{
+                                                            //var resultRecord = records.Find(x => x.EventID == item.FromEventPersonalDose) != null ? records.Find(x => x.EventID == item.FromEventPersonalDose).EventNumber : "No Event";
+                                                            var resultPosition = accounts.Find(x => x.UserID == item.UserID) != null ? accounts.Find(x => x.UserID == item.UserID).PositionName : "-";
+                                                        }
+                                                        &nbsp;<b>(@resultPosition)</b>
+                                                    </div>
+                                                </td>
+                                            }
+                                            else if (item.UserSupportTeamID != 0)
+                                            {
+                                                <td class="text-left">
+                                                    <div>
+                                                        @(SupportTeam.Find(x => x.ProjectSupportTeamID == item.UserSupportTeamID) != null ? SupportTeam.Find(x => x.ProjectSupportTeamID == item.UserSupportTeamID).Name : "-")
+                                                        @{
+                                                            //var resultRecord = records.Find(x => x.EventID == item.FromEventPersonalDose) != null ? records.Find(x => x.EventID == item.FromEventPersonalDose).EventNumber : "No Event";
+                                                            var resultPosition = SupportTeam.Find(x => x.ProjectSupportTeamID == item.UserSupportTeamID) != null ? SupportTeam.Find(x => x.ProjectSupportTeamID == item.UserSupportTeamID).Position : "-";
+                                                        }
+                                                        &nbsp;<b>(@resultPosition)</b>
+                                                    </div>
+                                                </td>
+                                            }
+
+                                            <td style="color: @(item.DoseAccumulationDay > 80 ? "red" : "#333")">
+                                                @(item.DoseAccumulationDay > 0 ? string.Format("{0:F4}", item.DoseAccumulationDay) : "-")
+                                                @(AppData.recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit) != null ? AppData.recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit).RecordEventUnitName : "-")
+                                            </td>
+
+                                            <td style="color: @(item.DoseAccumulationMonth > 80 * 30 ? "red" : "#333")">
+                                                @(item.DoseAccumulationMonth > 0 ? string.Format("{0:F4}", item.DoseAccumulationMonth) : "-")
+                                                @(AppData.recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit) != null ? AppData.recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit).RecordEventUnitName : "-")
+                                            </td>
+
+                                            <td style="color: @(item.DoseAccumulationYear > 80 * 365 ? "red" : "#333")">
+                                                @(item.DoseAccumulationYear > 0 ? string.Format("{0:F4}", item.DoseAccumulationYear) : "-")
+                                                @(AppData.recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit) != null ? AppData.recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit).RecordEventUnitName : "-")
+                                            </td>
+                                        </tr>
+                                    }
+
+                                    
+                                }
+                                else
+                                {
+
+
+                                   @*  var result = listPersonalDose.OrderBy(x => x.UserID)
+                                    .GroupBy(x => new { x.UserID, x.UserSupportTeamID })
+                                    .Select(group => new
+                                    {
+                                        UserID = group.Key.UserID,
+                                        UserSupportTeamID = group.Key.UserSupportTeamID,
+                                        DoseAccumulation = group.Sum(item => item.DoseAccumulation).ToString(),
+                                        DoseAccumulationUnit = group.First().DoseAccumulationUnit
+                                    }); *@
+
+
+                                    var result = listPersonalDose
+                                    .Where(x => x.CreateRegister.Year == DateTime.Today.Year) // กรองตามปีของวันนี้
+                                    .OrderBy(x => x.UserID) // เรียงลำดับตาม UserID
+                                    .GroupBy(x => new { x.UserID, x.UserSupportTeamID, x.PositionName })
+                                    .Select(group => new
+                                    {
+                                        UserID = group.Key.UserID,
+                                        UserSupportTeamID = group.Key.UserSupportTeamID,
+                                        DoseAccumulationDay = group.Where(item => item.CreateRegister.Date == DateTime.Today.Date).Sum(item => (double?)item.DoseAccumulation) ?? 0,
+                                        DoseAccumulationMonth = group.Where(item => item.CreateRegister.Month == DateTime.Today.Month).Sum(item => (double?)item.DoseAccumulation) ?? 0,
+                                        DoseAccumulationYear = group.Sum(item => (double?)item.DoseAccumulation) ?? 0,
+                                        DoseAccumulationUnit = group.First().DoseAccumulationUnit,
+                                        CreateRegister = group.First().CreateRegister
+                                    });
+
+                                    foreach (var item in result)
+                                    {
+                                        <tr @onclick="(item.UserID != Guid.Empty) ? () => TrClickedAtIndex(item.UserID, null) : () => TrClickedAtIndex(null, item.UserSupportTeamID)">
+                                            @if (item.UserID != Guid.Empty && accounts.Any(j => j.UserID == item.UserID))
+                                            {
+                                                <td class="text-left">
+                                                    <div>
+                                                        @accounts.Find(j => j.UserID == item.UserID).FirstName  @accounts.Find(j => j.UserID == item.UserID).LastName
+                                                        @{
+                                                            var resultPosition = accounts.Find(x => x.UserID == item.UserID) != null ? accounts.Find(x => x.UserID == item.UserID).PositionName : "-";
+                                                        }
+                                                        &nbsp;<b>(@resultPosition)</b>
+                                                    </div>
+                                                </td>
+                                            }
+                                            else if (item.UserSupportTeamID != null && item.UserSupportTeamID != 0)
+                                            {
+                                                <td class="text-left">
+                                                    <div>
+                                                        @(SupportTeam.Find(x => x.ProjectSupportTeamID == item.UserSupportTeamID) != null ? SupportTeam.Find(x => x.ProjectSupportTeamID == item.UserSupportTeamID).Name : "-")
+                                                        @{
+                                                            var resultPosition = SupportTeam.Find(x => x.ProjectSupportTeamID == item.UserSupportTeamID) != null ? SupportTeam.Find(x => x.ProjectSupportTeamID == item.UserSupportTeamID).Position : "-";
+                                                        }
+                                                        &nbsp;<b>(@resultPosition)</b>
+                                                    </div>
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                <td>-</td>
+                                            }
+
+                                            <td style="color: @(item.DoseAccumulationDay > 80 ? "red" : "#333")">
+                                                @(item.DoseAccumulationDay > 0 ? string.Format("{0:F4}", item.DoseAccumulationDay) : "-")
+                                                @(AppData.recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit) != null ? AppData.recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit).RecordEventUnitName : "-")
+                                            </td>
+
+                                            <td style="color: @(item.DoseAccumulationMonth > 80 * 30 ? "red" : "#333")">
+                                                @(item.DoseAccumulationMonth > 0 ? string.Format("{0:F4}", item.DoseAccumulationMonth) : "-")
+                                                @(AppData.recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit) != null ? AppData.recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit).RecordEventUnitName : "-")
+                                            </td>
+
+                                            <td style="color: @(item.DoseAccumulationYear > 80 * 365 ? "red" : "#333")">
+                                                @(item.DoseAccumulationYear > 0 ? string.Format("{0:F4}", item.DoseAccumulationYear) : "-")
+                                                @(AppData.recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit) != null ? AppData.recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit).RecordEventUnitName : "-")
+                                            </td>
+                                        </tr>
+                                    }
+
+                                }
+                            
+                                
+   
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+           
+        </div>
+        <div class="row mt-2" style="justify-content:center">
+            <div class="text-center">
+                @if (UserID != null)
+                {
+                    <a href="@($"ChildComponent/PersonalDose/PersonalDoseSearch/{UserID}/{UserSupportTeamID ?? 0}")" type="button" class="btn btn-warning">@AppData.LangResource[AppData.LanguageID, 639]</a>
+                }
+                else if (UserSupportTeamID != 0 && UserSupportTeamID != null)
+                {
+                    <a href="@($"ChildComponent/PersonalDose/PersonalDoseSearch/{UserID ?? new Guid()}/{UserSupportTeamID}")" type="button" class="btn btn-warning">@AppData.LangResource[AppData.LanguageID, 639]</a>
+                }
+                else
+                {
+                    <button type="button" disabled class="btn btn-warning">@AppData.LangResource[AppData.LanguageID, 639]</button>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+
+}

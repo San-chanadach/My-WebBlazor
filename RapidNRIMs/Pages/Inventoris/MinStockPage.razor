@@ -1,0 +1,390 @@
+﻿@page "/Inventoris/MinStockPage"
+@inject IJSRuntime jsRuntime
+@inject NavigationManager NavigationManager
+@inject AppData AppData
+@inject IToastService ToastService
+@inject HttpClient Http
+@inject IConfiguration Config
+@inject IMasterDataInventory _masterDataInventory
+@inject IMasterData _masterData
+@using System.Threading
+
+<PageTitle>Min Stock Page</PageTitle>
+
+<div class="col-md-12">
+
+    <div class="card-header text-light" style="background-color:#70DAD5">@AppData.LangResource[AppData.LanguageID, 429]</div>
+    <div class="card-body bg-light">
+        <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height:720px;">
+            @if (AppData.mins.Count != 0)
+            {
+                <table id="dataTable" class="table table-striped text-center">
+                    <thead class="fixedthead">
+                        <tr>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 430]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 431]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 432]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 433]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 579]</th>
+                        </tr>
+                    </thead>
+                    <tbody class="scrollContent">
+                        @foreach (var item in AppData.mins)
+                        {
+                            <tr>
+                                <td>@item.InventoryNumber</td>
+                                <td>@item.THName</td>
+                                <td>@item.Quantity</td>
+                                @if(item.IsNotif == true)
+                                {
+                                    <td>
+                                        <img src="assets/images/img-common/tick_symbol.png" width="24" height="24" style="margin-top: 10px;" />
+                                    </td>
+                                }
+                               
+                                <td>
+                                     <!--button type="button" class="btn btn-primary" @onclick="@(() => Notif(item.InventoryID))">
+                                        <i class="fas fa-bell"></i>
+                                     </button-->
+                                     <button type="button" class="btn btn-warning" @onclick="@(() => Notif(item.InventoryID))">
+                                           <i class="fas fa-edit fa-sm"></i>
+                                     </button>
+                                </td>
+
+                            </tr>
+
+
+                            @*<BSAlert Color="Color.Danger" IsDismissible="true">
+                                    Alert Instrument Name:@item.instrument.InstrumentENName - Number: @item.instrument.InstrumentNumber   is Due Calibrate  in @item.InstrumentCalibrationNext.ToString("dd/MM/yyyy")
+                                </BSAlert>*@
+                        }
+                    </tbody>
+                </table>
+                <!--button type="save" class="btn btn-info">@AppData.LangResource[AppData.LanguageID, 44]</button-->
+            }
+            else
+            {
+                <BSAlert Color="Color.Primary" IsDismissible="true">
+                    @AppData.LangResource[AppData.LanguageID, 434]
+                </BSAlert>
+            }
+
+        </div>
+    </div>
+
+</div>
+
+
+<!--ModalInventoryEdit---->
+<EditForm Model="@editInventory" OnValidSubmit="SaveEditInventory">
+    <BSModal @ref="ModalInventoryEdit">
+        <BSModalHeader OnClick="@(() => ModalInventoryEdit.Hide())" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID, 576]</BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 430]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="editInventory.InventoryNumber" disabled placeholder="@AppData.LangResource[AppData.LanguageID,430]" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => editInventory.InventoryNumber)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 64]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="editInventory.InventoryTHName" disabled placeholder="@AppData.LangResource[AppData.LanguageID,64]" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => editInventory.InventoryTHName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 65]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="editInventory.InventoryENName" disabled placeholder="@AppData.LangResource[AppData.LanguageID,65]" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => editInventory.InventoryENName)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 71]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputSelect disabled class="form-control" @bind-Value="editInventory.InventoryBrandID">
+                            <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                            @foreach (var item in inventoryBrands)
+                            {
+                                <option value="@item.InventoryBrandID">@item.InventoryBrandName</option>
+                            }
+                        </InputSelect>
+                    </div>
+                    <ValidationMessage For="@(() => editInventory.InventoryBrandID)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label for="agency" class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 76]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputSelect disabled class="form-control" @bind-Value="editInventory.InventoryAgencyID">
+                            <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                            @foreach (var item in inventoryAgencys)
+                            {
+                                <option value="@item.InventoryAgencyID">@item.InventoryAgencyName</option>
+                            }
+                        </InputSelect>
+                    </div>
+                    <ValidationMessage For="@(() => editInventory.InventoryAgencyID)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 184]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="phoneNumber" disabled placeholder="@AppData.LangResource[AppData.LanguageID,184]" class="form-control" />
+                    </div>
+                </div>
+            </div>
+             <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 404]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="email" disabled placeholder="@AppData.LangResource[AppData.LanguageID,404]" class="form-control" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <!--label for="agency" class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID,488]</span>
+                </label--->
+                <!--div class="col-12 col-md-8 col-lg-3">
+                    <div class="input-group input-box-bottom">
+                        <InputNumber disabled @bind-Value="editInventory.minStock" placeholder="@AppData.LangResource[AppData.LanguageID,488]" class="form-control" />
+                    </div>
+                </div--->
+                <!--div class="col-12 col-md-8 col-lg-2">
+                    <div class="input-group input-box-bottom">
+                        <span style="margin-top: 5px;">
+                            <input @bind="editInventory.IsNotif" class="form-check-input " type="checkbox" name="isall" id="isall" />
+                            <label for="">@AppData.LangResource[AppData.LanguageID,489]</label>
+                        </span>
+                    </div>
+                </!--div--->
+            </div>
+            <!--div class="row">
+              
+                <div class="col-12 col-md-8 col-lg-3">
+                    <div class="input-group input-box-bottom">
+                        <span style="margin-top: 5px;">
+                            <label for="">@AppData.LangResource[AppData.LanguageID,489]</label>
+                            <input @bind="editInventory.IsNotif" class="form-check-input " type="checkbox" name="isall" id="isall" style="margin-left: 5px;" />
+                        </span>
+                    </div>
+                </div>
+            </div-->
+        </BSModalBody>
+        <BSModalFooter>
+            <!--button type="submit" class="btn btn-warning">@AppData.LangResource[AppData.LanguageID, 44]</button--->
+            <!--button type="reset" class="btn " style="background-color:#B90F1B; color:#fff" @onclick="@(() => ModalInventoryEdit.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button--->
+        </BSModalFooter>
+    </BSModal>
+</EditForm>
+
+
+
+
+@code {
+
+
+    private List<Inventory> listInventory = new List<Inventory>();
+    private List<InventoryAgency> inventoryAgencys = new List<InventoryAgency>();
+    private List<InventoryBrand> inventoryBrands = new List<InventoryBrand>();
+    private List<InventoryStockCheckOut> inventoryStockCheckOuts = new List<InventoryStockCheckOut>();
+    private List<InventoryStock> inventoryStocks = new List<InventoryStock>();
+    private Inventory editInventory = new Inventory();
+
+    BSModal ModalInventoryEdit { get; set; }
+    BSModal ModalResponseError { get; set; }
+    BSModal ModalRespondSuccess { get; set; }
+
+    private string RequertMessage;
+
+    /// <summary>
+    /// OnInitializedAsync
+    /// </summary>
+    /// <returns></returns>
+    protected override void OnInitialized()
+    {
+        try
+        {
+            listInventory = AppData.inventorys;
+            inventoryBrands = AppData.inventoryBrands;
+            inventoryAgencys = AppData.inventoryAgencys;
+
+
+            foreach (var i in listInventory)
+            {
+                i.Getlookup(AppData.inventoryBrands, AppData.inventoryAgencys);
+            }
+
+            //await jsRuntime.InvokeAsync<object>("ThisDataTablesAdd");
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            //RequertMessage = val;
+        }
+
+    }
+
+
+    /// <summary>
+    /// clearURL
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("clearURL");
+        }
+    }
+
+    /// <summary>
+    /// SetAsync
+    /// </summary>
+    /// <returns></returns>
+    public async Task SetAsync()
+    {
+        AppData.inventorys = await _masterData.GetMasterDataAsync<Inventory>("Inventory");
+        AppData.inventoryBrands = await _masterData.GetMasterDataAsync<InventoryBrand>("InventoryBrand");
+        AppData.inventoryAgencys = await _masterData.GetMasterDataAsync<InventoryAgency>("InventoryAgency");
+        AppData.mins =  await Http.GetFromJsonAsync<List<MinStock>>($"{Config["nurl"]}/api/GetInventoryminStock");
+        foreach (var i in AppData.inventorys)
+        {
+            i.Getlookup(AppData.inventoryBrands, AppData.inventoryAgencys);
+        }
+
+        listInventory = AppData.inventorys;
+        inventoryBrands = AppData.inventoryBrands;
+        inventoryAgencys = AppData.inventoryAgencys;
+
+    }
+
+    string phoneNumber { get; set; } = string.Empty;
+    string email { get; set; } = string.Empty;
+
+    protected async void Notif(int id)
+    {
+        try
+        {
+            var respond = await _masterData.GetMasterDataAsyncByID<Inventory>("InventoryByID", id);
+            if (string.IsNullOrEmpty(respond.Content))
+            {
+                editInventory = respond;
+                var resultPhoneNumber = AppData.inventoryAgencys.Find(x => x.InventoryAgencyID == editInventory.InventoryAgencyID);
+                if (resultPhoneNumber != null)
+                {
+                    phoneNumber = resultPhoneNumber.InventoryAgencyTel;
+                }
+
+                var resultEmail = AppData.inventoryAgencys.Find(x => x.InventoryAgencyID == editInventory.InventoryAgencyID);
+                if (resultEmail != null)
+                {
+                    email = resultEmail.InventoryAgencyEmail;
+                }
+
+                ModalInventoryEdit.Show();
+            }
+            else
+            {
+                var requertException = respond.Content;
+                RequertMessage = requertException;
+                ModalResponseError.Show();
+            }
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+    }
+   
+    //public async Task Onsave() 
+    //{ 
+
+        //if (AppData.mins.Count != 0)
+        //{
+        //    foreach(var item in AppData.mins)
+        //    {
+        //        if (checkBox == false)
+        //        {
+                    //var res = await Http.PutAsJsonAsync("api/RegisterInventory", item.Inventory );
+                    //if (res.StatusCode == System.Net.HttpStatusCode.OK)
+                    //{
+                    //    //ToastService.ShowError("Update Consumasble  is not Success. Code : "+res.StatusCode +" :: "+res.Content.ToString());
+                    //    ToastService.ShowError("Update Consumasble  is Success. Code : "+res.StatusCode +" :: "+res.Content.ToString());
+                    //}
+
+                    //var respond = await _masterDataInventory.PutInventoryMasterDataAsync("PutInventory",editInventory);
+                    //if (!string.IsNullOrEmpty(respond.ToString()))
+                    //{
+                    //    await SetAsync();
+                    //    ToastService.ShowSuccess("Update Consumasble is Success");
+                    //}
+
+            //    }
+            //} 
+
+            //AppData.mins =  await Http.GetFromJsonAsync<List<RapidNrims.Shared.Model.Cores.MinStock>>("api/GetInventoryminStock");
+            //foreach (var i in AppData.mins)
+            //{
+            //    i.Inventory = AppData.inventorys.Find(j => i.InventoryID == j.InventoryID);
+            //} 
+
+        //}
+        //StateHasChanged();
+    //}
+    
+
+    /// <summary>
+    /// SaveEditInventory
+    /// </summary>
+    private async Task SaveEditInventory()
+    {
+        try
+        {
+            var respond = await _masterDataInventory.PutInventoryMasterDataAsync("PutInventory", editInventory);
+            if (!string.IsNullOrEmpty(respond.ToString()))
+            {
+                await SetAsync();
+                ToastService.ShowSuccess("Update Consumasble is Success");
+            }
+            else
+            {
+                ToastService.ShowError("Update Consumasble  is not Success");
+            }
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+           ToastService.ShowError($"Update Consumasble  is Success. Code : {val.ToString()}");
+        }
+        ModalInventoryEdit.Hide();
+    }
+
+}

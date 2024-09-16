@@ -1,0 +1,264 @@
+﻿@inherits ShowInstrumentCheckOutBase
+@page "/Instruments/ShowInstrumentCheckOutAll"
+
+<PageTitle>Check Out All Page</PageTitle>
+
+<div class="row margin-row-card">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">@AppData.LangResource[AppData.LanguageID,578]</div>
+            <div class="card-body">
+                <BSTabGroup>
+                    <BSTabList>
+                        <BSTab>
+                            <BSTabLabel>@AppData.LangResource[AppData.LanguageID, 16]</BSTabLabel>
+                            <BSTabContent>
+                                <div class="card-body">
+                                    <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height:720px;">
+
+                                        <table id="dataTable" class="table table-striped text-center">
+                                            <thead class="fixedthead">
+                                                <tr>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,407]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,230]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,61]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,168]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,70]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,71]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,100]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,101]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,23]</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="scrollContent">
+                                                @if (instrumentCheckOutListNonReturned != null)
+                                                {
+                                                    @foreach (var item in instrumentCheckOutListNonReturned)
+                                                    {
+                                                        <tr>
+                                                            <td data-label="">
+
+                                                                <span class="badge badge-pill badge-warning">
+                                                                    @AppData.LangResource[AppData.LanguageID,566]
+                                                                </span>
+
+                                                            </td>
+                                                            <td data-label="">@String.Format("{0:dd/MM/yyyy}", item.InstrumentCheckOutDate) </td>
+                                                            <td data-label="">@item.InstrumentNumber</td>
+                                                            <td data-label="">@(item.instrument != null ? item.instrument.InstrumentENName:"-")</td>
+                                                            <td data-label="">@(item.instrument != null ? item.instrument.Model.InstrumentModelName:"-")</td>
+                                                            <td data-label="">@(item.instrument != null ? item.instrument.Brand.InstrumentBrandName:"-")</td>
+
+                                                            <td data-label="">@(AppData.instrumentAction.Find(i => i.InstrumentActionID == item.InstrumentCheckOutAction) != null? AppData.instrumentAction.Find(i => i.InstrumentActionID == item.InstrumentCheckOutAction).InstrumentActionName:"-")</td>
+                                                            <td data-label="">
+                                                                @if (item.IsStaff)
+                                                                {
+                                                                    @(accounts.Find(i => i.UserID == @item.InstrumentCheckOutGiveTo) != null? accounts.Find(i => i.UserID == @item.InstrumentCheckOutGiveTo).FirstName:"-")
+                                                                }
+                                                                else
+                                                                {
+                                                                    @(other.Find(i => i.UserID == @item.InstrumentCheckOutGiveTo) != null? other.Find(i => i.UserID == @item.InstrumentCheckOutGiveTo).UserName:"-")
+                                                                }
+                                                            </td>
+                                                            <td>
+                                                                <a type="button" class="btn btn-warning " href="@Config["rurl"]/api/InstrumentCheckOutReport?CheckOutID=@item.InstrumentCheckOutID&USerID=@item.InstrumentCheckOutGiveTo&s=@(item.IsStaff?1:0)&CUserID=@(AppData.UserID )" download="" target="_blank">
+                                                                    <i class="fas fa-download"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                        
+                                                    }
+                                                }
+
+                                            </tbody>
+                                        </table>
+
+
+                                    </div>
+
+                                </div>
+                            </BSTabContent>
+                        </BSTab>
+
+                        <BSTab>
+                            <BSTabLabel>@AppData.LangResource[AppData.LanguageID, 533]</BSTabLabel>
+                            <BSTabContent>
+                                <div class="card-body">
+                                    <div @ref="dataTableContainer" class="scrollBar fixTableHead table-responsive scroll-inner" style="height:720px;">
+
+                                        <table id="dataTable" class="table  text-center">
+                                            <thead class="fixedthead">
+                                                <tr>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 93]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 89]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 90]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 91]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 92]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 71]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 70]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 30]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 415]</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="scrollContent">
+                                                @foreach (var item in instrumentListViewsReady.OrderByDescending(x => x.InstrumentNumber))
+                                                {
+                                                    <tr class="@GetRowBackgroundColor(item.InstrumentID)" @onclick="() => TrClickedAtIndex(item.InstrumentID)">
+
+                                                        <td data-label="@AppData.LangResource[AppData.LanguageID,93]">
+                                                            <span class="@item.Status.ColorTag">
+                                                                @item.Status.InstrumentStatusENName
+                                                            </span>
+                                                        </td>
+
+                                                        <td data-label="@AppData.LangResource[AppData.LanguageID,89]">@item.InstrumentNumber</td>
+                                                        <td data-label="@AppData.LangResource[AppData.LanguageID,90]">@item.InstrumentENName</td>
+                                                        <td data-label="@AppData.LangResource[AppData.LanguageID,91]">@item.InstrumentAssetNumber</td>
+                                                        <td data-label="@AppData.LangResource[AppData.LanguageID,92]">@item.InstrumentSerialNumber</td>
+                                                        <td data-label="@AppData.LangResource[AppData.LanguageID,71]">@(item.Brand != null ? item.Brand.InstrumentBrandName:"-")</td>
+                                                        <td data-label="@AppData.LangResource[AppData.LanguageID,70]">@(item.Model != null ? item.Model.InstrumentModelName:"-") </td>
+                                                        <td data-label="Location">@(AppData.instrumentLocations.Find(x => x.InstrumentLocationID == item.InstrumentLocationID) != null ? AppData.instrumentLocations.Find(x => x.InstrumentLocationID == item.InstrumentLocationID).InstrumentLocationName:"-")</td>
+                                                        <td data-label="@AppData.LangResource[AppData.LanguageID,56]">@item.InstrumentRegisterDate.Value.ToString("yyyy")</td>
+
+                                                    </tr>
+                                                    
+                                                }
+
+                                            </tbody>
+                                        </table>
+
+
+                                    </div>
+                                </div>
+                                <div class="text-center">
+
+
+
+                                    @if (ID == null)
+                                    {
+                                        <!-- ถ้าไม่มี Id -->
+
+                                        <button style="cursor: pointer;" disabled class="btn btn-warning" name="ShowInstrument">@AppData.LangResource[AppData.LanguageID, 94]</button>
+
+                                    }
+                                    else
+                                    {
+
+
+                                        <a href="@($"Instruments/ShowInstrument/{ID}")" class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID, 94]</a>
+
+                                    }
+
+
+
+
+
+
+
+
+                                </div>
+                            </BSTabContent>
+                        </BSTab>
+
+                        <BSTab>
+                            <BSTabLabel>@AppData.LangResource[AppData.LanguageID, 450]</BSTabLabel>
+                            <BSTabContent>
+                                <div class="card-body">
+                                    <div @ref="dataTableContainer" class="scrollBar fixTableHead table-responsive scroll-inner" style="height:720px;">
+
+                                        <table id="dataTable" class="table  text-center">
+                                            <thead class="fixedthead">
+                                                <tr>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 93]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 89]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 90]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 91]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 92]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 71]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 70]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 30]</th>
+                                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 415]</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="scrollContent">
+                                                @foreach (var item in AppData.instrumentsList.OrderByDescending(x => x.InstrumentNumber))
+                                                {
+
+
+                                                    <tr class="@GetRowBackgroundColor(item.InstrumentID)" @onclick="() => TrClickedAtIndex(item.InstrumentID)">
+
+                                                        <td data-label="@AppData.LangResource[AppData.LanguageID,93]">
+                                                            <span class="@item.Status.ColorTag">
+                                                                @item.Status.InstrumentStatusENName
+                                                            </span>
+                                                        </td>
+
+                                                        <td data-label="@AppData.LangResource[AppData.LanguageID,89]">@item.InstrumentNumber</td>
+                                                        <td data-label="@AppData.LangResource[AppData.LanguageID,90]">@item.InstrumentENName</td>
+                                                        <td data-label="@AppData.LangResource[AppData.LanguageID,91]">@item.InstrumentAssetNumber</td>
+                                                        <td data-label="@AppData.LangResource[AppData.LanguageID,92]">@item.InstrumentSerialNumber</td>
+                                                        <td data-label="@AppData.LangResource[AppData.LanguageID,71]">@(item.Brand != null ? item.Brand.InstrumentBrandName:"-")</td>
+                                                        <td data-label="@AppData.LangResource[AppData.LanguageID,70]">@(item.Model != null ? item.Model.InstrumentModelName:"-") </td>
+                                                        <td data-label="Location">@(AppData.instrumentLocations.Find(x => x.InstrumentLocationID == item.InstrumentLocationID) != null ? AppData.instrumentLocations.Find(x => x.InstrumentLocationID == item.InstrumentLocationID).InstrumentLocationName:"-")</td>
+                                                        <td data-label="@AppData.LangResource[AppData.LanguageID,56]">@item.InstrumentRegisterDate.Value.ToString("yyyy")</td>
+
+                                                    </tr>
+
+                                                }
+
+                                            </tbody>
+                                        </table>
+
+
+                                    </div>
+                                </div>
+                                <div class="text-center">
+
+
+
+                                    @if (ID == null)
+                                    {
+                                        <!-- ถ้าไม่มี Id -->
+
+                                        <button style="cursor: pointer;" disabled class="btn btn-warning" name="ShowInstrument">@AppData.LangResource[AppData.LanguageID, 94]</button>
+
+                                    }
+                                    else
+                                    {
+
+
+                                        <a href="@($"Instruments/ShowInstrument/{ID}")" class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID, 94]</a>
+
+                                    }
+
+
+
+
+
+
+
+
+                                </div>
+                            </BSTabContent>
+                        </BSTab>
+
+
+                    </BSTabList>
+                    <BSTabSelectedContent />
+                </BSTabGroup>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="text-center">
+
+     <a href="@($"/index")" class="btn margin-btn" style="background-color:#7F7F7F; color:#fff">@AppData.LangResource[AppData.LanguageID, 49]</a>
+
+</div>
+
+
+
+

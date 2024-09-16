@@ -1,0 +1,230 @@
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.csproj.AssemblyReference.cache
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.GeneratedMSBuildEditorConfig.editorconfig
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.AssemblyInfoInputs.cache
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.AssemblyInfo.cs
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.csproj.CoreCompileInputs.cache
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.MvcApplicationPartsAssemblyInfo.cache
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.RazorAssemblyInfo.cache
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.RazorAssemblyInfo.cs
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\appsettings.Development.json
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\appsettings.json
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\RapidNRIMs.staticwebassets.runtime.json
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\RapidNRIMs.exe
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\RapidNRIMs.deps.json
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\RapidNRIMs.runtimeconfig.json
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\RapidNRIMs.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\RapidNRIMs.pdb
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\Append.Blazor.Printing.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\BlazorComponentUtilities.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\Blazored.LocalStorage.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\Blazored.Toast.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\BlazorInputFile.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\BlazorStrap.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\itext.licensing.base.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\itext.barcodes.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\itext.forms.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\itext.io.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\itext.kernel.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\itext.layout.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\itext.pdfa.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\itext.sign.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\itext.styledxmlparser.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\itext.svg.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\itext.commons.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\ICU4N.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\J2N.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\itext.typography.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\Microsoft.AspNetCore.Authorization.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\Microsoft.AspNetCore.Components.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\Microsoft.AspNetCore.Components.Authorization.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\Microsoft.AspNetCore.Components.Forms.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\Microsoft.AspNetCore.Components.Web.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\Microsoft.AspNetCore.Components.WebAssembly.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\Microsoft.AspNetCore.Metadata.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\Microsoft.DotNet.PlatformAbstractions.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\Microsoft.Extensions.Configuration.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\Microsoft.Extensions.DependencyModel.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\Microsoft.Extensions.Localization.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\Microsoft.Extensions.Localization.Abstractions.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\Microsoft.Extensions.Logging.Abstractions.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\Microsoft.JSInterop.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\Microsoft.JSInterop.WebAssembly.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\Newtonsoft.Json.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\BouncyCastle.Crypto.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\System.IO.Pipelines.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\BlazorFullCalendar.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\bin\Debug\net6.0\BlazorFullCalendar.pdb
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\obj\Debug\net6.0\staticwebassets.build.json
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\obj\Debug\net6.0\staticwebassets.development.json
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\obj\Debug\net6.0\scopedcss\Shared\MainLayout.razor.rz.scp.css
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\obj\Debug\net6.0\scopedcss\Shared\NavMenu.razor.rz.scp.css
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\obj\Debug\net6.0\scopedcss\bundle\RapidNRIMs.styles.css
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\obj\Debug\net6.0\scopedcss\projectbundle\RapidNRIMs.bundle.scp.css
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.csproj.CopyComplete
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\obj\Debug\net6.0\refint\RapidNRIMs.dll
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.pdb
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.genruntimeconfig.cache
+D:\Project-OAP\RapidNRIMs\RapidNRIMs\obj\Debug\net6.0\ref\RapidNRIMs.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.csproj.AssemblyReference.cache
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.GeneratedMSBuildEditorConfig.editorconfig
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.AssemblyInfoInputs.cache
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.AssemblyInfo.cs
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.csproj.CoreCompileInputs.cache
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.MvcApplicationPartsAssemblyInfo.cache
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.RazorAssemblyInfo.cache
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.RazorAssemblyInfo.cs
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\refint\RapidNRIMs.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.pdb
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\appsettings.Development.json
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\appsettings.json
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\RapidNRIMs.staticwebassets.runtime.json
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\RapidNRIMs.exe
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\RapidNRIMs.deps.json
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\RapidNRIMs.runtimeconfig.json
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\RapidNRIMs.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\RapidNRIMs.pdb
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\Append.Blazor.Printing.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\BlazorComponentUtilities.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\Blazored.LocalStorage.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\Blazored.Toast.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\BlazorInputFile.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\BlazorStrap.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\itext.licensing.base.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\itext.barcodes.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\itext.forms.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\itext.io.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\itext.kernel.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\itext.layout.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\itext.pdfa.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\itext.sign.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\itext.styledxmlparser.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\itext.svg.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\itext.commons.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\ICU4N.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\J2N.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\itext.typography.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\Microsoft.AspNetCore.Authorization.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\Microsoft.AspNetCore.Components.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\Microsoft.AspNetCore.Components.Authorization.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\Microsoft.AspNetCore.Components.Forms.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\Microsoft.AspNetCore.Components.Web.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\Microsoft.AspNetCore.Components.WebAssembly.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\Microsoft.AspNetCore.Metadata.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\Microsoft.DotNet.PlatformAbstractions.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\Microsoft.Extensions.Configuration.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\Microsoft.Extensions.DependencyModel.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\Microsoft.Extensions.Localization.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\Microsoft.Extensions.Localization.Abstractions.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\Microsoft.Extensions.Logging.Abstractions.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\Microsoft.JSInterop.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\Microsoft.JSInterop.WebAssembly.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\Newtonsoft.Json.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\BouncyCastle.Crypto.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\System.IO.Pipelines.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\BlazorFullCalendar.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\PSC.Blazor.Components.Chartjs.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\BlazorFullCalendar.pdb
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\PSC.Blazor.Components.Chartjs.pdb
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\PSC.Blazor.Components.Chartjs.xml
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\staticwebassets.build.json
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\staticwebassets.development.json
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\scopedcss\Shared\MainLayout.razor.rz.scp.css
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\scopedcss\Shared\NavMenu.razor.rz.scp.css
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\scopedcss\bundle\RapidNRIMs.styles.css
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\scopedcss\projectbundle\RapidNRIMs.bundle.scp.css
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.csproj.CopyComplete
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.genruntimeconfig.cache
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\ref\RapidNRIMs.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\Microsoft.Win32.SystemEvents.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\SixLabors.ImageSharp.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\System.Drawing.Common.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\runtimes\win\lib\net6.0\Microsoft.Win32.SystemEvents.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Drawing.Common.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\staticwebassets\msbuild.RapidNRIMs.Microsoft.AspNetCore.StaticWebAssets.props
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\staticwebassets\msbuild.build.RapidNRIMs.props
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\staticwebassets\msbuild.buildMultiTargeting.RapidNRIMs.props
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\staticwebassets\msbuild.buildTransitive.RapidNRIMs.props
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2564_OAP\DevSources\3.Develop\V1.5.1\RapidNrimsV1.5.1\RapidNrims-VersionDev-Phase2.1\RapidNRIMs\obj\Debug\net6.0\staticwebassets.pack.json
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\appsettings.Development.json
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\appsettings.json
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\RapidNRIMs.staticwebassets.runtime.json
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\RapidNRIMs.exe
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\RapidNRIMs.deps.json
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\RapidNRIMs.runtimeconfig.json
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\RapidNRIMs.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\RapidNRIMs.pdb
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\Append.Blazor.Printing.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\BlazorComponentUtilities.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\Blazored.LocalStorage.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\Blazored.Toast.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\BlazorInputFile.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\BlazorStrap.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\itext.licensing.base.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\itext.barcodes.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\itext.forms.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\itext.io.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\itext.kernel.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\itext.layout.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\itext.pdfa.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\itext.sign.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\itext.styledxmlparser.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\itext.svg.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\itext.commons.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\ICU4N.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\J2N.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\itext.typography.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\Microsoft.AspNetCore.Authorization.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\Microsoft.AspNetCore.Components.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\Microsoft.AspNetCore.Components.Authorization.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\Microsoft.AspNetCore.Components.Forms.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\Microsoft.AspNetCore.Components.Web.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\Microsoft.AspNetCore.Components.WebAssembly.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\Microsoft.AspNetCore.Metadata.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\Microsoft.DotNet.PlatformAbstractions.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\Microsoft.Extensions.Configuration.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\Microsoft.Extensions.DependencyModel.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\Microsoft.Extensions.Localization.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\Microsoft.Extensions.Localization.Abstractions.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\Microsoft.Extensions.Logging.Abstractions.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\Microsoft.JSInterop.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\Microsoft.JSInterop.WebAssembly.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\Microsoft.Win32.SystemEvents.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\Newtonsoft.Json.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\SixLabors.ImageSharp.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\System.Drawing.Common.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\System.IO.Pipelines.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\runtimes\win\lib\net6.0\Microsoft.Win32.SystemEvents.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Drawing.Common.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\BlazorFullCalendar.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\PSC.Blazor.Components.Chartjs.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\BlazorFullCalendar.pdb
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\PSC.Blazor.Components.Chartjs.pdb
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\PSC.Blazor.Components.Chartjs.xml
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.csproj.AssemblyReference.cache
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.GeneratedMSBuildEditorConfig.editorconfig
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.AssemblyInfoInputs.cache
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.AssemblyInfo.cs
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.csproj.CoreCompileInputs.cache
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.MvcApplicationPartsAssemblyInfo.cache
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.RazorAssemblyInfo.cache
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.RazorAssemblyInfo.cs
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\staticwebassets.build.json
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\staticwebassets.development.json
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\staticwebassets\msbuild.RapidNRIMs.Microsoft.AspNetCore.StaticWebAssets.props
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\staticwebassets\msbuild.build.RapidNRIMs.props
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\staticwebassets\msbuild.buildMultiTargeting.RapidNRIMs.props
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\staticwebassets\msbuild.buildTransitive.RapidNRIMs.props
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\staticwebassets.pack.json
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\scopedcss\Shared\MainLayout.razor.rz.scp.css
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\scopedcss\Shared\NavMenu.razor.rz.scp.css
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\scopedcss\bundle\RapidNRIMs.styles.css
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\scopedcss\projectbundle\RapidNRIMs.bundle.scp.css
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.csproj.CopyComplete
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\refint\RapidNRIMs.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.pdb
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\RapidNRIMs.genruntimeconfig.cache
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\obj\Debug\net6.0\ref\RapidNRIMs.dll
+E:\ฝ่าย IT\Project\Project\RapidNRIMS_2567_OAP\3.Develop\Client\RapidNrims-VersionDev-Phase2.2\RapidNRIMs\bin\Debug\net6.0\BouncyCastle.Crypto.dll

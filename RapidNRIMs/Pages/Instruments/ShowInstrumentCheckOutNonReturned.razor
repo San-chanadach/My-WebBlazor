@@ -1,0 +1,91 @@
+﻿@inherits ShowInstrumentCheckOutBase
+@page "/Instrument/ShowInstrumentCheckOutNonReturned"
+
+<PageTitle>Check Out Non Returned Page</PageTitle>
+
+
+<div class="col-md-12">
+    <div class="card-header bg-gradient-secondary">@AppData.LangResource[AppData.LanguageID,568]</div>
+    <div class="card-body bg-light">
+        <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height:720px;">
+           
+                <table id="dataTable"  class="table table-striped text-center"> 
+                    <thead class="fixedthead">
+                        <tr>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,407]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,230]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,61]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,168]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,70]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,71]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,100]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,101]</th>
+                            <th class="alternateRow">@AppData.LangResource[AppData.LanguageID,23]</th>
+                        </tr>
+                    </thead>
+                    <tbody class="scrollContent">
+                        @if(instrumentCheckOutListNonReturned != null)
+                        {
+                            @foreach(var item in instrumentCheckOutListNonReturned)
+                            {
+
+                                @if(item.InstrumentCheckOutStatus == 1)
+                                {
+                                    <tr>
+                                        <td data-label="">
+                                        
+                                            <span class="badge badge-pill badge-warning">
+                                                 @AppData.LangResource[AppData.LanguageID,566]
+                                            </span>
+                                        
+                                        </td>
+                                        <td data-label="">@String.Format("{0:dd/MM/yyyy}", item.InstrumentCheckOutDate) </td>
+                                        <td data-label="">@item.InstrumentNumber</td>
+                                        <td data-label="">@(item.instrument != null ? item.instrument.InstrumentENName:"-")</td>
+                                        <td data-label="">@(item.instrument != null ? item.instrument.Model.InstrumentModelName:"-")</td>
+                                        <td data-label="">@(item.instrument != null ? item.instrument.Brand.InstrumentBrandName:"-")</td>
+                                    
+                                        <td data-label="">@(AppData.instrumentAction.Find(i => i.InstrumentActionID == item.InstrumentCheckOutAction) != null? AppData.instrumentAction.Find(i => i.InstrumentActionID == item.InstrumentCheckOutAction).InstrumentActionName:"-")</td>
+                                        <td data-label="">
+                                            @if (item.IsStaff)
+                                            {
+                                                @(accounts.Find(i => i.UserID == @item.InstrumentCheckOutGiveTo) != null? accounts.Find(i => i.UserID == @item.InstrumentCheckOutGiveTo).FirstName:"-")
+                                            }
+                                            else
+                                            {
+                                                @(other.Find(i => i.UserID == @item.InstrumentCheckOutGiveTo) != null? other.Find(i => i.UserID == @item.InstrumentCheckOutGiveTo).UserName:"-")
+                                            }
+                                        </td>
+                                        <td>
+                                            <a type="button" class="btn btn-warning " href="@Config["rurl"]/api/InstrumentCheckOutReport?CheckOutID=@item.InstrumentCheckOutID&USerID=@item.InstrumentCheckOutGiveTo&s=@(item.IsStaff?1:0)&CUserID=@(AppData.UserID )" download="" target="_blank">
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                        </td>
+                                </tr>
+                                }
+                               
+                                
+                                
+                                    
+                            }
+                        }
+                        
+                    </tbody>
+                </table>
+           
+
+        </div>
+    </div> 
+</div>
+<div class="text-center">
+
+     <a href="@($"/index")" class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID, 49]</a>
+    <a href="@($"Instrument/CheckOut")" class="btn btn-primary margin-btn"> @AppData.LangResource[AppData.LanguageID,567]</a>
+
+   
+
+</div>
+
+
+
+

@@ -1,0 +1,460 @@
+﻿@page "/Inventoris/Expiry"
+@inject IJSRuntime jsRuntime
+@inject NavigationManager NavigationManager
+@inject AppData AppData
+@inject IToastService ToastService
+@inject HttpClient Http
+@inject IConfiguration Config
+@inject IMasterData _masterData
+@using System.Threading
+
+<PageTitle>Expiry Page</PageTitle>
+
+<div class="row margin-row-card">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">@AppData.LangResource[AppData.LanguageID, 276]</div>
+            <div class="card-body">
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 259]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <input type="text" @bind-value="inventoryStockSearch.InventoryStockNumber" class="form-control" placeholder="@AppData.LangResource[AppData.LanguageID,259]" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 30]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <select class="form-control" @bind="inventoryStockSearch.InventoryStockLocationID">
+                                <option selected value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                @foreach (var item in inventoryLocations)
+                                {
+                                    if (item.IsActive == true && item.IsActive != null)
+                                    {
+                                        <option value="@item.InventoryLocationID">@item.InventoryLocationName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                        <span>@AppData.LangResource[AppData.LanguageID, 108]</span>
+                    </label>
+                    <div class="col-12 col-md-8 col-lg-3">
+                        <div class="input-group input-box-bottom">
+                            <select selected class="form-control" @bind="inventoryStockSearch.InventoryStockStockTypeID">
+                                <option value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                @foreach (var item in inventoryStockTypes)
+                                {
+                                    if (item.IsActive == true && item.IsActive != null)
+                                    {
+                                        <option value="@item.InventoryStockTypeID">@item.InventoryStockTypeName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center" style="margin-top:0.5rem;">
+                    <button type="submit" @onclick="Onsearch" id="OnsearchDoseUserAll" class="btn" style="background-color:#2E2BFF; color:#fff">@AppData.LangResource[AppData.LanguageID, 48]</button>
+                    <button type="reset" @onclick="ClearInventorySearch" class="btn" style="background-color:#B90F1B; color:#fff" name="Search" id="OnsearchDoseUserAll">
+                        @AppData.LangResource[AppData.LanguageID, 45]
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row margin-row-card">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">@AppData.LangResource[AppData.LanguageID, 115]</div>
+            <div class="card-body">
+                <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height:545px;">
+                    <table id="dataTable" class="table table-bordered table-striped text-center" width="100%">
+                        <thead class="fixedthead">
+                            <tr>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 116]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 117]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 30]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 108]</th>
+                                <!--th>@AppData.LangResource[AppData.LanguageID,76]</th-->
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 428]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 113]</th>
+
+                            </tr>
+                        </thead>
+                        <tbody class="scrollContent">
+
+                            @if (FilteredInventoryStock.Count > 0)
+                            {
+                                @foreach (var item in FilteredInventoryStock)
+                                {
+                                    <tr @onclick="() => TrClickedAtIndex(item.InventoryStockID)">
+
+                                        <td>@(item.InventoryStockNumber != null ? item.InventoryStockNumber:"-")</td>
+
+                                        @if (AppData.LanguageID == 0)
+                                        {
+                                            <td>@(item.inventory!= null ? item.inventory.InventoryENName:"-") </td>
+                                        }
+                                        else
+                                        {
+                                            <td>@(item.inventory!= null ? item.inventory.InventoryTHName:"-") </td>
+                                        }
+                                        <td>@(item.StockLocation != null ? item.StockLocation.InventoryLocationName:"-")</td>
+                                        <td>@(item.StockType != null ? item.StockType.InventoryStockTypeName:"-")</td>
+                                        <td>@item.InventoryStockQuantity</td>
+                                        <td>@item.InventoryStockExpireDate.Value.ToString("dd/MM/yyyy")</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        @if (AppData.CurrentPermission.Find(i => i.permissionID == 12).permissionE || AppData.CurrentPermission.Find(i => i.permissionID == 12).permissionU)
+        {
+            <div class="text-center">
+                @if (ID == null)
+                {
+                    <button style="cursor:  pointer;" disabled class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID, 118]</button>
+                    <button type="button" disabled class="btn margin-btn" style="background-color:#404040; color:#fff">@AppData.LangResource[AppData.LanguageID, 95]</button>
+                }
+                else
+                {
+                    <a href="@($"Inventoris/ShowInventory/{ID}")" class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID, 118]</a>
+                    if (discardInventoryStock.IsActive == true)
+                    {
+                        <button type="submit" class="btn margin-btn" style="background-color:#404040; color:#fff" @onclick="Discard">@AppData.LangResource[AppData.LanguageID, 95]</button>
+                    }
+                    else
+                    {
+                        <button type="submit" class="btn margin-btn" style="background-color:#404040; color:#fff" disabled>@AppData.LangResource[AppData.LanguageID, 95]</button>
+                    }
+                   
+                }
+                <button type="submit" @onclick="ShowDiscard" class="btn margin-btn" style="background-color:#404040; color:#fff" id="OnsearchDoseUserAll">@AppData.LangResource[AppData.LanguageID, 482]</button>
+                
+                
+            </div>
+        }
+       
+    </div>
+</div>
+
+
+<EditForm Model="@discardInventoryStock" OnValidSubmit="UpdateInventoryStockDiscard">
+    <BSModal @ref="InventoryDiscard">
+        <BSModalHeader OnClick="@(() => InventoryDiscard.Hide())" Class="btn-header-color">@AppData.LangResource[AppData.LanguageID, 611]</BSModalHeader>
+        <BSModalBody>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 120]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputDate @bind-Value="discardInventoryStock.InventoryStockDiscardDate" placeholder="@AppData.LangResource[AppData.LanguageID,120]" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => discardInventoryStock.InventoryStockDiscardDate)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 121]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputSelect class="form-control" @bind-Value="discardInventoryStock.InventoryStockDiscardBy" id="discardBy">
+                            <option value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                            @foreach (var item in accounts)
+                            {
+                                if(item.IsActive)
+                                {
+                                    @if (item.UserID == discardInventoryStock.InventoryStockDiscardBy)
+                                    {
+                                        <option value="@item.UserID">@item.FirstName</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item.UserID">@item.FirstName</option>
+                                    }
+                                }
+                               
+
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <ValidationMessage For="@(() => discardInventoryStock.InventoryStockDiscardBy)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+
+                </div>
+
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 104]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-7">
+                    <div class="input-group input-box-bottom">
+                        <InputText @bind-Value="discardInventoryStock.InventoryStockReason" placeholder="@AppData.LangResource[AppData.LanguageID,104]" class="form-control" />
+                    </div>
+
+                    <ValidationMessage For="@(() => discardInventoryStock.InventoryStockReason)" style="margin-top: -0.8rem; margin-bottom: 5px; font-size:12px; " />
+
+                </div>
+
+            </div>
+        </BSModalBody>
+        <BSModalFooter>
+            <button type="submit" class="btn btn-danger">@AppData.LangResource[AppData.LanguageID, 95]</button>
+            <button type="reset" class="btn btn-info" @onclick="@(() => InventoryDiscard.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+        </BSModalFooter>
+    </BSModal>
+
+</EditForm>
+
+<BSModal class="row style-justify mt-5" @ref="Load" IsCentered="true" Size="Size.Small" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+    <BSModalBody>
+        <div class="text-center mt-3">
+            <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+                  style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+        </div>
+        <div class="text-center pt-3" style=" font-size: 16pt">
+            @AppData.LangResource[AppData.LanguageID, 325]
+        </div>
+    </BSModalBody>
+</BSModal>
+
+@code {
+    /// <summary>
+    /// List Initial
+    /// </summary>
+    List<InventoryStock> inventoryStocks = new List<InventoryStock>();
+
+    private List<Account> accounts = new List<Account>();
+
+    /// <summary>
+    /// Componente Of Stock Initial
+    /// </summary>
+    private List<Inventory> inventories = new List<Inventory>();
+    private List<InventoryAgency> inventoryAgencys = new List<InventoryAgency>();
+    private List<InventoryBrand> inventoryBrands = new List<InventoryBrand>();
+    private List<InventoryStockType> inventoryStockTypes = new List<InventoryStockType>();
+    private List<InventoryLocation> inventoryLocations = new List<InventoryLocation>();
+
+    /// <summary>
+    ///  Parameter For Passing  Discard
+    /// </summary>
+    InventoryStock discardInventoryStock = new InventoryStock()
+        {
+            InventoryStockDiscardDate = DateTime.Now
+        };
+
+    public BSModal Load { get; set; }
+
+
+    /// <summary>
+    /// ID OnSelect
+    /// </summary>
+    public int? ID { get; set; }
+
+    /// <summary>
+    /// inventory Search
+    /// </summary>
+
+    InventoryStock inventoryStockSearch = new InventoryStock
+        {
+            InventoryStockNumber = ""
+        };
+
+    /// <summary>
+    ///  Table Filter
+    /// </summary>
+    List<InventoryStock> FilteredInventoryStock => inventoryStocks.Where(
+    i => i.InventoryStockNumber.ToLower().Contains(inventoryStockSearch.InventoryStockNumber.ToLower()) &&
+    i.InventoryStockLocationID.ToString().ToLower().Contains(inventoryStockSearch.InventoryStockLocationID.ToString().ToLower()) &&
+    i.InventoryStockStockTypeID.ToString().ToLower().Contains(inventoryStockSearch.InventoryStockStockTypeID.ToString().ToLower())
+    ).ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        inventories = AppData.inventorys;
+
+        inventoryStockTypes = AppData.inventoryStockTypes;
+        //inventoryBrands = AppData.inventoryBrands;
+        //inventoryAgencys = AppData.inventoryAgencys;
+        inventoryLocations = AppData.inventoryLocations;
+
+        inventories = AppData.inventorys;
+        //var activeInventory = inventories.Find(i => i.IsActive == true).IsActive;
+        //if (activeInventory == true)
+        //    inventories = await _masterData.GetAllActiveMasterDataAsync<Inventory>("ActiveInventory");
+
+        inventoryStockTypes = AppData.inventoryStockTypes;
+        //var activeInventoryStockType = inventoryStockTypes.Find(i => i.IsActive == true).IsActive;
+        //if(activeInventoryStockType == true)
+        //    inventoryStockTypes = await _masterData.GetAllActiveMasterDataAsync<InventoryStockType>("ActiveInventoryStockType");
+
+
+        inventoryLocations = AppData.inventoryLocations;
+        //var activeInventoryLocation = inventoryLocations.Find(i => i.IsActive == true).IsActive;
+        //if (activeInventoryLocation == true)
+        //    inventoryLocations = await _masterData.GetAllActiveMasterDataAsync<InventoryLocation>("ActiveInventoryLocation");
+
+
+        //accounts = await Http.GetFromJsonAsync<List<Account>>("https://www.eprsmarttool.com/RapidAuthenication_Service/api/GetAccount");
+
+        accounts = await Http.GetFromJsonAsync<List<Account>>($"{Config["aurl"]}/api/GetAccount");
+
+        if (AppData.LanguageID == 0)
+        {
+            var resultInventoryLocation = inventoryLocations.OrderBy(l => l.InventoryLocationName).ToList();
+            inventoryLocations = resultInventoryLocation;
+            var resultInventoryStockTypes = inventoryStockTypes.OrderBy(c => c.InventoryStockTypeName).ToList();
+            inventoryStockTypes = resultInventoryStockTypes;
+        }
+
+
+    }
+
+    public void Discard()
+    {
+        discardInventoryStock.InventoryStockDiscardBy = null;
+        InventoryDiscard.Show();
+    }
+
+
+    public async Task TrClickedAtIndex(int? id)
+    {
+
+
+        ID = id;
+        //inventoryStockByIds = await Http.GetFromJsonAsync<List<InventoryStock>>($"api/GetInventoryStock/{ID}");
+
+        var respond = await Http.GetFromJsonAsync<List<InventoryStock>>($"{Config["nurl"]}/api/GetInventoryStock/{ID}");
+        discardInventoryStock = respond.First();
+        discardInventoryStock.InventoryStockDiscardDate = DateTime.Today;
+        discardInventoryStock.InventoryStockReason = "";
+
+
+
+
+    }
+
+    public async Task ShowDiscard()
+    {
+       
+        try
+        {
+            Load.Show();
+            await Task.Run(Loading);
+            ID = null;
+            inventoryStocks = await Http.GetFromJsonAsync<List<InventoryStock>>($"{Config["nurl"]}/api/GetDiscardInventoryStock");
+            foreach (var i in inventoryStocks)
+            {
+                i.GetLookUp(inventories, inventoryLocations, inventoryStockTypes);
+            }
+            await jsRuntime.InvokeAsync<object>("ResponsiveDataTables");
+            StateHasChanged();
+            Load.Hide();
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError($"{e.Message}");
+        }
+        
+       
+    }
+
+    private async Task UpdateInventoryStockDiscard()
+    {
+
+        var upresult = await Http.PutAsJsonAsync($"{Config["nurl"]}/api/ExpireInventoryStock/{ID}", discardInventoryStock);
+        ToastService.ShowSuccess("Successfully DiscardInventoryStock");
+        inventoryStocks = await Http.GetFromJsonAsync<List<InventoryStock>>($"{Config["nurl"]}/api/GetInventoryStock");
+        foreach (var i in inventoryStocks)
+        {
+            i.GetLookUp(inventories, inventoryLocations, inventoryStockTypes);
+        }
+        StateHasChanged();
+        InventoryDiscard.Hide();
+
+        //await OnInitializedAsync();
+    }
+
+    private void ShowInventoryError()
+    {
+        ToastService.ShowError("Inventory list is not selected.");
+    }
+
+    /// <summary>
+    /// clearURL
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("clearURL");
+           // await jsRuntime.InvokeAsync<object>("ResponsiveDataTables");
+        }
+    }
+
+    public async void Onsearch()
+    {
+        try
+        {
+            Load.Show();
+            await Task.Run(Loading);
+            
+            ID = null;
+           
+            inventoryStocks = await Http.GetFromJsonAsync<List<InventoryStock>>($"{Config["nurl"]}/api/GetInventoryStock");
+            foreach (var i in inventoryStocks)
+            {
+                i.GetLookUp(inventories, inventoryLocations, inventoryStockTypes);
+            }
+
+            await jsRuntime.InvokeAsync<object>("ResponsiveDataTables");
+           
+            StateHasChanged();
+           
+            Load.Hide();
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError($"{e.Message}");
+        }
+    }
+
+
+    private void ClearInventorySearch()
+    {
+
+        inventoryStockSearch.InventoryStockNumber = "";
+        inventoryStockSearch.InventoryStockLocationID = null;
+        inventoryStockSearch.InventoryStockStockTypeID = null;
+        ID = null;
+        inventoryStocks = new List<InventoryStock>();
+    }
+
+    BSModal InventoryDiscard { get; set; }
+
+    private void Loading()
+    {
+        System.Threading.Thread.Sleep(300);
+        // Retrieve data from the server and initialize
+        // Employees property which the View will bind
+    }
+}
+

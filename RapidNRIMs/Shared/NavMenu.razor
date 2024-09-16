@@ -1,0 +1,826 @@
+﻿@inject AppData AppData
+@inject IJSRuntime jsRuntime
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject IConfiguration config
+
+<div class="top-row pl-4 navbar navbar-dark">
+    <a class="navbar-brand" href="index" Match="NavLinkMatch.All" @onclick="() => ToggleNavMenu(NavSubmenu.None)">
+        @if (logoR != "")
+        {
+            <img class="img-logo" src="@($"{config["nurl"]}{config["nurlFileLogo"]}{logoR}")">
+        }
+    </a>
+    <button class="navbar-toggler" @onclick="() => ToggleNavMenu(navSubmenu)">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</div>
+
+<div class="@NavMenuCssClass">
+
+    <ul class="nav flex-column" id="navMenus">
+
+        <li class="nav-item px-3">
+            <a class="nav-link" href="index" Match="NavLinkMatch.All" @onclick="() => ToggleNavMenu(NavSubmenu.None)">
+                <img class="icon-menu" src="assets/icons/icon-menu/Dashboard.png">@AppData.LangResource[AppData.LanguageID, 6]
+            </a>
+        </li>
+
+        <!--Record-->
+        <li class="nav-item px-3">
+            <a href="" class="nav-link" @onclick="() => ToggleSubmenu(NavSubmenu.RecordSubMenu)" @onclick:preventDefault>
+                <img class="icon-menu" src="assets/icons/icon-menu/Record.png">@AppData.LangResource[AppData.LanguageID, 7]
+            </a>
+
+            @if (navSubmenu == NavSubmenu.RecordSubMenu)
+            {
+                <i class="arrow down my-icon"></i>
+            }
+            else
+            {
+                <i class="arrow right my-icon"></i>
+            }
+
+            @if (navSubmenu == NavSubmenu.RecordSubMenu)
+            {
+
+                <ul class="nav flex-column" id="navi">
+
+                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 43).permissionV)
+                    {
+                        <li class="nav-item px-3">
+                            <a class="nav-link" @onclick=@(() => goPage("Record/RegisterProject"))>
+                                @AppData.LangResource[AppData.LanguageID, 552]
+                            </a>
+                        </li>
+                    }
+                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 44).permissionV)
+                    {
+                        <li class="nav-item px-3">
+                            <a class="nav-link" @onclick=@(() => goPage("Record/ProjectSearch"))>
+                                @AppData.LangResource[AppData.LanguageID, 558]
+                            </a>
+                        </li>
+                    }
+
+                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 1).permissionV)
+                    {
+                       @*  <li class="nav-item px-3">
+                            <a class="nav-link pointer" @onclick=@(() => goPage($"Record/EventRegister/{Number}"))>
+                                @AppData.LangResource[AppData.LanguageID, 8]
+                            </a>
+                        </li> *@
+                    }
+
+
+                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 2).permissionV)
+                    {
+                        <li class="nav-item px-3">
+                            <a class="nav-link" @onclick=@(() => goPage("Record/Search"))>
+                                @AppData.LangResource[AppData.LanguageID, 9]
+                            </a>
+                        </li>
+
+                    }
+
+
+
+                </ul>
+            }
+        </li>
+
+        <!--Instrument-->
+        <li class="nav-item px-3">
+            <a class="nav-link" href="" @onclick="() => ToggleSubmenu(NavSubmenu.InstrumentSubMenu)" @onclick:preventDefault>
+                <img class="icon-menu" src="assets/icons/icon-menu/Instrument.png"> @AppData.LangResource[AppData.LanguageID, 10]
+
+            </a>
+            @if (navSubmenu == NavSubmenu.InstrumentSubMenu)
+            {
+                <i class="arrow down"></i>
+            }
+            else
+            {
+                <i class="arrow right"></i>
+            }
+
+            @if (navSubmenu == NavSubmenu.InstrumentSubMenu)
+            {
+                <ul class="nav flex-column">
+                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 3).permissionV)
+                    {
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" @onclick=@(() => goPage("Instruments/RegisterInstrument"))>
+                                @AppData.LangResource[AppData.LanguageID, 11]
+                            </NavLink>
+                        </li>
+                    }
+                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 4).permissionV)
+                    {
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" @onclick=@(() => goPage("Instruments/InstrumentSearch"))>
+                                @AppData.LangResource[AppData.LanguageID, 12]
+                            </NavLink>
+                        </li>
+                    }
+                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 5).permissionV)
+                    {
+
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" @onclick=@(() => goPage("Instruments/InstrumentCAL"))>
+                                @AppData.LangResource[AppData.LanguageID, 13]
+                            </NavLink>
+                        </li>
+                    }
+                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 6).permissionV)
+                    {
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" @onclick=@(() => goPage("Instruments/InstrumentMA"))>
+                                @AppData.LangResource[AppData.LanguageID, 14]
+                            </NavLink>
+                        </li>
+                    }
+                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 7).permissionV)
+                    {
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" @onclick=@(() => goPage("Instruments/CheckList"))>
+                                @AppData.LangResource[AppData.LanguageID, 15]
+                            </NavLink>
+                        </li>
+                    }
+                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 8).permissionV)
+                    {
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" @onclick=@(() => goPage("Instruments/CheckOut"))>
+                                @AppData.LangResource[AppData.LanguageID, 16]
+                            </NavLink>
+                        </li>
+                    }
+                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 9).permissionV)
+                    {
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" @onclick=@(() => goPage("Instruments/CheckIn"))>
+                                @AppData.LangResource[AppData.LanguageID, 17]
+                            </NavLink>
+                        </li>
+                    }
+                </ul>
+
+            }
+        </li>
+
+        <!--Inventory-->
+        <li class="nav-item px-3">
+            <a class="nav-link" href="" @onclick="() => ToggleSubmenu(NavSubmenu.InventorySubMenu)" @onclick:preventDefault>
+                <img class="icon-menu" src="assets/icons/icon-menu/Inventory.png"> @AppData.LangResource[AppData.LanguageID, 18]
+            </a>
+            @if (navSubmenu == NavSubmenu.InventorySubMenu)
+            {
+                <i class="arrow down"></i>
+            }
+            else
+            {
+                <i class="arrow right"></i>
+            }
+            @if (navSubmenu == NavSubmenu.InventorySubMenu)
+            {
+                <ul class="nav flex-column">
+                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 10).permissionV)
+                    {
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" @onclick=@(() => goPage("Inventoris/AddStock"))>
+                                @AppData.LangResource[AppData.LanguageID, 225]
+                            </NavLink>
+                        </li>
+                    }
+                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 12).permissionV)
+                    {
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" @onclick=@(() => goPage("Inventoris/Expiry"))>
+                                @AppData.LangResource[AppData.LanguageID, 20]
+                            </NavLink>
+                        </li>
+                    }
+                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 11).permissionV)
+                    {
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" @onclick=@(() => goPage("Inventoris/CheckOut"))>
+                                @AppData.LangResource[AppData.LanguageID, 16]
+                            </NavLink>
+                        </li>
+                    }
+                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 11).permissionV)
+                    {
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" @onclick=@(() => goPage("Inventoris/CheckIn"))>
+                                @AppData.LangResource[AppData.LanguageID, 17]
+                            </NavLink>
+                        </li>
+                    }
+                </ul>
+            }
+        </li>
+
+        <!--RadiationSource-->
+        <li class="nav-item px-3">
+            <a class="nav-link" href="" @onclick="() => ToggleSubmenu(NavSubmenu.RadiationSourcesSubMenu)" @onclick:preventDefault>
+                <img class="icon-menu" src="assets/icons/icon-menu/RadiationSource.png"> @AppData.LangResource[AppData.LanguageID, 21]
+            </a>
+            @if (navSubmenu == NavSubmenu.RadiationSourcesSubMenu)
+            {
+                <i class="arrow down"></i>
+            }
+            else
+            {
+                <i class="arrow right"></i>
+            }
+
+            @if (navSubmenu == NavSubmenu.RadiationSourcesSubMenu)
+            {
+                <ul class="nav flex-column">
+                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 13).permissionV)
+                    {
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" @onclick=@(() => goPage("RadiationSources/RegisterSources"))>
+                                @AppData.LangResource[AppData.LanguageID, 154]
+                            </NavLink>
+                        </li>
+                    }
+
+                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 14).permissionV)
+                    {
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" @onclick=@(() => goPage("RadiationSources/SourcesSearch"))>
+                                @AppData.LangResource[AppData.LanguageID, 22]
+                            </NavLink>
+                        </li>
+                    }
+                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 15).permissionV)
+                    {
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" @onclick=@(() => goPage("RadiationSources/CheckOut"))>
+                                @AppData.LangResource[AppData.LanguageID, 16]
+                            </NavLink>
+                        </li>
+                    }
+                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 16).permissionV)
+                    {
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" @onclick=@(() => goPage("RadiationSources/CheckIn"))>
+                                @AppData.LangResource[AppData.LanguageID, 17]
+                            </NavLink>
+                        </li>
+                    }
+                </ul>
+            }
+        </li>
+
+        <!--Report-->
+        <li class="nav-item px-3">
+            <a class="nav-link" href="" @onclick="() => ToggleSubmenu(NavSubmenu.ReportSubMenu)" @onclick:preventDefault>
+                <img class="icon-menu" src="assets/icons/icon-menu/Report.png"> @AppData.LangResource[AppData.LanguageID, 23]
+            </a>
+            @if (navSubmenu == NavSubmenu.ReportSubMenu)
+            {
+                <i class="arrow down"></i>
+            }
+            else
+            {
+                <i class="arrow right"></i>
+            }
+            @if (navSubmenu == NavSubmenu.ReportSubMenu)
+            {
+                @if (AppData.CurrentPermission.Find(i => i.permissionID == 17).permissionV)
+                {
+                    <ul class="nav flex-column">
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" @onclick=@(() => goPage("Report/GeneralReport"))>
+                                @AppData.LangResource[AppData.LanguageID, 24]
+                            </NavLink>
+                        </li>
+                    </ul>
+                }
+            }
+        </li>
+
+        <!--Security-->
+        <li class="nav-item px-3">
+            <a class="nav-link" href="" @onclick="() => ToggleSubmenu(NavSubmenu.SecuritySubMenu)" @onclick:preventDefault>
+                <img class="icon-menu" src="assets/icons/icon-menu/Security.png"> @AppData.LangResource[AppData.LanguageID, 25]
+            </a>
+            @if (navSubmenu == NavSubmenu.SecuritySubMenu)
+            {
+                <i class="arrow down"></i>
+            }
+            else
+            {
+                <i class="arrow right"></i>
+            }
+            @if (navSubmenu == NavSubmenu.SecuritySubMenu)
+            {
+                <ul class="nav flex-column">
+                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 18).permissionV)
+                    {
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" @onclick=@(() => goPage("Security/UserManagement"))>
+                                @AppData.LangResource[AppData.LanguageID, 26]
+                            </NavLink>
+                        </li>
+                    }
+
+                     <li class="nav-item px-3">
+                        <NavLink class="nav-link" @onclick=@(() => goPage("ChildComponent/PersonalDose/PersonalDoseRegister"))>
+                            Personal Dose Register
+                        </NavLink>
+                     </li>
+
+                    <li class="nav-item px-3">
+                        <NavLink class="nav-link" @onclick=@(() => goPage("ChildComponent/PersonalDose/PersonalDoseSearchAll"))>
+                            Personal Dose Search
+                        </NavLink>
+                    </li>
+
+                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 19).permissionV)
+                    {
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" @onclick=@(() => goPage("Security/TeamSchedule"))>
+                                @AppData.LangResource[AppData.LanguageID, 155]
+                            </NavLink>
+                        </li>
+                    }
+                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 20).permissionV)
+                    {
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" @onclick=@(() => goPage("Security/ChangePassword"))>
+                                @AppData.LangResource[AppData.LanguageID, 27]
+                            </NavLink>
+                        </li>
+                    }
+                </ul>
+            }
+        </li>
+
+        <!--MasterData-->
+        <li class="nav-item px-3">
+            <a class="nav-link" href="" @onclick="() => ToggleSubmenu(NavSubmenu.MasterDataMainSubMenu)" @onclick:preventDefault>
+                <img class="icon-menu" src="assets/icons/icon-menu/MasterDataIcon.png"> @AppData.LangResource[AppData.LanguageID, 479]
+            </a>
+            @if (navSubmenu == NavSubmenu.MasterDataMainSubMenu)
+            {
+                <i class="arrow down"></i>
+            }
+            else
+            {
+                <i class="arrow right"></i>
+            }
+            @if (navSubmenu == NavSubmenu.MasterDataMainSubMenu)
+            {
+                <div class="scrollBar fixTableHead scroll-inner" style="height:260px;">
+
+                    <ul class="nav flex-column">
+
+                        <!--MasterDataRecordSubMenu--->
+                        <li class="nav-item px-3">
+                            <a class="nav-link" href="" @onclick="() => ToggleSubmenuAnotherlayer(NavSubmenu.MasterDataRecordSubMenu)" @onclick:preventDefault>
+                                @AppData.LangResource[AppData.LanguageID, 7]
+                            </a>
+                            @if (navSubmenuAnotherlayer == NavSubmenu.MasterDataRecordSubMenu)
+                            {
+                                <i class="arrow down"></i>
+                            }
+                            else
+                            {
+                                <i class="arrow right"></i>
+                            }
+                            @if (navSubmenuAnotherlayer == NavSubmenu.MasterDataRecordSubMenu)
+                            {
+                                <ul class="nav flex-column">
+
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 45).permissionV)
+                                    {
+                                        <li class="nav-item px-0">
+                                            <NavLink class="nav-link" @onclick=@(() => goPage("MasterData/MasterDataProjectType"))>
+                                                @AppData.LangResource[AppData.LanguageID, 555]
+                                            </NavLink>
+                                        </li>
+                                    }
+
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 21).permissionV)
+                                    {
+                                        <!--li class="nav-item px-0">
+                                            <NavLink class="nav-link" @onclick=@(() => goPage("MasterData/MasterDataEventType"))>
+                                                @AppData.LangResource[AppData.LanguageID, 31]
+                                            </NavLink>
+                                        </!--li--->
+                                    }
+
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 22).permissionV)
+                                    {
+                                        <li class="nav-item px-0">
+                                            <NavLink class="nav-link" @onclick=@(() => goPage("MasterData/MasterDataInstrumentUnit"))>
+                                                @AppData.LangResource[AppData.LanguageID, 492]
+                                            </NavLink>
+                                        </li>
+                                    }
+
+                                </ul>
+                            }
+                        </li>
+
+                        <!--MasterDataInstrumentSubMenu-66-->
+                        <li class="nav-item px-3">
+                            <a class="nav-link" href="" @onclick="() => ToggleSubmenuAnotherlayer(NavSubmenu.MasterDataInstrumentSubMenu)" @onclick:preventDefault>
+                                @AppData.LangResource[AppData.LanguageID, 10]
+                            </a>
+                            @if (navSubmenuAnotherlayer == NavSubmenu.MasterDataInstrumentSubMenu)
+                            {
+                                <i class="arrow down"></i>
+                            }
+                            else
+                            {
+                                <i class="arrow right"></i>
+                            }
+                            @if (navSubmenuAnotherlayer == NavSubmenu.MasterDataInstrumentSubMenu)
+                            {
+                                <ul class="nav flex-column">
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 23).permissionV)
+                                    {
+
+                                        <li class="nav-item px-0">
+                                            <NavLink class="nav-link" @onclick=@(() => goPage("MasterData/MasterDataInstrumentAction"))>
+                                                @AppData.LangResource[AppData.LanguageID, 462]
+                                            </NavLink>
+                                        </li>
+                                    }
+
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 24).permissionV)
+                                    {
+                                        <li class="nav-item px-0">
+                                            <NavLink class="nav-link" @onclick=@(() => goPage("MasterData/MasterDataInstrumentAgency"))>
+                                                @AppData.LangResource[AppData.LanguageID, 463]
+                                            </NavLink>
+                                        </li>
+                                    }
+
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 25).permissionV)
+                                    {
+                                        <li class="nav-item px-0">
+                                            <NavLink class="nav-link" @onclick=@(() => goPage("MasterData/MasterDataInstrumentBrand"))>
+                                                @AppData.LangResource[AppData.LanguageID, 464]
+                                            </NavLink>
+                                        </li>
+                                    }
+
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 26).permissionV)
+                                    {
+                                        <li class="nav-item px-0">
+                                            <NavLink class="nav-link" @onclick=@(() => goPage("MasterData/MasterDataInstrumentCatagory"))>
+                                                @AppData.LangResource[AppData.LanguageID, 465]
+                                            </NavLink>
+                                        </li>
+                                    }
+
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 27).permissionV)
+                                    {
+                                        <li class="nav-item px-0">
+                                            <NavLink class="nav-link" @onclick=@(() => goPage("MasterData/MasterDataInstrumentLocation"))>
+                                                @AppData.LangResource[AppData.LanguageID, 466]
+                                            </NavLink>
+                                        </li>
+                                    }
+
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 28).permissionV)
+                                    {
+                                        <li class="nav-item px-0">
+                                            <NavLink class="nav-link" @onclick=@(() => goPage("MasterData/MasterDataInstrumentModel"))>
+                                                @AppData.LangResource[AppData.LanguageID, 467]
+                                            </NavLink>
+                                        </li>
+                                    }
+
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 29).permissionV)
+                                    {
+                                        <li class="nav-item px-0">
+                                            <NavLink class="nav-link" @onclick=@(() => goPage("MasterData/MasterDataInstrumentType"))>
+                                                @AppData.LangResource[AppData.LanguageID, 66]
+                                            </NavLink>
+                                        </li>
+                                    }
+
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 30).permissionV)
+                                    {
+                                        <li class="nav-item px-0">
+                                            <NavLink class="nav-link" @onclick=@(() => goPage("MasterData/MasterDataInstrumentCheckListType"))>
+                                                @AppData.LangResource[AppData.LanguageID, 321]
+                                            </NavLink>
+                                        </li>
+
+                                    }
+
+                                </ul>
+                            }
+                        </li>
+
+                        <!--MasterDataInventorySubMenu--->
+                        <li class="nav-item px-3">
+                            <a class="nav-link" href="" @onclick="() => ToggleSubmenuAnotherlayer(NavSubmenu.MasterDataInventorySubMenu)" @onclick:preventDefault>
+                                @AppData.LangResource[AppData.LanguageID, 18]
+                            </a>
+                            @if (navSubmenuAnotherlayer == NavSubmenu.MasterDataInventorySubMenu)
+                            {
+                                <i class="arrow down"></i>
+                            }
+                            else
+                            {
+                                <i class="arrow right"></i>
+                            }
+                            @if (navSubmenuAnotherlayer == NavSubmenu.MasterDataInventorySubMenu)
+                            {
+                                <ul class="nav flex-column">
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 31).permissionV)
+                                    {
+                                        <li class="nav-item px-0">
+                                            <NavLink class="nav-link" @onclick=@(() => goPage("MasterData/MasterDataInventoryStockNumber"))>
+                                                @AppData.LangResource[AppData.LanguageID, 106]
+                                            </NavLink>
+                                        </li>
+                                    }
+
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 32).permissionV)
+                                    {
+                                        <li class="nav-item px-0">
+                                            <NavLink class="nav-link" @onclick=@(() => goPage("MasterData/MasterDataInventoryAction"))>
+                                                @AppData.LangResource[AppData.LanguageID, 468]
+                                            </NavLink>
+                                        </li>
+                                    }
+
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 33).permissionV)
+                                    {
+                                        <li class="nav-item px-0">
+                                            <NavLink class="nav-link" @onclick=@(() => goPage("MasterData/MasterDataInventoryAgency"))>
+                                                @AppData.LangResource[AppData.LanguageID, 469]
+                                            </NavLink>
+                                        </li>
+                                    }
+
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 34).permissionV)
+                                    {
+                                        <li class="nav-item px-0">
+                                            <NavLink class="nav-link" @onclick=@(() => goPage("MasterData/MasterDataInventoryBrand"))>
+                                                @AppData.LangResource[AppData.LanguageID, 470]
+                                            </NavLink>
+                                        </li>
+                                    }
+
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 35).permissionV)
+                                    {
+                                        <li class="nav-item px-0">
+                                            <NavLink class="nav-link" @onclick=@(() => goPage("MasterData/MasterDataInventoryLocation"))>
+                                                @AppData.LangResource[AppData.LanguageID, 471]
+                                            </NavLink>
+                                        </li>
+                                    }
+
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 36).permissionV)
+                                    {
+                                        <li class="nav-item px-0">
+                                            <NavLink class="nav-link" @onclick=@(() => goPage("MasterData/MasterDataInventoryStockType"))>
+                                                @AppData.LangResource[AppData.LanguageID, 472]
+                                            </NavLink>
+                                        </li>
+                                    }
+
+                                </ul>
+                            }
+                        </li>
+
+                        <!--MasterDataRadiationSourceSubMenu--->
+                        <li class="nav-item px-3">
+                            <a class="nav-link" href="" @onclick="() => ToggleSubmenuAnotherlayer(NavSubmenu.MasterDataRadiationSourceSubMenu)" @onclick:preventDefault>
+                                @AppData.LangResource[AppData.LanguageID, 21]
+                            </a>
+                            @if (navSubmenuAnotherlayer == NavSubmenu.MasterDataRadiationSourceSubMenu)
+                            {
+                                <i class="arrow down"></i>
+                            }
+                            else
+                            {
+                                <i class="arrow right"></i>
+                            }
+                            @if (navSubmenuAnotherlayer == NavSubmenu.MasterDataRadiationSourceSubMenu)
+                            {
+                                <ul class="nav flex-column">
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 37).permissionV)
+                                    {
+                                        <li class="nav-item px-0">
+                                            <NavLink class="nav-link" @onclick=@(() => goPage("MasterData/MasterDataRadiationSourceLocation"))>
+                                                @AppData.LangResource[AppData.LanguageID, 473]
+                                            </NavLink>
+                                        </li>
+                                    }
+
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 38).permissionV)
+                                    {
+                                        <li class="nav-item px-0">
+                                            <NavLink class="nav-link" @onclick=@(() => goPage("MasterData/MasterDataRadiationSourceType"))>
+                                                @AppData.LangResource[AppData.LanguageID, 474]
+                                            </NavLink>
+                                        </li>
+                                    }
+
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 39).permissionV)
+                                    {
+                                        <li class="nav-item px-0">
+                                            <NavLink class="nav-link" @onclick=@(() => goPage("MasterData/MasterDataRadiationSourceCheckOutAction"))>
+                                                @AppData.LangResource[AppData.LanguageID, 210]
+                                            </NavLink>
+                                        </li>
+                                    }
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 42).permissionV)
+                                    {
+                                        <li class="nav-item px-0">
+                                            <NavLink class="nav-link" @onclick=@(() => goPage("MasterData/MasterDataRadiationSourceAgency"))>
+                                                @AppData.LangResource[AppData.LanguageID, 515]
+                                            </NavLink>
+                                        </li>
+                                    }
+
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 40).permissionV)
+                                    {
+                                        <li class="nav-item px-0">
+                                            <NavLink class="nav-link" @onclick=@(() => goPage("MasterData/MasterDataRadiationSourceUnit"))>
+                                                @AppData.LangResource[AppData.LanguageID, 498]
+                                            </NavLink>
+                                        </li>
+                                    }
+
+                                    @if (AppData.CurrentPermission.Find(i => i.permissionID == 41).permissionV)
+                                    {
+                                        <li class="nav-item px-0">
+                                            <NavLink class="nav-link" @onclick=@(() => goPage("MasterData/MasterDataRadiationSourceDoseUnit"))>
+                                                @AppData.LangResource[AppData.LanguageID, 504]
+                                            </NavLink>
+                                        </li>
+                                    }
+
+                                </ul>
+                            }
+                        </li>
+                    </ul>
+                </div>
+            }
+        </li>
+
+        <!--Logout-->
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" @onclick="Logout">
+                <img class="icon-menu" src="assets/icons/icon-menu/Logout.png"> @AppData.LangResource[AppData.LanguageID, 5]
+            </NavLink>
+        </li>
+
+    </ul>
+
+    <!--logout--->
+    <div class="col-md-12">
+        @if (logoEPR != "")
+        {
+            <img class="img-logo" src="@($"{config["nurl"]}{config["nurlFileLogo"]}{logoEPR}")">
+        }
+    </div>
+     
+</div>
+
+
+@code {
+
+
+    string logoEPR { get; set; } = string.Empty;
+    string logoR { get; set; } = string.Empty;
+
+    private void Logout()
+    {
+        if (AppData.UserID != null)
+        {
+            AppData.UserID = null;
+            NavigationManager.NavigateTo("Accounting/Login");
+
+        }
+    }
+
+    private enum NavSubmenu
+    {
+        None,
+        RecordSubMenu,
+        InstrumentSubMenu,
+        InventorySubMenu,
+        RadiationSourcesSubMenu,
+        ReportSubMenu,
+        SecuritySubMenu,
+        MasterDataMainSubMenu,
+        MasterDataInstrumentSubMenu,
+        MasterDataInventorySubMenu,
+        MasterDataRadiationSourceSubMenu,
+        MasterDataRecordSubMenu
+    }
+
+    private bool collapseNavMenu = true;
+    string Number = "-";
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private NavSubmenu navSubmenu = NavSubmenu.None;
+    private NavSubmenu navSubmenuAnotherlayer = NavSubmenu.None;
+
+    private void ToggleNavMenu(NavSubmenu? submenu = null)
+    {
+
+        
+        collapseNavMenu = !collapseNavMenu;
+        navSubmenu = submenu ?? navSubmenu;
+        navSubmenuAnotherlayer = submenu ?? navSubmenuAnotherlayer;
+        
+
+    }
+
+
+
+    private void ToggleSubmenu(NavSubmenu submenu)
+    {
+        if (navSubmenu == submenu)
+        {
+            navSubmenu = NavSubmenu.None;
+            navSubmenuAnotherlayer = NavSubmenu.None;
+        }
+        else
+        {
+            navSubmenu = submenu;
+            navSubmenuAnotherlayer = submenu;
+        }
+    }
+
+    private void ToggleSubmenuAnotherlayer(NavSubmenu submenuAnotherlayer)
+    {
+        if (navSubmenuAnotherlayer == submenuAnotherlayer)
+        {
+            navSubmenuAnotherlayer = NavSubmenu.None;
+        }
+        else
+        {
+            navSubmenuAnotherlayer = submenuAnotherlayer;
+        }
+
+    }
+
+    private List<LanguageModels> languages = new List<LanguageModels>();
+    protected override async Task OnInitializedAsync()
+    {
+
+
+        var result = await Http.GetFromJsonAsync<List<LanguageModels>>($"{config["nurl"]}/api/Languages/GetAllLanguages");
+        if (result != null)
+        {
+            languages = result;
+        }
+        int i = 0;
+        foreach (var item in (languages ?? new List<LanguageModels>()))
+        {
+            i++;
+            AppData.LangResource[0, i] = item.Value1;
+            AppData.LangResource[1, i] = item.Value2;
+        }
+        if (AppData.LanguageID != 0 && AppData.LanguageID != 1) { AppData.LanguageID = 0; }
+
+
+        AppData.imageLogos = await Http.GetFromJsonAsync<List<ImageLogo>>($"{config["nurl"]}/api/GetFileLogo");
+
+        var resultLogoE = AppData.imageLogos.Find(x => x.Id == 1);
+        if (resultLogoE != null)
+        {
+            logoEPR = resultLogoE.ImageName;
+        }
+
+
+        var resultLogoR = AppData.imageLogos.Find(x => x.Id == 2);
+        if (resultLogoR != null)
+        {
+            logoR = resultLogoR.ImageName;
+        }
+
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeAsync<object>("activeMenu");
+            await jsRuntime.InvokeVoidAsync("clearURL");
+        }
+    }
+
+    public void goPage(string page)
+    {
+        NavigationManager.NavigateTo(page);
+        jsRuntime.InvokeVoidAsync("clearURL");
+    }
+
+}

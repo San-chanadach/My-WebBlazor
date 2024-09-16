@@ -1,0 +1,284 @@
+﻿@page "/ChildComponent/PersonalDose/PersonalDoseSearch/{userID}/{userSupportTeamID}"
+@inherits PersonalDoseSearchBase
+@using System.Text.RegularExpressions;
+@using System.Globalization
+
+
+<div class="row margin-row-card">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">@AppData.LangResource[AppData.LanguageID, 630]</div>
+            <div class="card-body">
+                <div class="form-row ml-3">
+                    <div class="form-group row col-md-6">
+                        <label class="col-sm-3 col-form-label">@AppData.LangResource[AppData.LanguageID, 623]</label>
+                        <div class="col-sm-7">
+                            <div class="input-group">
+                                <select class="form-control" disabled>
+                                    <option value="0">
+                                        @if (UserID != "00000000-0000-0000-0000-000000000000")
+                                        {
+
+                                            var account = accounts.Find(x => x.UserID == Guid.Parse(UserID));
+                                            if (account != null)
+                                            {
+                                                @(account.FirstName + " " + account.LastName)
+                                            }
+                                            
+                                            
+                                        }
+                                        else 
+                                        {
+                                            @(SupportTeam.Find(x => x.ProjectSupportTeamID == int.Parse(UserSupportTeamID)) != null ? SupportTeam.Find(x => x.ProjectSupportTeamID == int.Parse(UserSupportTeamID)).Name : "-")
+                                        }
+
+                                    </option>
+
+                                </select>
+                                <span class="col-12 col-md-4 col-lg-2">
+                                    <label class="col-form-label">
+                                        <span>@AppData.LangResource[AppData.LanguageID, 631]</span>
+                                        <span>/@AppData.LangResource[AppData.LanguageID, 632]</span>
+                                        <span>
+                                            <input type="checkbox" class="mt-8" @bind="IsChack" @onclick="CheckBox"  />
+                                        </span>
+                                       
+                                    </label>
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                @if (IsChack)
+                {
+                    <div class="form-row ml-3">
+                        <div class="form-group row col-md-6">
+                            <label class="col-sm-3 col-form-label">@AppData.LangResource[AppData.LanguageID, 32]</label>
+                            <div class="col-sm-7">
+                                <div class="input-group">
+                                    @* <input type="text" class="form-control" @ref="startDatePicker" @bind-value="StartDate" id="setStartDatepicker" name="setStartDatepicker" placeholder="dd/mm/yyyy" /> *@
+                                    @* <span style="display:flex;">
+                                <button class="btn btn-outline-secondary border-left-0" type="button" style="border: 1px solid #ced4da;" @onclick="ShowDatePicker">
+                                <i class="fa-regular fa-calendar-days"></i>
+                                </button>
+                                </span> *@
+                                    <input type="date" class="form-control" @bind-value="personalDose.StartDatetime" id="setStartDatepicker" name="setStartDatepicker" placeholder="dd/mm/yyyy" />
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group row col-md-5">
+                            <label class="col-sm-3 col-form-label">@AppData.LangResource[AppData.LanguageID, 33]</label>
+                            <div class="col-sm-8">
+                                <div class="input-group">
+                                    @*  <input type="text" class="form-control" @ref="endDatePicker" id="setEndDatepicker" @bind-value="EndDate" name="setEndDatepicker" placeholder="dd/mm/yyyy" /> *@
+                                    <input type="date" class="form-control" @bind-value="personalDose.EndDatetime" id="setStartDatepicker" name="setStartDatepicker" placeholder="dd/mm/yyyy" />
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+                    
+               
+
+                <div class="row" style="justify-content:center;">
+                    <div class="text-center" >
+                        @if (IsChack)
+                        {
+
+                            <button type="button" class="btn btn-primary" @onclick="SearchDoseByUserDate" style=" margin-right: 10px;">Show Date</button>
+
+                        }
+                        else
+                        {
+
+                            <button type="button" @onclick="SearchDoseByUserAll" class="btn btn-warning" style="margin-right: 10px;">Show All</button>
+
+                        }
+
+                        <button type="reset" @onclick="ClearPersonalDose" class="btn" style="background-color:#B90F1B; color:#fff">@AppData.LangResource[AppData.LanguageID, 45]</button>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row margin-row-card">
+    <div class="col-md-12">
+        <div class="card">
+            
+            <div class="card-body">
+
+                <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height:380px;">
+                    <table id="dataTable" class="table table-bordered table-striped text-center">
+                        <thead class="fixedthead">
+                            <tr>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 628]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 30]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 629]</th>
+                                <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 625]</th>
+                            </tr>
+                        </thead>
+                        <tbody class="scrollContent">
+                            @if (IsChack)
+                            {
+                                @foreach (var item in listPersonalDoseByUser)
+                                {
+                                    <tr>
+
+                                        <td style="cursor:default;">
+                                            @if (item.UserID != new Guid())
+                                            {
+                                                var account = accounts.Find(x => x.UserID == item.UserID);
+                                                if (account != null)
+                                                {
+                                                    @(account.FirstName + " " + account.LastName)
+                                                }
+                                                
+                                            }
+                                            else
+                                            {
+                                                @(SupportTeam.Find(x => x.ProjectSupportTeamID == item.UserSupportTeamID) != null ? SupportTeam.Find(x => x.ProjectSupportTeamID == item.UserSupportTeamID).Name : "-")
+                                            }
+
+                                        </td>
+                                        <td style="cursor:default;">
+                                           @*  @(listInstrumentLocation.Find(x => x.InstrumentLocationID == item.LocationID) != null ? listInstrumentLocation.Find(x => x.InstrumentLocationID == item.LocationID).InstrumentLocationNameENG : "-") *@
+                                           @item.LocationName
+                                        </td>
+
+                                        <td style="cursor:default;">@item.TotalHour</td>
+                                        <td style="cursor:default;">
+                                            @(String.Format("{0:0.0000}", item.DoseAccumulation) != null ? String.Format("{0:0.0000}", item.DoseAccumulation) : "-")
+                                            @(AppData.recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit) != null ? AppData.recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit).RecordEventUnitName : "-")
+                                        </td>
+
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+
+
+
+                                @foreach (var item in listPersonalDose)
+                                {
+                                    <tr>
+
+                                        <td style="cursor:default;">
+                                            @if (item.UserID != new Guid())
+                                            {
+                                                var account = accounts.Find(x => x.UserID == item.UserID);
+                                                if (account != null)
+                                                {
+                                                    @(account.FirstName + " " + account.LastName)
+                                                }
+                                            }
+                                            else
+                                            {
+                                                @(SupportTeam.Find(x => x.ProjectSupportTeamID == item.UserSupportTeamID) != null ? SupportTeam.Find(x => x.ProjectSupportTeamID == item.UserSupportTeamID).Name : "-")
+                                            }
+                                        </td>
+                                        <td style="cursor:default;">
+                                            @* @(listInstrumentLocation.Find(x => x.InstrumentLocationID == item.LocationID) != null ? listInstrumentLocation.Find(x => x.InstrumentLocationID == item.LocationID).InstrumentLocationNameENG : "-") *@
+                                            @item.LocationName
+                                        </td>
+
+                                        <td style="cursor:default;">@item.TotalHour</td>
+                                        <td style="cursor:default;">
+                                            @(String.Format("{0:0.0000}", item.DoseAccumulation) != null ? String.Format("{0:0.0000}", item.DoseAccumulation) : "-")
+                                            @(AppData.recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit) != null ? AppData.recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit).RecordEventUnitName : "-")
+                                        </td>
+
+                                    </tr>
+                                }
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row ml-2">
+    @if (UserID != null)
+    {
+        <a href="@($"ChildComponent/PersonalDose/PersonalDoseSearchAll/{UserID}/{UserSupportTeamID ?? ""}")" type="button" class="btn margin-btn" style="background-color:#7F7F7F; color:#fff">@AppData.LangResource[AppData.LanguageID, 49]</a>
+    }
+    else if (!string.IsNullOrEmpty(UserSupportTeamID))
+    {
+        <a href="@($"ChildComponent/PersonalDose/PersonalDoseSearchAll/00000000-0000-0000-0000-000000000000/{UserSupportTeamID}")" type="button" class="btn margin-btn" style="background-color:#7F7F7F; color:#fff">@AppData.LangResource[AppData.LanguageID, 49]</a>
+       
+    }
+
+    @* @if (IsChack && listPersonalDoseByUser.Count > 0)
+    {
+        if(UserID != "")
+        {
+            <a href="@($"{Config["rurl"]}/api/PersonalDose?start={StartDate}&end={EndDate}&UserID={UserID}&SupportID={UserSupportTeamID ?? ""}")" download="" target="_blank" class="btn btn-primary margin-btn" style="color:#fff">Personal Report</a>
+        }
+        else if(int.Parse(UserSupportTeamID) != 0)
+        {
+            <a href="@($"{Config["rurl"]}/api/PersonalDose?start={StartDate}&end={EndDate}&UserID={00000000-0000-0000-0000-000000000000}&SupportID={int.Parse(UserSupportTeamID)}")" download="" target="_blank" class="btn btn-primary margin-btn" style="color:#fff">Personal Report</a>
+
+        }
+    }
+    else if (listPersonalDose.Count > 0)
+    {
+        if (UserID != "")
+        {
+            <a href="@($"{Config["rurl"]}/api/PersonalDose?start={UserStartAll.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture)}&end={UserEndAll.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture)}&UserID={UserID}&SupportID={UserSupportTeamID ?? ""}")" download="" target="_blank" class="btn btn-primary margin-btn" style="color:#fff">Personal Report</a>
+        }
+        else
+        {
+            <a href="@($"{Config["rurl"]}/api/PersonalDose?start={UserStartAll.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture)}&end={UserEndAll.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture)}&UserID={00000000-0000-0000-0000-000000000000}&SupportID={int.Parse(UserSupportTeamID)}")" download="" target="_blank" class="btn btn-primary margin-btn" style="color:#fff">Personal Report</a>
+
+        }
+    }
+ *@
+
+    @if (IsChack && listPersonalDoseByUser.Count > 0)
+    {
+        if (UserID != "")
+        {
+            <a href="@($"{Config["rurl"]}/api/PersonalDose?start={personalDose.StartDatetime.Date.ToString("yyyy-MM-dd")}&end={personalDose.EndDatetime.Date.ToString("yyyy-MM-dd")}&UserID={UserID}&SupportID={UserSupportTeamID ?? ""}")" download="" target="_blank" class="btn btn-primary margin-btn" style="color:#fff">Personal Report</a>
+        }
+        else if (int.Parse(UserSupportTeamID) != 0)
+        {
+            <a href="@($"{Config["rurl"]}/api/PersonalDose?start={personalDose.StartDatetime.Date.ToString("yyyy-MM-dd")}&end={personalDose.EndDatetime.Date.ToString("yyyy-MM-dd")}&UserID={00000000-0000-0000-0000-000000000000}&SupportID={int.Parse(UserSupportTeamID)}")" download="" target="_blank" class="btn btn-primary margin-btn" style="color:#fff">Personal Report</a>
+
+        }
+    }
+    else if (listPersonalDose.Count > 0)
+    {
+        if (UserID != "")
+        {
+            <a href="@($"{Config["rurl"]}/api/PersonalDose?start={UserStartAll.ToString("yyyy-MM-dd")}&end={UserEndAll.ToString("yyyy-MM-dd")}&UserID={UserID}&SupportID={UserSupportTeamID ?? ""}")" download="" target="_blank" class="btn btn-primary margin-btn" style="color:#fff">Personal Report</a>
+        }
+        else
+        {
+            <a href="@($"{Config["rurl"]}/api/PersonalDose?start={UserStartAll.ToString("yyyy-MM-dd")}&end={UserEndAll.ToString("yyyy-MM-dd")}&UserID={00000000-0000-0000-0000-000000000000}&SupportID={int.Parse(UserSupportTeamID)}")" download="" target="_blank" class="btn btn-primary margin-btn" style="color:#fff">Personal Report</a>
+
+        }
+    }
+
+
+    
+
+</div>
+
+
+@code {
+
+}

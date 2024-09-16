@@ -1,0 +1,4 @@
+﻿/***************custom-file-input***********************/
+.custom-file-input ~ .custom-file-label::after {
+    content: "ChooseFile";
+}

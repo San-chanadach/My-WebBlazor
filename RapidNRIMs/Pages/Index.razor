@@ -1,0 +1,73 @@
+﻿@inherits IndexBase
+@page "/index"
+@page "/index/{projectID}"
+
+<PageTitle>Home Page </PageTitle>
+
+<div class="container-fluid py-4">
+
+    <div class="paper-a4">
+        <!----------Row Card Top------------------------------------------->
+        <CardDashboard />
+
+        <!----------Row Latest event--------------------------------------->
+        <div class="row mt-0">
+            <LatestEventDashboard />
+
+            <!--ComingUpEventDashboard /--->
+        </div>
+    </div>
+
+
+    <!----------Row List Calibration, Maintenance, Cosumable----------->
+    <div class="row paper-a4 ">
+        <CalibrateNeedDashboard />
+
+        <MaintenanceNeedDashboard />
+
+        <ConsumableNeedDashboard />
+    </div>
+
+    <!----------Row grap Checkout-------------------------------------->
+    <LineChart />
+
+    <!----------Row Most popular--------------------------------------->
+
+    <div class="row paper-a4">
+        <PopularInstrumentCheckOutDashboard />
+
+        <PopularConsumableCheckOutDashboard />
+    </div>
+
+
+
+    <!----------Row Operational Staff and Calendar------------------------>
+    <div class="row paper-a4">
+
+        <PieChart />
+
+        <OperationalStaffDashboard />
+
+
+    </div>
+
+    <!----------Row Event Team and Chart Events------------------------>
+    <div class="row paper-a4" id="card-project">
+
+        <EventTeamDashboard />
+
+
+
+
+    </div>
+
+
+</div>
+
+
+  
+
+
+
+
+    

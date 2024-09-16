@@ -1,0 +1,435 @@
+is_global = true
+build_property.TargetFramework = net6.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = RapidNRIMs
+build_property.RootNamespace = RapidNRIMs
+build_property.ProjectDir = C:\Project\Chanadach\RapidNrims\RapidNRIMs\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 6.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Project\Chanadach\RapidNrims\RapidNRIMs
+build_property._RazorSourceGeneratorDebug = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Accounting/ForgotPassword.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudGluZ1xGb3Jnb3RQYXNzd29yZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Accounting/Login.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudGluZ1xMb2dpbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/ChildComponent/IndexDashboardComponent/CalibrateNeedDashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2hpbGRDb21wb25lbnRcSW5kZXhEYXNoYm9hcmRDb21wb25lbnRcQ2FsaWJyYXRlTmVlZERhc2hib2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/ChildComponent/IndexDashboardComponent/CardDashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2hpbGRDb21wb25lbnRcSW5kZXhEYXNoYm9hcmRDb21wb25lbnRcQ2FyZERhc2hib2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/ChildComponent/IndexDashboardComponent/ConsumableNeedDashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2hpbGRDb21wb25lbnRcSW5kZXhEYXNoYm9hcmRDb21wb25lbnRcQ29uc3VtYWJsZU5lZWREYXNoYm9hcmQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/ChildComponent/IndexDashboardComponent/EventTeamDashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2hpbGRDb21wb25lbnRcSW5kZXhEYXNoYm9hcmRDb21wb25lbnRcRXZlbnRUZWFtRGFzaGJvYXJkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/ChildComponent/IndexDashboardComponent/LatestEventDashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2hpbGRDb21wb25lbnRcSW5kZXhEYXNoYm9hcmRDb21wb25lbnRcTGF0ZXN0RXZlbnREYXNoYm9hcmQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/ChildComponent/IndexDashboardComponent/LineChart.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2hpbGRDb21wb25lbnRcSW5kZXhEYXNoYm9hcmRDb21wb25lbnRcTGluZUNoYXJ0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/ChildComponent/IndexDashboardComponent/MaintenanceNeedDashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2hpbGRDb21wb25lbnRcSW5kZXhEYXNoYm9hcmRDb21wb25lbnRcTWFpbnRlbmFuY2VOZWVkRGFzaGJvYXJkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/ChildComponent/IndexDashboardComponent/OperationalStaffDashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2hpbGRDb21wb25lbnRcSW5kZXhEYXNoYm9hcmRDb21wb25lbnRcT3BlcmF0aW9uYWxTdGFmZkRhc2hib2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/ChildComponent/IndexDashboardComponent/PieChart.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2hpbGRDb21wb25lbnRcSW5kZXhEYXNoYm9hcmRDb21wb25lbnRcUGllQ2hhcnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/ChildComponent/IndexDashboardComponent/PopularConsumableCheckOutDashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2hpbGRDb21wb25lbnRcSW5kZXhEYXNoYm9hcmRDb21wb25lbnRcUG9wdWxhckNvbnN1bWFibGVDaGVja091dERhc2hib2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/ChildComponent/IndexDashboardComponent/PopularInstrumentCheckOutDashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2hpbGRDb21wb25lbnRcSW5kZXhEYXNoYm9hcmRDb21wb25lbnRcUG9wdWxhckluc3RydW1lbnRDaGVja091dERhc2hib2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/ChildComponent/IndexDashboardComponent/ShowDetailEventResult.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2hpbGRDb21wb25lbnRcSW5kZXhEYXNoYm9hcmRDb21wb25lbnRcU2hvd0RldGFpbEV2ZW50UmVzdWx0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/ChildComponent/IndexDashboardComponent/Tooltip.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2hpbGRDb21wb25lbnRcSW5kZXhEYXNoYm9hcmRDb21wb25lbnRcVG9vbHRpcC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/ChildComponent/PersonalDose/PersonalDoseRegister.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2hpbGRDb21wb25lbnRcUGVyc29uYWxEb3NlXFBlcnNvbmFsRG9zZVJlZ2lzdGVyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/ChildComponent/PersonalDose/PersonalDoseSearch.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2hpbGRDb21wb25lbnRcUGVyc29uYWxEb3NlXFBlcnNvbmFsRG9zZVNlYXJjaC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/ChildComponent/PersonalDose/PersonalDoseSearchAll.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2hpbGRDb21wb25lbnRcUGVyc29uYWxEb3NlXFBlcnNvbmFsRG9zZVNlYXJjaEFsbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/ChildComponent/Record/PlanningComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2hpbGRDb21wb25lbnRcUmVjb3JkXFBsYW5uaW5nQ29tcG9uZW50LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Counter.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ291bnRlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/FetchData.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRmV0Y2hEYXRhLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Instruments/Calibration.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5zdHJ1bWVudHNcQ2FsaWJyYXRpb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Instruments/CheckIn.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5zdHJ1bWVudHNcQ2hlY2tJbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Instruments/CheckList.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5zdHJ1bWVudHNcQ2hlY2tMaXN0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Instruments/CheckListHistrory.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5zdHJ1bWVudHNcQ2hlY2tMaXN0SGlzdHJvcnkucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Instruments/CheckListMobile.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5zdHJ1bWVudHNcQ2hlY2tMaXN0TW9iaWxlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Instruments/CheckListTemplate.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5zdHJ1bWVudHNcQ2hlY2tMaXN0VGVtcGxhdGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Instruments/CheckListWeekly/Weekly.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5zdHJ1bWVudHNcQ2hlY2tMaXN0V2Vla2x5XFdlZWtseS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Instruments/CheckOut.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5zdHJ1bWVudHNcQ2hlY2tPdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Instruments/InstrumentCAL.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5zdHJ1bWVudHNcSW5zdHJ1bWVudENBTC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Instruments/InstrumentMA.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5zdHJ1bWVudHNcSW5zdHJ1bWVudE1BLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Instruments/InstrumentSearch.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5zdHJ1bWVudHNcSW5zdHJ1bWVudFNlYXJjaC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Instruments/Maintenance.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5zdHJ1bWVudHNcTWFpbnRlbmFuY2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Instruments/RegisterInstrument.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5zdHJ1bWVudHNcUmVnaXN0ZXJJbnN0cnVtZW50LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Instruments/ShowInstrument.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5zdHJ1bWVudHNcU2hvd0luc3RydW1lbnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Instruments/ShowInstrumentCheckOutAll.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5zdHJ1bWVudHNcU2hvd0luc3RydW1lbnRDaGVja091dEFsbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Instruments/ShowInstrumentCheckOutNonReturned.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5zdHJ1bWVudHNcU2hvd0luc3RydW1lbnRDaGVja091dE5vblJldHVybmVkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Instruments/ShowInstrumentCheckOutReturned.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5zdHJ1bWVudHNcU2hvd0luc3RydW1lbnRDaGVja091dFJldHVybmVkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Inventoris/AddStock.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW52ZW50b3Jpc1xBZGRTdG9jay5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Inventoris/CheckIn.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW52ZW50b3Jpc1xDaGVja0luLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Inventoris/CheckOut.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW52ZW50b3Jpc1xDaGVja091dC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Inventoris/Expiry.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW52ZW50b3Jpc1xFeHBpcnkucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Inventoris/MinStockPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW52ZW50b3Jpc1xNaW5TdG9ja1BhZ2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Inventoris/ShowInventory.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW52ZW50b3Jpc1xTaG93SW52ZW50b3J5LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Inventoris/ShowLimitConsumable.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW52ZW50b3Jpc1xTaG93TGltaXRDb25zdW1hYmxlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Loading.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9hZGluZy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/MasterData/MasterDataEventType.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyRGF0YVxNYXN0ZXJEYXRhRXZlbnRUeXBlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/MasterData/MasterDataInstrumentAction.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyRGF0YVxNYXN0ZXJEYXRhSW5zdHJ1bWVudEFjdGlvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/MasterData/MasterDataInstrumentAgency.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyRGF0YVxNYXN0ZXJEYXRhSW5zdHJ1bWVudEFnZW5jeS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/MasterData/MasterDataInstrumentBrand.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyRGF0YVxNYXN0ZXJEYXRhSW5zdHJ1bWVudEJyYW5kLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/MasterData/MasterDataInstrumentCatagory.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyRGF0YVxNYXN0ZXJEYXRhSW5zdHJ1bWVudENhdGFnb3J5LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/MasterData/MasterDataInstrumentCheckListType.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyRGF0YVxNYXN0ZXJEYXRhSW5zdHJ1bWVudENoZWNrTGlzdFR5cGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/MasterData/MasterDataInstrumentLocation.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyRGF0YVxNYXN0ZXJEYXRhSW5zdHJ1bWVudExvY2F0aW9uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/MasterData/MasterDataInstrumentModel.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyRGF0YVxNYXN0ZXJEYXRhSW5zdHJ1bWVudE1vZGVsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/MasterData/MasterDataInstrumentType.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyRGF0YVxNYXN0ZXJEYXRhSW5zdHJ1bWVudFR5cGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/MasterData/MasterDataInstrumentUnit.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyRGF0YVxNYXN0ZXJEYXRhSW5zdHJ1bWVudFVuaXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/MasterData/MasterDataInventoryAction.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyRGF0YVxNYXN0ZXJEYXRhSW52ZW50b3J5QWN0aW9uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/MasterData/MasterDataInventoryAgency.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyRGF0YVxNYXN0ZXJEYXRhSW52ZW50b3J5QWdlbmN5LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/MasterData/MasterDataInventoryBrand.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyRGF0YVxNYXN0ZXJEYXRhSW52ZW50b3J5QnJhbmQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/MasterData/MasterDataInventoryLocation.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyRGF0YVxNYXN0ZXJEYXRhSW52ZW50b3J5TG9jYXRpb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/MasterData/MasterDataInventoryStockNumber.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyRGF0YVxNYXN0ZXJEYXRhSW52ZW50b3J5U3RvY2tOdW1iZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/MasterData/MasterDataInventoryStockType.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyRGF0YVxNYXN0ZXJEYXRhSW52ZW50b3J5U3RvY2tUeXBlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/MasterData/MasterDataProjectType.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyRGF0YVxNYXN0ZXJEYXRhUHJvamVjdFR5cGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/MasterData/MasterDataRadiationSourceAgency.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyRGF0YVxNYXN0ZXJEYXRhUmFkaWF0aW9uU291cmNlQWdlbmN5LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/MasterData/MasterDataRadiationSourceCheckOutAction.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyRGF0YVxNYXN0ZXJEYXRhUmFkaWF0aW9uU291cmNlQ2hlY2tPdXRBY3Rpb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/MasterData/MasterDataRadiationSourceDoseUnit.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyRGF0YVxNYXN0ZXJEYXRhUmFkaWF0aW9uU291cmNlRG9zZVVuaXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/MasterData/MasterDataRadiationSourceLocation.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyRGF0YVxNYXN0ZXJEYXRhUmFkaWF0aW9uU291cmNlTG9jYXRpb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/MasterData/MasterDataRadiationSourceType.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyRGF0YVxNYXN0ZXJEYXRhUmFkaWF0aW9uU291cmNlVHlwZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/MasterData/MasterDataRadiationSourceUnit.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyRGF0YVxNYXN0ZXJEYXRhUmFkaWF0aW9uU291cmNlVW5pdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/ModalMasterData/ModalManageProject.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kYWxNYXN0ZXJEYXRhXE1vZGFsTWFuYWdlUHJvamVjdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/RadiationSources/CheckIn.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmFkaWF0aW9uU291cmNlc1xDaGVja0luLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/RadiationSources/CheckOut.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmFkaWF0aW9uU291cmNlc1xDaGVja091dC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/RadiationSources/RegisterSources.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmFkaWF0aW9uU291cmNlc1xSZWdpc3RlclNvdXJjZXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/RadiationSources/ShowSources.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmFkaWF0aW9uU291cmNlc1xTaG93U291cmNlcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/RadiationSources/SourcesSearch.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmFkaWF0aW9uU291cmNlc1xTb3VyY2VzU2VhcmNoLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Record/EventRegister.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVjb3JkXEV2ZW50UmVnaXN0ZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Record/ManageEvents.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVjb3JkXE1hbmFnZUV2ZW50cy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Record/ManageProjects.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVjb3JkXE1hbmFnZVByb2plY3RzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Record/ProjectSearch.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVjb3JkXFByb2plY3RTZWFyY2gucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Record/RegisterProject.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVjb3JkXFJlZ2lzdGVyUHJvamVjdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Record/Search.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVjb3JkXFNlYXJjaC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Record/ShowEvent/Event.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVjb3JkXFNob3dFdmVudFxFdmVudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Record/ShowProjectInLab.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVjb3JkXFNob3dQcm9qZWN0SW5MYWIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Record/ShowSubEvent/AddSubEvent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVjb3JkXFNob3dTdWJFdmVudFxBZGRTdWJFdmVudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Record/ShowSubEvent/SubEvent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVjb3JkXFNob3dTdWJFdmVudFxTdWJFdmVudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Record/ShowSubEvent/SubEventManage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVjb3JkXFNob3dTdWJFdmVudFxTdWJFdmVudE1hbmFnZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Report/GeneralReport.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0XEdlbmVyYWxSZXBvcnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Security/ChangePassword.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2VjdXJpdHlcQ2hhbmdlUGFzc3dvcmQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Security/TeamSchedule.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2VjdXJpdHlcVGVhbVNjaGVkdWxlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Security/TeamScheduleTest.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2VjdXJpdHlcVGVhbVNjaGVkdWxlVGVzdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Security/UserManagement.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2VjdXJpdHlcVXNlck1hbmFnZW1lbnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Security/UserProfile.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2VjdXJpdHlcVXNlclByb2ZpbGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Splash.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3BsYXNoLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/TestFile.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGVzdEZpbGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Shared/LoginLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXExvZ2luTGF5b3V0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Shared/SurveyPrompt.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFN1cnZleVByb21wdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Shared/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-5k7xw8jkxg
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Shared/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5hdk1lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-g0ygt3e8gg
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/_Host.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0hvc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Project/Chanadach/RapidNrims/RapidNRIMs/Pages/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0xheW91dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 

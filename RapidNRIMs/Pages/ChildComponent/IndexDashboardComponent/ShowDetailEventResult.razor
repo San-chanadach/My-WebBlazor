@@ -1,0 +1,234 @@
+﻿@inherits ShowDetailEventResultBase
+@page "/ChildComponent/IndexDashboardComponent/ShowDetailEventResult/{ProjectID}"
+@using System.Text.RegularExpressions;
+
+<div class="col-md-12">
+    <div class="card-header bg-gradient-secondary">@AppData.LangResource[AppData.LanguageID, 577]:
+        <span class="province-name">
+            @(recordProjects.Find(x => x.ProjectID == int.Parse(ProjectID)) != null ? recordProjects.Find(x => x.ProjectID == int.Parse(ProjectID)).ProjectNumber : "-")
+        </span>
+    </div>
+    <div class="card-body bg-light">
+        <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height:380px;">
+
+            <table id="dataTable" class="table table-striped text-center">
+                <thead class="fixedthead">
+                    <tr>
+                        <th class="alternateRow" style="text-align:left;">@AppData.LangResource[AppData.LanguageID, 401]</th>
+                        <th class="alternateRow" style="text-align:left;">@AppData.LangResource[AppData.LanguageID, 157]</th>
+                        <th class="alternateRow" style="text-align:left;">@AppData.LangResource[AppData.LanguageID, 586]</th>
+                        <th class="alternateRow" style="text-align:left;">@AppData.LangResource[AppData.LanguageID, 587]</th>
+                        
+                    </tr>
+                </thead>
+                <tbody class="scrollContent">
+
+                    @if (eventSumPersonalDoses.Count() == 1)
+                    {
+                        <tr>
+                            <td colspan="5">
+                                <BSAlert Color="Color.Danger" IsDismissible="true">
+                                    <p class="text-center">
+                                        This project number does not have a team assigned for individual event quantities
+                                    </p>
+                                </BSAlert>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in eventSumPersonalDoses)
+                        {
+                            hasData = true;
+                            var result = accounts.Find(x => x.FirstName + ' ' + x.LastName == item.TeamOrSupportName);
+                            <tr>
+                                <td style="display: flex; align-items: center; cursor:default;">
+                                    <span style="margin-right:12px;">
+                                        @if (result != null)
+                                        {
+                                            <i class="fa-solid fa-user fa-2x" style="padding: 1px; color: #164176;"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="fa-regular fa-user fa-2x" style="padding: 1px; color: #164176;"></i>
+                                        }
+                                    </span>
+                                    <span>@item.TeamOrSupportName</span>
+                                </td>
+                                <td data-label="" style="text-align:left; cursor:default;">@item.PositionName</td>
+                                <td data-label="" style="text-align:left; cursor:default;">@(item.TotalEventPDAccumulation.HasValue != null ? item.TotalEventPDAccumulation.Value.ToString("F4") : 0.0000) @item.RecordEventUnitName</td>
+                                <td data-label="" style="text-align:left; cursor:default;">@item.TotalHours</td>
+                            </tr>
+                        }
+
+                        @if (!hasData)
+                        {
+                            <tr>
+                                <td colspan="5">
+                                    <BSAlert Color="Color.Danger" IsDismissible="true">
+                                        <p class="text-center">
+                                            This Project Number
+                                            does not contain Event Personal Dose result information.
+                                        </p>
+                                    </BSAlert>
+                                </td>
+                            </tr>
+                        }
+                    }
+
+                   
+
+
+
+                   
+                    
+
+
+
+
+
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+</div>
+
+<div class="text-center" style="position: fixed;
+                                bottom: 0;
+                                left: 0;
+                                width: 100%;
+                                text-align: center;
+                                padding: 15px;">
+
+    <a href="@($"index/{ProjectID}")" class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID, 49]</a>
+
+</div>
+
+
+
+
+@* @foreach (var itemProEvent in projectEventRecords)
+{
+    if (int.TryParse(ProjectID, out int projectId))
+    {
+        if (projectId == itemProEvent.ProjectID)
+        {
+            var groupedResults = eventResults.Where(item => item.eventID == itemProEvent.EventID)
+            .GroupBy(item => item.eventResultBy)
+            .Select(group => new
+            {
+                eventResultBy = group.Key,
+                DoseAccumulation = group.Sum(item => decimal.TryParse(item.DoseAccumulation, out decimal dose) ? dose : 0M).ToString(), // รวม DoseAccumulation และแปลงเป็น string
+                DoseAccumulationUnit = group.First().DoseAccumulationUnit,
+                Hour = group.Sum(item =>
+                {
+                    var match = Regex.Match(item.Hour ?? "", @"(\d+) ชั่วโมง (\d+) นาที");
+
+                    if (match.Success)
+                    {
+                        int hours = int.Parse(match.Groups[1].Value);
+                        int minutes = int.Parse(match.Groups[2].Value);
+
+                        int totalMinutes = hours * 60 + minutes;
+
+                        int displayedHours = totalMinutes / 60;
+                        int displayedMinutes = totalMinutes % 60;
+
+                        return totalMinutes;
+                    }
+                    return 0M;
+                }).ToString(),
+                eventResultDate = group.First().eventResultDate,
+                eventId = group.First().eventID
+
+            });
+
+
+            foreach (var item in groupedResults)
+            {
+                hasData = true;
+
+                <tr>
+                    <td data-label="">
+                        @(accounts.Find(x => x.UserID == item.eventResultBy) != null ? accounts.Find(x => x.UserID == item.eventResultBy).FirstName : "-")
+                        @(accounts.Find(x => x.UserID == item.eventResultBy) != null ? accounts.Find(x => x.UserID == item.eventResultBy).LastName : "-")
+                    </td>
+                    <td>
+
+                        @foreach (var itemEvent in recordEvents)
+                        {
+
+                            @if (itemEvent.EventID == itemProEvent.EventID)
+                            {
+                                <div class="province-info">
+                                    <span class="province-name">
+                                        @(recordEventProvinces.Find(x => x.ProvinceID == itemEvent.ProvinceID) != null ? recordEventProvinces.Find(x => x.ProvinceID == itemEvent.ProvinceID).ProvinceENName : "-")
+                                    </span>
+                                    <span class="district-name">
+                                        @(recordEventDistricts.Find(x => x.DistrictID == itemEvent.SubDistrictID) != null ? recordEventDistricts.Find(x => x.DistrictID == itemEvent.SubDistrictID).DistrictENName : "-")
+                                    </span>
+                                    <span class="subdistrict-name">
+                                        @(subDistricts.Find(x => x.subDistrictID == itemEvent.SubDistrictID) != null ? subDistricts.Find(x => x.subDistrictID == itemEvent.SubDistrictID).subDistrictENName : "-")
+                                    </span>
+                                    <span class="subdistrict-code">
+                                        @(subDistricts.Find(i => i.subDistrictID == itemEvent.SubDistrictID) != null ? subDistricts.Find(i => i.subDistrictID == itemEvent.SubDistrictID).subDistrictCode : "-")
+                                    </span>
+                                </div>
+
+                            }
+                        }
+                    </td>
+
+
+                    <td data-label="">
+                        @item.DoseAccumulation
+                        @(recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit) != null ? recordEventUnits.Find(x => x.RecordEventUnitID == item.DoseAccumulationUnit).RecordEventUnitName : "-")
+                    </td>
+
+
+                    <td data-label="">
+
+                        @foreach (var itemPersonal in projectPersonalDoses)
+                        {
+
+                            if (itemPersonal.ProjectID == int.Parse(ProjectID))
+                            {
+                                hasDataPersonalDose = true;
+
+                                if (itemProEvent.EventID == item.eventId)
+                                {
+                                    if (itemPersonal.UserID == item.eventResultBy)
+                                    {
+                                        @itemPersonal.PersonalDose
+                                    }
+
+                                }
+                            }
+                        }
+
+                        @if (!hasDataPersonalDose)
+                        {
+                            <span>-</span>
+                        }
+
+                    </td>
+
+                    @{
+                        var H = int.Parse(item.Hour) / 60;
+                        var M = int.Parse(item.Hour) % 60;
+                        var result = $"{H} ชั่วโมง {M} นาที";
+                    }
+                    <td data-label="">@result</td>
+
+                </tr>
+
+            }
+
+
+
+        }
+    }
+
+} *@

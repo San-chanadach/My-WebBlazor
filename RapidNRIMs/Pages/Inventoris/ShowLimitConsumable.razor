@@ -1,0 +1,73 @@
+﻿@inherits ShowLimitConsumableBase
+@page "/Inventoris/ShowLimitConsumable"
+
+<PageTitle>Consumable In Lab</PageTitle>
+
+
+<div class="col-md-12">
+    <div class="card-header bg-gradient-secondary">@AppData.LangResource[AppData.LanguageID, 571]</div>
+    <div class="card-body bg-light">
+        <div class="scrollBar fixTableHead table-responsive scroll-inner" style="height:720px;">
+
+            <table id="dataTable" class="table table-striped text-center">
+                <thead class="fixedthead">
+                    <tr>
+                        <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 116]</th>
+                        <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 117]</th>
+                        <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 428]</th>
+                        <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 112]</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollContent">
+                    @if (inventoryStocks != null)
+                    {
+                        @foreach (var item in inventoryStocks.OrderByDescending(x => x.InventoryStockID))
+                        {
+                            <tr @onclick="() => TrClickedAtIndex(item.InventoryStockID)">
+
+                                <td>@(item.InventoryStockNumber != null ? item.InventoryStockNumber:"-")</td>
+
+                                @if (AppData.LanguageID == 0)
+                                {
+                                    <td>@(item.inventory!= null ? item.inventory.InventoryENName:"-") </td>
+                                }
+                                else
+                                {
+                                    <td>@(item.inventory!= null ? item.inventory.InventoryTHName:"-") </td>
+                                }
+
+                                <td>@item.InventoryStockQuantity</td>
+                                <td>@item.InventoryStockPurchaseDate.Value.ToString("dd/MM/yyyy")</td>
+                            </tr>
+
+                        }
+                    }
+
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+</div>
+<div class="text-center">
+
+    <a href="@($"index")" class="btn margin-btn" style="background-color:#7F7F7F; color:#fff">@AppData.LangResource[AppData.LanguageID, 49]</a>
+    @if (ID == null)
+    {
+        <button style="cursor:  pointer;" disabled class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID, 118]</button>
+    }
+    else
+    {
+        <a href="@($"Inventoris/ShowInventory/{ID}")" class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID, 118]</a>
+
+    }
+    
+
+
+
+</div>
+
+
+
+

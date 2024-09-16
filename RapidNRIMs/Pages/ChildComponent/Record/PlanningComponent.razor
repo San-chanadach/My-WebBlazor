@@ -1,0 +1,151 @@
+﻿@inherits ManageProjectBase
+<div class="col-md-12">
+    <div class="card">
+        <div class="card-header">@AppData.LangResource[AppData.LanguageID, 540]: @recordProject.ProjectNumber</div>
+        <div class="card-body">
+            <div class="row">
+                <label for="projectName" class="col-12 col-md-4 col-lg-2 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 553]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-3">
+                    <div class="input-group input-box-bottom">
+                        <input type="text" @bind-value="recordProject.ProjectName" placeholder="@AppData.LangResource[AppData.LanguageID,553]" class="form-control" />
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+                <label for="provinceRegional" class="col-12 col-md-4 col-lg-2 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 554]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-3">
+                    <div class="input-group input-box-bottom">
+                        @if (recordEvents.Count > 0)
+                        {
+                            <select class="form-control" @bind="recordProject.ProjectRegional" disabled>
+                                <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                @foreach (var item in AppData.recordRegionals)
+                                {
+                                    @if (AppData.LanguageID == 0)
+                                    {
+                                        <option value="@item.RegionalNumber">@item.RegionalENName</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item.RegionalNumber">@item.RegionalTHName</option>
+                                    }
+                                }
+
+                            </select>
+                        }
+                        else
+                        {
+                            <select class="form-control" @bind="recordProject.ProjectRegional">
+                                <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                                @foreach (var item in AppData.recordRegionals)
+                                {
+                                    @if (AppData.LanguageID == 0)
+                                    {
+                                        <option value="@item.RegionalNumber">@item.RegionalENName</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item.RegionalNumber">@item.RegionalTHName</option>
+                                    }
+                                }
+
+                            </select>
+                        }
+
+                    </div>
+                </div>
+                <label for="projectType" class="col-12 col-md-4 col-lg-2 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 555]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-3">
+                    <div class="input-group input-box-bottom">
+                        <select class="form-control" @bind="recordProject.ProjectType">
+                            <option value="0">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                            @foreach (var item in AppData.recordProjectTypes)
+                            {
+                                if (item.IsActive == true && item.IsActive != null)
+                                {
+                                    @if (AppData.LanguageID == 0)
+                                    {
+                                        <option value="@item.ProjectTypeID">@item.ProjectTypeENName</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item.ProjectTypeID">@item.ProjectTypeTHName</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <label for="startDate" class="col-12 col-md-4 col-lg-2 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 32]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-3">
+                    <div class="input-group input-box-bottom">
+                        <input type="date" @bind-value="recordProject.ProjectStartDate" placeholder="@AppData.LangResource[AppData.LanguageID,32]" class="form-control" />
+                    </div>
+                </div>
+                <label for="endDate" class="col-12 col-md-4 col-lg-2 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 33]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-3">
+                    <div class="input-group input-box-bottom">
+                        <input type="date" @bind-value="recordProject.ProjectEndDate" placeholder="@AppData.LangResource[AppData.LanguageID,33]" class="form-control" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <label for="registertBy" class="col-12 col-md-4 col-lg-2 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 556]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-3">
+                    <div class="input-group input-box-bottom">
+                        <select class="form-control" @bind="recordProject.ProjectRegisteredBy">
+                            <option selected value="">@AppData.LangResource[AppData.LanguageID, 2]</option>
+                            @foreach (var item in accounts)
+                            {
+                                if (item.IsActive)
+                                {
+                                    <option value="@item.UserID">@item.FirstName</option>
+                                }
+                            }
+                        </select>
+
+                    </div>
+                </div>
+                <label for="informerName" class="col-12 col-md-4 col-lg-2 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 235]</span>
+                </label>
+                <div class="col-12 col-md-8 col-lg-3">
+                    <div class="input-group input-box-bottom">
+                        <input type="text" @bind-value="recordProject.ProjectInformerName" placeholder="@AppData.LangResource[AppData.LanguageID,235]" class="form-control" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-4 col-lg-2 col-form-label">
+                    <span>@AppData.LangResource[AppData.LanguageID, 37]</span>
+                </label>
+                <div class="col-12 col-md-12 col-lg-8 input-box-bottom">
+                    <textarea rows="2" @bind="recordProject.ProjectRecommend" placeholder="@AppData.LangResource[AppData.LanguageID,37]" class="form-control"></textarea>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="text-center" style="margin-top: -1.5rem; margin-bottom: 0.5rem">
+
+            <button type="submit" @onclick="SaveEditProjectRecord" class="btn btn-warning margin-btn">@AppData.LangResource[AppData.LanguageID, 308]</button>
+
+        </div>
+
+    </div>
+</div>

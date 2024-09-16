@@ -1,0 +1,444 @@
+﻿@page "/MasterData/MasterDataInstrumentCheckListType"
+@inject AppData AppData
+@inject IToastService ToastService
+@inject IMasterData _masterData
+@inject IJSRuntime jsRuntime
+
+@if (listInstrumentChecklistType == null)
+{
+    <div class="text-center mt-3">
+        <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+              style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+    </div>
+    <div class="text-center pt-3" style=" font-size: 16pt">
+        @AppData.LangResource[AppData.LanguageID, 325]
+    </div>
+}
+else
+{
+
+    <div class="row margin-row-card">
+        <div class="col-md-12">
+            <div class="float-right" style="margin-bottom:10px; margin-top:10px">
+                <!--button class="btn btn-primary" @onclick="@(() => ModalInstrumentChecklistTypeCreate.Show())">
+                    @AppData.LangResource[AppData.LanguageID, 458]
+                </button-->
+
+            </div>
+        </div>
+    </div>
+    
+    <div class="row margin-row-card">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header"><i class="fas fa-table mr-1"></i>@AppData.LangResource[AppData.LanguageID, 461]</div>
+                <div class="card-body">
+                    <div class="scrollBar fixTableHead table-responsive scroll-inner heightTable" style="height: 700px;">
+                        <table id="dataTable" class="display table table-bordered table-striped text-center" width="100%">
+                            <thead class="fixedthead">
+                                <tr>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 322]</th>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 456]</th>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 457]</th>
+                                    <th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 145]</th>
+                                    <!--th class="alternateRow">@AppData.LangResource[AppData.LanguageID, 146]</th-->
+                                </tr>
+                            </thead>
+                            <tbody class="scrollContent">
+                                @{int id = 1;}
+                                @foreach (var item in listInstrumentChecklistType)
+                                {
+                                   
+                                    if (item.IsActive != null && item.IsActive == true)
+                                    {
+                                         <tr>
+                                            <td>@id</td>
+                                            <td>@item.InstrumentCheckListTypeName</td>
+                                            <td>@item.InstrumentCheckListTypeDescription</td>
+                                            <td>
+                                                <button type="button" class="btn btn-warning" @onclick="@(() => InstrumentCheckListTypeUpdate(item.InstrumentCheckListTypeID))">
+                                                    <i class="fas fa-edit fa-sm"></i>
+                                                </button>
+                                            </td>
+                                            <!--td>
+                                                <button  type="button" class="btn btn-warning" @onclick="@(() => InstrumentCheckListTypeDelete(item.InstrumentCheckListTypeID))">
+                                                    <i class="fas fa-trash-alt fa-sm"></i>
+                                                </button>
+                                            </td-->
+                                        </tr>
+                                        id++;
+                                    }  
+                                }
+                            </tbody>
+                           
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+<!--Loading-->
+<BSModal class="row style-justify mt-5" @ref="Load" IsCentered="true" Size="Size.Small" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+    <BSModalBody>
+        <div class="text-center mt-3">
+            <span class="spinner-border text-warning spinner-border-sm " role="status" aria-hidden="true"
+                  style="font-size: 16pt; width: 36px; height: 36px; color: Gold " />
+        </div>
+        <div class="text-center pt-3" style=" font-size: 16pt">
+            @AppData.LangResource[AppData.LanguageID, 325]
+        </div>
+    </BSModalBody>
+</BSModal>
+
+<!--ModalInstrumentBrandCreate-->
+<BSModal @ref="ModalInstrumentChecklistTypeCreate">
+    <BSModalHeader OnClick="@(() => ModalInstrumentChecklistTypeCreate.Hide())">@AppData.LangResource[AppData.LanguageID, 458]</BSModalHeader>
+    <BSModalBody>
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 456]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" @bind-value="addInstrumentChecklistType.InstrumentCheckListTypeName" placeholder="@AppData.LangResource[AppData.LanguageID,456]" class="form-control" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-4 col-form-label" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                <span>@AppData.LangResource[AppData.LanguageID, 457]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" @bind-value="addInstrumentChecklistType.InstrumentCheckListTypeDescription" placeholder="@AppData.LangResource[AppData.LanguageID,457]" class="form-control" />
+                </div>
+            </div>
+        </div>
+    </BSModalBody>
+    <BSModalFooter>
+        @if (AppData.CurrentPermission.Find(i => i.permissionID == 30).permissionC)
+        {
+            <button type="submit" @onclick="SaveCreateInstrumentChecklistType" class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+        else
+        {
+            <button type="button" disabled class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+        <button type="reset" class="btn btn-danger" @onclick="@(() => ModalInstrumentChecklistTypeCreate.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalInstrumentBrandEdit-->
+<BSModal @ref="ModalInstrumentChecklistTypeEdit">
+    <BSModalHeader OnClick="@(() => ModalInstrumentChecklistTypeEdit.Hide())">@AppData.LangResource[AppData.LanguageID, 459]</BSModalHeader>
+    <BSModalBody>
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-4 col-form-label">
+                <span>@AppData.LangResource[AppData.LanguageID, 456]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" @bind-value="editInstrumentChecklistType.InstrumentCheckListTypeName" placeholder="@AppData.LangResource[AppData.LanguageID,456]" class="form-control" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-12 col-md-4 col-lg-4 col-form-label" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                <span>@AppData.LangResource[AppData.LanguageID, 457]</span>
+            </label>
+            <div class="col-12 col-md-8 col-lg-7">
+                <div class="input-group input-box-bottom">
+                    <input type="text" @bind-value="editInstrumentChecklistType.InstrumentCheckListTypeDescription" placeholder="@AppData.LangResource[AppData.LanguageID,457]" class="form-control" />
+                </div>
+            </div>
+        </div>
+    </BSModalBody>
+    <BSModalFooter>
+        @if (AppData.CurrentPermission.Find(i => i.permissionID == 30).permissionU)
+        {
+            <button type="submit" @onclick="SaveEditInstrumentChecklistType" class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+        else
+        {
+            <button type="button" disabled class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+        <button type="button" class="btn btn-danger" @onclick="@(() => ModalInstrumentChecklistTypeEdit.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalInstrumentBrandDelete-->
+<BSModal @ref="ModalInstrumentChecklistTypeDelete">
+    <BSModalHeader OnClick="@(() => ModalInstrumentChecklistTypeDelete.Hide())">@AppData.LangResource[AppData.LanguageID, 460]</BSModalHeader>
+    <BSModalBody>
+
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="alert-modal-delete">
+                    @AppData.LangResource[AppData.LanguageID, 323] @AppData.LangResource[AppData.LanguageID, 456]:<br>@editInstrumentChecklistType.InstrumentCheckListTypeName @AppData.LangResource[AppData.LanguageID, 324] ?
+                </h4>
+            </div>
+        </div>
+
+    </BSModalBody>
+    <BSModalFooter>
+        @if (AppData.CurrentPermission.Find(i => i.permissionID == 30).permissionD)
+        {
+            <button type="submit" @onclick="SaveDeleteInstrumentChecklistType" class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+        else
+        {
+            <button type="button" disabled class="btn btn-success">@AppData.LangResource[AppData.LanguageID, 44]</button>
+        }
+        <button type="button" class="btn btn-danger" @onclick="@(() => ModalInstrumentChecklistTypeDelete.Hide())">@AppData.LangResource[AppData.LanguageID, 158]</button>
+    </BSModalFooter>
+</BSModal>
+
+<!--ModalResponseError-->
+<BSModal Class="text-center" @ref="ModalResponseError" IsCentered="true" Size="Size.Large">
+    <BSModalBody>
+
+        <div class="row">
+            <div class="col-md-12 alert-modal-logo">
+                <img src="assets/images/img-common/delete_symbol.png" width="100" height="100" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <p class="alert-modal">@RequertMessage</p>
+            </div>
+        </div>
+        <button type="button" @onclick="@(() => ModalResponseError.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+
+    </BSModalBody>
+</BSModal>
+
+<!--ModalRespondSuccess-->
+<BSModal Class="text-center alert-modal-body" @ref="ModalRespondSuccess" IsCentered="true" Size="Size.Large">
+    <BSModalBody>
+        <div class="row">
+            <div class="col-md-12 alert-modal-logo">
+                <img src="assets/images/img-common/tick_symbol.png" width="100" height="100" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="alert-modal">@RequertMessage</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <button @onclick="@(() => ModalRespondSuccess.Hide())" class="btn btn-success alert-modal-button">@AppData.LangResource[AppData.LanguageID, 330]</button>
+            </div>
+        </div>
+    </BSModalBody>
+</BSModal>
+
+@code {
+
+    /// <summary>
+    /// InstrumentBrand
+    /// </summary>
+    private List<InstrumentChecklistType> listInstrumentChecklistType = new List<InstrumentChecklistType>();
+    private InstrumentChecklistType addInstrumentChecklistType = new InstrumentChecklistType();
+    private InstrumentChecklistType editInstrumentChecklistType = new InstrumentChecklistType();
+
+    /// <summary>
+    /// BSModal
+    /// </summary>
+    BSModal Load { get; set; }
+    BSModal ModalResponseError { get; set; }
+    BSModal ModalRespondSuccess { get; set; }
+    BSModal ModalInstrumentChecklistTypeCreate { get; set; }
+    BSModal ModalInstrumentChecklistTypeEdit { get; set; }
+    BSModal ModalInstrumentChecklistTypeDelete { get; set; }
+
+    /// <summary>
+    /// Variable
+    /// </summary>
+    private string RequertMessage;
+
+    /// <summary>
+    /// OnInitializedAsync
+    /// </summary>
+    /// <returns></returns>
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            AppData.instrumentChecklistTypes = await _masterData.GetMasterDataAsync<InstrumentChecklistType>("InstrumentCheckListType");
+            listInstrumentChecklistType = AppData.instrumentChecklistTypes;
+            ///await jsRuntime.InvokeAsync<object>("ResponsiveDataTables");
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+        }
+    }
+
+
+    /// <summary>
+    /// Modal show InstrumentCheckListTypeUpdate
+    /// </summary>
+    /// <param name="id"></param>
+    private async Task InstrumentCheckListTypeUpdate(int? id)
+    {
+        try
+        {
+            var respond = await _masterData.GetMasterDataAsyncByID<InstrumentChecklistType>("InstrumentCheckListTypeByID", id);
+            if (string.IsNullOrEmpty(respond.Content))
+            {
+                editInstrumentChecklistType = respond;
+                ModalInstrumentChecklistTypeEdit.Show();
+            }
+            else
+            {
+                var requertException = respond.Content;
+                RequertMessage = requertException;
+                ModalResponseError.Show();
+            }
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+    }
+
+    /// <summary>
+    /// Modal show InstrumentCheckListTypeDelete
+    /// </summary>
+    /// <param name="id"></param>
+    private async Task InstrumentCheckListTypeDelete(int? id)
+    {
+        try
+        {
+            var respond = await _masterData.GetMasterDataAsyncByID<InstrumentChecklistType>("InstrumentCheckListTypeByID", id);
+
+            if (string.IsNullOrEmpty(respond.Content))
+            {
+                editInstrumentChecklistType = respond;
+                ModalInstrumentChecklistTypeDelete.Show();
+            }
+            else
+            {
+                var requertException = respond.Content;
+                RequertMessage = requertException;
+                ModalResponseError.Show();
+            }
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+    }
+
+    /// <summary>
+    /// SaveCreateInstrumentChecklistType
+    /// </summary>
+    private async Task SaveCreateInstrumentChecklistType()
+    {
+        try
+        {
+            var respond = await _masterData.PostMasterDataAsync("PostInstrumentChecklistType", addInstrumentChecklistType);
+            if (!string.IsNullOrEmpty(respond.ToString()))
+            {
+                var requertException = respond.StatusMessage;
+                RequertMessage = requertException;
+                await OnInitializedAsync();
+                ModalRespondSuccess.Show();
+            }
+            else
+            {
+                var requertException = respond.Content;
+                RequertMessage = requertException;
+                ModalResponseError.Show();
+            }
+
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+        ModalInstrumentChecklistTypeCreate.Hide();
+    }
+
+    /// <summary>
+    /// SaveEditInstrumentChecklistType
+    /// </summary>
+    private async Task SaveEditInstrumentChecklistType()
+    {
+        try
+        {
+            var respond = await _masterData.PutMasterDataAsync("PutInstrumentCheckListType", editInstrumentChecklistType, editInstrumentChecklistType.InstrumentCheckListTypeID);
+            if (!string.IsNullOrEmpty(respond.ToString()))
+            {
+                var requertException = respond.StatusMessage;
+                RequertMessage = requertException;
+                await OnInitializedAsync();
+                ModalRespondSuccess.Show();
+            }
+            else
+            {
+                var requertException = respond.Content;
+                RequertMessage = requertException;
+                ModalResponseError.Show();
+            }
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+        ModalInstrumentChecklistTypeEdit.Hide();
+    }
+
+    /// <summary>
+    /// SaveDeleteInstrumentChecklistType
+    /// </summary>
+    private async Task SaveDeleteInstrumentChecklistType()
+    {
+        try
+        {
+            var respond = await _masterData.DeleteMasterDataAsync<InstrumentChecklistType>("DeleteInstrumentChecklistType", editInstrumentChecklistType.InstrumentCheckListTypeID);
+            if (!string.IsNullOrEmpty(respond.ToString()))
+            {
+                var requertException = respond.StatusMessage;
+                RequertMessage = requertException;
+                await OnInitializedAsync();
+                ModalRespondSuccess.Show();
+            }
+            else
+            {
+                var requertException = respond.Content;
+                RequertMessage = requertException;
+                ModalResponseError.Show();
+            }
+        }
+        catch (Exception e)
+        {
+            var val = e.Message;
+            RequertMessage = val;
+            ModalResponseError.Show();
+        }
+        ModalInstrumentChecklistTypeDelete.Hide();
+    }
+
+    /// <summary>
+    /// ClearCreateInstrumentChecklistType
+    /// </summary>
+    private void ClearCreateInstrumentChecklistType()
+    {
+        addInstrumentChecklistType = new InstrumentChecklistType();
+    }
+
+}

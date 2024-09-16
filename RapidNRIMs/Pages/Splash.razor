@@ -1,0 +1,203 @@
+﻿@layout LoginLayout
+@page "/Splash"
+@inject AppData AppData
+@inject IJSRuntime jsRuntime
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IConfiguration config
+@inject IMasterData _masterData
+@inject IMasterDataInstrument _masterDataInstrument
+@inject IMasterDataInventory _masterDataInventory
+@inject ILocalStorageService _localstorageService
+@inject IMasterDataPhase2 _masterDataPhase2
+
+<PageTitle>Loading Page</PageTitle>
+
+
+<div id="app" class="registration-form">
+    <form>
+        <div class="form-icon">
+            <img class="form-icon" src="@($"{config["nurl"]}{config["nurlFileLogo"]}{logoEPR}")">
+        </div>
+        <div class="form-group text-center">
+            <div class="text-center mt-3">
+                <span class="spinner-border spinner-border-sm " role="status" aria-hidden="true"
+                      style="font-size: 16pt; width: 36px; height: 36px; color: Gold" />
+            </div>
+            <div class="text-center pt-3" style=" font-size: 16pt">
+               @config["pro"] 
+            </div>
+            <div class="text-center pt-3" style=" font-size: 16pt">
+                Loading...
+            </div>
+            <BSProgress @bind-Value="progress" IsStriped="true" IsAnimated="true" />
+        </div>
+
+    </form>
+</div>
+
+
+@code {
+    int progress = 0;
+    string logoEPR { get; set; } = string.Empty;
+    string logoR { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+        AppData.imageLogos = await Http.GetFromJsonAsync<List<ImageLogo>>($"{config["nurl"]}/api/GetFileLogo");
+
+        var resultLogoE = AppData.imageLogos.Find(x => x.Id == 1);
+        if (resultLogoE != null)
+        {
+            logoEPR = resultLogoE.ImageName;
+        }
+
+
+        var resultLogoR = AppData.imageLogos.Find(x => x.Id == 2);
+        if (resultLogoR != null)
+        {
+            logoR = resultLogoR.ImageName;
+        }
+
+        /*Load permission*/
+        //AppData.SetPermission(await Http.GetFromJsonAsync<List<UserPermission>>($"{config["aurl"]}/api/GetPermissionByUserID/{AppData.UserID}"));
+
+        AppData.CurrentPermission = (await Http.GetFromJsonAsync<List<UserPermission>>($"{config["aurl"]}/api/GetPermissionByUserID/{AppData.UserID}"));
+        progress = 10;
+        StateHasChanged();
+        // Load Noti
+
+
+
+         AppData.mins = await Http.GetFromJsonAsync<List<MinStock>>($"{config["nurl"]}/api/GetInventoryminStock");
+        //load Static Address
+        progress = 20;
+        StateHasChanged();
+        //load Intance Instrument Mgnt
+        //*(อันเก่าเวอร์ชั่น 1.5)*AppData.instrumentTypes = await Http.GetFromJsonAsync<List<InstrumentType>>($"api/InstrumentType/GetAllInstrumentType");
+        AppData.instrumentTypes = await _masterData.GetMasterDataAsync<InstrumentType>("InstrumentType");
+        //AppData.instruments = await _masterData.GetMasterDataAsync<RapidNrims.Shared.Model.Cores.Instrument>("Instrument");
+        AppData.instrumentListViews = await _masterDataInstrument.GetAllInstrumentMasterDataAsync<InstrumentListView>("GetInstrumentListView");
+        AppData.instrumentsList = await _masterData.GetMasterDataAsync<Instrument>("Instrument");
+        //await _localstorageService.SetItemAsync("InstrumentSearch", AppData.instrumentListViews);
+        //await _localstorageService.GetItemAsync<string>("InstrumentSearch");
+        progress = 25;
+        StateHasChanged();
+        AppData.recordEvents = await Http.GetFromJsonAsync<List<RecordEvent>>($"{config["nurl"]}/api/GetEventRecord");
+        AppData.recordProjects = await _masterData.GetMasterDataAsync<RecordProject>("ProjectRecord");
+        //AppData.recordProjects = await _masterDataPhase2.GetMasterDataAsync<RecordProject>("ProjectRecord");
+        AppData.eventResults = await Http.GetFromJsonAsync<List<EventResult>>($"{config["nurl"]}/api/GetEventResult");
+        AppData.recordEventTypes = await _masterData.GetMasterDataAsync<RecordEventType>("EventType");
+        AppData.recordProjectTypes = await _masterData.GetMasterDataAsync<RecordProjectType>("ProjectType");
+        AppData.recordRegionals = await _masterData.GetMasterDataAsync<RecordRegional>("Regional");
+        AppData.recordEventUnits = await _masterData.GetMasterDataAsync<RecordEventUnit>("RecordEventUnit");
+        //*(อันเก่าเวอร์ชั่น 1.5)*AppData.instrumentCatagories = await Http.GetFromJsonAsync<List<InstrumentCatagory>>($"api/InstrumentCatagory/GetAllInstrumentCatagory");
+        AppData.instrumentCatagories = await _masterData.GetMasterDataAsync<InstrumentCatagory>("InstrumentCatagory");
+        //(อันเก่าเวอร์ชั่น 1.5)AppData.instrumentBrands = await Http.GetFromJsonAsync<List<InstrumentBrand>>($"api/InstrumentBrand/GetAllInstrumentBrand");
+        AppData.instrumentBrands = await _masterData.GetMasterDataAsync<InstrumentBrand>("InstrumentBrand");
+        //*(อันเก่าเวอร์ชั่น 1.5)*AppData.instrumentModels = await Http.GetFromJsonAsync<List<InstrumentModel>>($"api/InstrumentModel");
+        AppData.instrumentModels = await _masterData.GetMasterDataAsync<InstrumentModel>("InstrumentModel");
+        //(อันเก่าเวอร์ชั่น 1.5)AppData.instrumentAgencies = await Http.GetFromJsonAsync<List<InstrumentAgency>>($"api/InstrumentAgency/GetAllInstrumentAgencies");
+        AppData.instrumentAgencies = await _masterData.GetMasterDataAsync<InstrumentAgency>("InstrumentAgency");
+        //*(อันเก่าเวอร์ชั่น 1.5)*AppData.instrumentLocations = await Http.GetFromJsonAsync<List<InstrumentLocation>>($"api​/InstrumentLocation/GetAllInstrumentLocations");
+        AppData.instrumentLocations = await _masterData.GetMasterDataAsync<InstrumentLocation>("InstrumentLocation");
+        //*(อันเก่าเวอร์ชั่น 1.5)*AppData.instrumentAction = await Http.GetFromJsonAsync<List<InstrumentAction>>($"api/InstrumentAction/GetAllInstrumentActions");
+        AppData.instrumentAction = await _masterData.GetMasterDataAsync<InstrumentAction>("InstrumentAction");
+        AppData.instrumentStatus = await Http.GetFromJsonAsync<List<InstrumentStatus>>($"{config["nurl"]}/api/InstrumentStatus");
+        //*(อันเก่าเวอร์ชั่น 1.5)*AppData.instrumentChecklistTypes = await Http.GetFromJsonAsync<List<InstrumentChecklistType>>($"api/InstrumentCheckListType/GetAllInstrumentCheckListType");
+        AppData.instrumentChecklistTypes = await _masterData.GetMasterDataAsync<InstrumentChecklistType>("InstrumentCheckListType");
+        AppData.instrumentUnits = await _masterData.GetMasterDataAsync<InstrumentUnit>("InstrumentUnit");
+        AppData.instrumentCheckOutsList = await Http.GetFromJsonAsync<List<InstrumentCheckOut>>($"{config["nurl"]}/api/GetInstrumentCheckOut");
+        foreach (var item in AppData.instrumentCheckOutsList)
+        {
+            item.GetLookUp(AppData.instrumentsList);
+        }
+        progress = 45;
+        StateHasChanged();
+
+        AppData.radiationSources = await Http.GetFromJsonAsync<List<RadiationSource>>($"{config["nurl"]}/api/GetRadiationSource");
+        AppData.radiationDoseUnits = await Http.GetFromJsonAsync<List<RadiationDoseUnit>>($"{config["nurl"]}/api/GetRadiationDostUnit");
+        AppData.radiationSourceCheckOutActions = await Http.GetFromJsonAsync<List<RadiationSourceCheckOutAction>>($"{config["nurl"]}/api/GetRadiationSourceCheckOutAction");
+        //*(อันเก่าเวอร์ชั่น 1.5)*AppData.radiationSourceLocations = await Http.GetFromJsonAsync<List<RadiationSourceLocation>>($"api/GetRadiationSourceLocation/GetAllRadiationSourceLocations");
+        //*(อันเก่าเวอร์ชั่น 1.5)*AppData.radiationSourceTypes = await Http.GetFromJsonAsync<List<RadiationSourceType>>($"api/GetRadiationSourceType");
+        AppData.radiationSourceLocations = await _masterData.GetMasterDataAsync<RadiationSourceLocation>("RadiationSourceLocation");
+        AppData.radiationSourceTypes = await _masterData.GetMasterDataAsync<RadiationSourceType>("RadiationSourceType");
+        AppData.radiationSourceCheckOutActions = await _masterData.GetMasterDataAsync<RadiationSourceCheckOutAction>("RadiationSourceCheckOutAction");
+        //AppData.radioActivityUnits = await Http.GetFromJsonAsync<List<RadioActivityUnit>>($"api/GetRadiationActivityUnit");
+        AppData.radiationSourceUnits = await _masterData.GetMasterDataAsync<RadiationSourceUnit>("RadiationSourceUnit");
+        AppData.radiationSourceAgencies = await _masterData.GetMasterDataAsync<RadiationSourceAgency>("RadiationSourceAgency");
+        AppData.radiationSourceStatuses = await Http.GetFromJsonAsync<List<RadiationSourceStatus>>($"{config["nurl"]}/api/GetRadiationSourceStatus");
+        
+        progress = 50;
+
+
+        AppData.SetNoti(await Http.GetFromJsonAsync<List<InstrumentCalibration>>($"{config["nurl"]}/api/GetDueInstrumentCalibration"),
+                await Http.GetFromJsonAsync<List<InstrumentMaintenance>>($"{config["nurl"]}/api/GetDueInstrumentMaintenance")
+                , AppData.instrumentsList);
+        foreach (var i in AppData.instrumentBrands)
+        {
+            i.Getlookup(AppData.instrumentModels);
+        }
+        foreach (var i in AppData.instrumentsList)
+        {
+            i.GetLookup(AppData.instrumentBrands, AppData.instrumentModels, AppData.instrumentAgencies, AppData.instrumentStatus);
+        }
+        progress = 60;
+
+        StateHasChanged();
+        //*(อันเก่าเวอร์ชั่น 1.5)*AppData.inventoryActions = await Http.GetFromJsonAsync<List<InventoryAction>>("api/GetInventoryAction");
+        AppData.inventoryActions = await _masterData.GetMasterDataAsync<InventoryAction>("InventoryAction");
+        AppData.inventoryStockCheckOuts = await Http.GetFromJsonAsync<List<InventoryStockCheckOut>>($"{config["nurl"]}/api/GetInventoryStockCheckOut");
+        //*(อันเก่าเวอร์ชั่น 1.5)* AppData.inventorys = await Http.GetFromJsonAsync<List<RapidNrims.Shared.Model.Cores.Inventory>>($"api/GetInventory");
+        AppData.inventorys = await _masterData.GetMasterDataAsync<Inventory>("Inventory");
+        AppData.inventoryStocks = await Http.GetFromJsonAsync<List<InventoryStock>>($"{config["nurl"]}/api/GetInventoryStock");
+        //*(อันเก่าเวอร์ชั่น 1.5)*AppData.inventoryStockTypes = await Http.GetFromJsonAsync<List<InventoryStockType>>($"api/GetInventoryStockType");
+        AppData.inventoryStockTypes = await _masterData.GetMasterDataAsync<InventoryStockType>("InventoryStockType");
+        //*(อันเก่าเวอร์ชั่น 1.5)*AppData.inventoryBrands = await Http.GetFromJsonAsync<List<InventoryBrand>>($"api/GetInventoryBrand");
+        AppData.inventoryBrands = await _masterData.GetMasterDataAsync<InventoryBrand>("InventoryBrand");
+        //*(อันเก่าเวอร์ชั่น 1.5)*AppData.inventoryAgencys = await Http.GetFromJsonAsync<List<InventoryAgency>>($"api/GetInventoryAgency");
+        AppData.inventoryAgencys = await _masterData.GetMasterDataAsync<InventoryAgency>("InventoryAgency");
+        //AppData.radiationSourceLocations = await _masterData.GetMasterDataAsync<RadiationSourceLocation>("RadiationSourceLocation");
+        //AppData.radiationSourceTypes = await _masterData.GetMasterDataAsync<RadiationSourceType>("RadiationSourceType");
+        AppData.mins = await Http.GetFromJsonAsync<List<MinStock>>($"{config["nurl"]}/api/GetInventoryminStock");
+        //*(อันเก่าเวอร์ชั่น 1.5)*AppData.inventoryLocations = await Http.GetFromJsonAsync<List<InventoryLocation>>($"api/GetInventoryLocation");
+        AppData.inventoryLocations = await _masterData.GetMasterDataAsync<InventoryLocation>("InventoryLocation");
+        foreach (var i in AppData.inventorys)
+        {
+            i.Getlookup(AppData.inventoryBrands, AppData.inventoryAgencys);
+        }
+        progress = 75;
+        StateHasChanged();
+        foreach (var i in AppData.mins)
+        {
+            i.Inventory = AppData.inventorys.Find(j => i.InventoryID == j.InventoryID);
+        } 
+        AppData.SetLookUpLocation(await Http.GetFromJsonAsync<List<RecordEventProvince>>($"{config["nurl"]}/api/Province/GetAllProvinces"), await Http.GetFromJsonAsync<List<RecordEventDistrict>>($"{config["nurl"]}/api/District/GetAllDistricts"), await Http.GetFromJsonAsync<List<SubDistrict>>($"{config["nurl"]}/api/SubDistrict/GetAllSubDistricts"));
+
+        progress = 100;
+
+        var timer = new Timer(new TimerCallback(_ =>
+        {
+            InvokeAsync(() =>
+            {
+                StateHasChanged();
+            });
+        }), null, 500, System.Threading.Timeout.Infinite);
+
+        NavigationManager.NavigateTo("/index");
+
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("clearURL");
+        }
+    }
+
+
+}
+
